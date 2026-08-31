@@ -1,0 +1,19 @@
+# IntelliJ IDEA i VS Code
+.idea/
+*.iml
+.vscode/
+
+# Maven
+target/
+
+# Angular i Node
+node_modules/
+dist/
+.angular/
+
+# Lokalna podesavanja koja ne idu u repozitorijum
+application-local.properties
+
+# Sistemski fajlovi
+.DS_Store
+Thumbs.db
