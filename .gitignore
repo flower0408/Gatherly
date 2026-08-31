@@ -1,7 +1,7 @@
-# IntelliJ IDEA i VS Code
+# IntelliJ IDEA
+# .vscode/ se ne ignorise: Angular CLI ga generise uz projekat
 .idea/
 *.iml
-.vscode/
 
 # Maven
 target/
