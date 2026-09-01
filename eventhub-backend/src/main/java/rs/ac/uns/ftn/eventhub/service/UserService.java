@@ -15,6 +15,8 @@ public interface UserService {
 
     User saveUser(User user);
 
+    User verifyUser(String verificationToken);
+
     Integer deleteUser(Long id);
 
     List<User> searchUsersByNames(String firstName, String lastName);

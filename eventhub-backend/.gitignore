@@ -35,3 +35,6 @@ build/
 .mvn
 mvnw
 mvnw.cmd
+
+# Lokalna podesavanja sa nalogom za slanje poste
+application-local.properties

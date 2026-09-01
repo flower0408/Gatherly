@@ -14,6 +14,7 @@ import rs.ac.uns.ftn.eventhub.service.UserService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -77,6 +78,7 @@ public class UserServiceImpl implements UserService {
         newUser.setAdmin(false);
         newUser.setDeleted(false);
         newUser.setVerified(false);
+        newUser.setVerificationToken(UUID.randomUUID().toString());
         newUser.setRole(Role.USER);
         newUser = userRepository.save(newUser);
 
@@ -86,6 +88,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public User saveUser(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public User verifyUser(String verificationToken) {
+        Optional<User> user = userRepository.findFirstByVerificationToken(verificationToken);
+
+        if (user.isEmpty()) {
+            logger.error("Repository search for user with verification token: " + verificationToken + " returned null");
+            return null;
+        }
+
+        User foundUser = user.get();
+        logger.info("Activating account of user with id: " + foundUser.getId());
+        foundUser.setVerified(true);
+        foundUser.setVerificationToken(null);
+
+        return userRepository.save(foundUser);
     }
 
     @Override

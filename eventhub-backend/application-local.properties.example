@@ -1,0 +1,12 @@
+# Kopirati ovaj fajl u application-local.properties i popuniti svojim podacima.
+# application-local.properties se ne cuva u repozitorijumu.
+# U ovaj fajl se ne upisuju pravi podaci, on je samo sablon.
+#
+# SMTP server i port se ne podesavaju ovde nego u application.properties.
+
+# Adresa koja se prikazuje kao posiljalac, mora biti verifikovana kod provajdera
+app.mail-from=
+
+# Podaci za prijavu na SMTP server
+spring.mail.username=
+spring.mail.password=

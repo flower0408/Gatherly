@@ -20,6 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findFirstByEmail(String email);
 
+    Optional<User> findFirstByVerificationToken(String verificationToken);
+
     @Query(nativeQuery = true,
             value = "select * from `user` " +
                     "where (first_name like concat('%', :firstName, '%') or last_name like concat('%', :firstName, '%') or " +

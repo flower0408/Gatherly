@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.eventhub.model.dto.*;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
+import rs.ac.uns.ftn.eventhub.service.MailService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +41,9 @@ public class UserController {
     UserDetailsService userDetailsService;
 
 
+    MailService mailService;
+
+
     AuthenticationManager authenticationManager;
 
 
@@ -49,10 +53,11 @@ public class UserController {
 
     @Autowired
     public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
-                          UserDetailsService userDetailsService, TokenUtils tokenUtils) {
+                          UserDetailsService userDetailsService, MailService mailService, TokenUtils tokenUtils) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
+        this.mailService = mailService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -64,6 +69,8 @@ public class UserController {
             logger.error("User couldn't be created from DTO");
             return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
         }
+        logger.info("Sending verification mail to new user");
+        mailService.sendVerificationMail(createdUser);
         logger.info("Creating response");
         UserDTO userDTO = new UserDTO(createdUser);
         logger.info("Created and sent response");
@@ -71,11 +78,31 @@ public class UserController {
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<String> verify(@RequestParam("token") String token) {
+        logger.info("Verifying account with token: " + token);
+        User verifiedUser = userService.verifyUser(token);
+        if (verifiedUser == null) {
+            logger.error("No account found for verification token: " + token);
+            return new ResponseEntity<>("This confirmation link is invalid or has already been used.", HttpStatus.BAD_REQUEST);
+        }
+        logger.info("Account of user with id: " + verifiedUser.getId() + " is now active");
+
+        return new ResponseEntity<>("Your account has been activated. You can now sign in.", HttpStatus.OK);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<UserTokenState> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) {
         logger.info("Checking user's username and password");
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+        // Nalog koji nije potvrdjen preko linka iz mejla ne moze da se prijavi
+        logger.info("Checking if user's account is verified");
+        User requestingUser = userService.findByUsername(authenticationRequest.getUsername());
+        if (!requestingUser.isVerified()) {
+            logger.error("Account of user with id: " + requestingUser.getId() + " is not verified");
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        }
         logger.info("Putting user in security context");
         SecurityContextHolder.getContext().setAuthentication(authentication);
         logger.info("Creating token for user");
@@ -207,6 +234,8 @@ public class UserController {
         logger.info("Updating password for user with id: " + user.getId());
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         user = userService.saveUser(user);
+        logger.info("Sending notification mail about changed password");
+        mailService.sendPasswordChangedMail(user);
 
         logger.info("You have successfully updated your password");
         return new ResponseEntity<>(new UserDTO(user), HttpStatus.OK);
