@@ -11,6 +11,7 @@ import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.repository.UserRepository;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,11 +48,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (!user.isEmpty())
-            return user.get();
-        logger.error("Repository search for user with id: " + id + " returned null");
-        return null;
+        return userRepository.findByIdAndIsDeletedFalse(id);
     }
 
     @Override
@@ -92,7 +89,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Integer deleteUser(Long id) {
+        return userRepository.deleteUserById(id);
+    }
+
+    @Override
+    public List<User> searchUsersByNames(String firstName, String lastName) {
+        Optional<List<User>> users = userRepository.findUsersByFirstAndLastName(firstName, lastName);
+        if (!users.isEmpty())
+            return users.get();
+        logger.error("Repository search for users with provided query returned null");
+        return null;
+    }
+
+    @Override
     public List<User> findAll() {
-        return this.userRepository.findAll();
+        return this.userRepository.findAllActiveUsers().orElse(Collections.emptyList());
     }
 }
