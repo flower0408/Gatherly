@@ -16,6 +16,7 @@ import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
+import rs.ac.uns.ftn.eventhub.service.MailService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
@@ -44,17 +45,22 @@ public class EventRegistrationController {
     UserService userService;
 
 
+    MailService mailService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(EventRegistrationController.class);
 
     @Autowired
     public EventRegistrationController(EventRegistrationServiceImpl registrationService, EventServiceImpl eventService,
-                                       CommunityServiceImpl communityService, UserServiceImpl userService, TokenUtils tokenUtils) {
+                                       CommunityServiceImpl communityService, UserServiceImpl userService,
+                                       MailService mailService, TokenUtils tokenUtils) {
         this.registrationService = registrationService;
         this.eventService = eventService;
         this.communityService = communityService;
         this.userService = userService;
+        this.mailService = mailService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -80,12 +86,14 @@ public class EventRegistrationController {
             logger.error("User with id: " + user.getId() + " is already registered for event with id: " + eventId);
             return new ResponseEntity<>("You are already registered for this event.", HttpStatus.CONFLICT);
         }
+        // Popunjen dogadjaj ne odbija prijavu nego je stavlja na listu cekanja
+        RegistrationStatus status = RegistrationStatus.PENDING;
         if (registrationService.countTakenSpots(event.getId()) >= event.getCapacity()) {
-            logger.error("Event with id: " + eventId + " is full");
-            return new ResponseEntity<>("This event is full.", HttpStatus.CONFLICT);
+            logger.info("Event with id: " + eventId + " is full, registration goes to the waiting list");
+            status = RegistrationStatus.WAITLISTED;
         }
         logger.info("Creating registration of user with id: " + user.getId() + " for event with id: " + eventId);
-        EventRegistration registration = registrationService.createRegistration(user, event, RegistrationStatus.PENDING);
+        EventRegistration registration = registrationService.createRegistration(user, event, status);
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(new EventRegistrationDTO(registration), HttpStatus.CREATED);
@@ -165,8 +173,12 @@ public class EventRegistrationController {
             logger.error("Registration with id: " + id + " is already cancelled");
             return new ResponseEntity<>("This registration is already cancelled.", HttpStatus.CONFLICT);
         }
+        boolean freedSpot = registration.getStatus() == RegistrationStatus.ACCEPTED;
         logger.info("Cancelling registration with id: " + id);
         registration = registrationService.updateStatus(registration, RegistrationStatus.CANCELLED);
+        // Mesto se oslobodilo samo ako je prijava bila prihvacena
+        if (freedSpot)
+            promoteFromWaitlist(eventService.findById(registration.getForEvent().getId()));
 
         return new ResponseEntity<>(new EventRegistrationDTO(registration), HttpStatus.OK);
     }
@@ -203,9 +215,39 @@ public class EventRegistrationController {
             logger.error("Event with id: " + event.getId() + " is full");
             return new ResponseEntity<>("This event is full.", HttpStatus.CONFLICT);
         }
+        boolean freedSpot = status == RegistrationStatus.REJECTED
+                && registration.getStatus() == RegistrationStatus.ACCEPTED;
         registration = registrationService.updateStatus(registration, status);
 
+        User participant = userService.findById(registration.getCreatedBy().getId());
+        if (status == RegistrationStatus.ACCEPTED)
+            mailService.sendRegistrationAcceptedMail(participant, event);
+        else
+            mailService.sendRegistrationRejectedMail(participant, event);
+
+        // Odbijanje vec prihvacene prijave takodje oslobadja mesto
+        if (freedSpot)
+            promoteFromWaitlist(event);
+
         return new ResponseEntity<>(new EventRegistrationDTO(registration), HttpStatus.OK);
+    }
+
+    // Kada se oslobodi mesto, prvi sa liste cekanja automatski prelazi u prihvacene i dobija obavestenje
+    private void promoteFromWaitlist(Event event) {
+        if (event == null)
+            return;
+        if (registrationService.countTakenSpots(event.getId()) >= event.getCapacity()) {
+            logger.info("Event with id: " + event.getId() + " is still full, nobody is promoted");
+            return;
+        }
+        EventRegistration next = registrationService.findFirstWaitlisted(event.getId());
+        if (next == null) {
+            logger.info("Waiting list for event with id: " + event.getId() + " is empty");
+            return;
+        }
+        logger.info("Promoting registration with id: " + next.getId() + " from the waiting list");
+        registrationService.updateStatus(next, RegistrationStatus.ACCEPTED);
+        mailService.sendPromotedFromWaitlistMail(userService.findById(next.getCreatedBy().getId()), event);
     }
 
     // Prijavama upravlja onaj ko je napravio dogadjaj, organizator zajednice kojoj dogadjaj pripada, ili administrator

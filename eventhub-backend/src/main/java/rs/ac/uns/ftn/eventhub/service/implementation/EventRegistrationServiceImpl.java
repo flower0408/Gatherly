@@ -60,6 +60,11 @@ public class EventRegistrationServiceImpl implements EventRegistrationService {
     }
 
     @Override
+    public EventRegistration findFirstWaitlisted(Long eventId) {
+        return eventRegistrationRepository.findFirstWaitlisted(eventId).orElse(null);
+    }
+
+    @Override
     public EventRegistration createRegistration(User user, Event event, RegistrationStatus status) {
         EventRegistration newRegistration = new EventRegistration();
         newRegistration.setStatus(status);

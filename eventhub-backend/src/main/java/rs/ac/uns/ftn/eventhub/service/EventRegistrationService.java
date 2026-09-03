@@ -19,6 +19,8 @@ public interface EventRegistrationService {
 
     Integer countTakenSpots(Long eventId);
 
+    EventRegistration findFirstWaitlisted(Long eventId);
+
     EventRegistration createRegistration(User user, Event event, RegistrationStatus status);
 
     EventRegistration updateStatus(EventRegistration registration, RegistrationStatus status);

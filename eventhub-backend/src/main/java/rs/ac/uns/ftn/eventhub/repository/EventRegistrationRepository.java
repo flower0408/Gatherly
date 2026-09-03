@@ -35,6 +35,12 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
                     "and status in ('ACCEPTED', 'ATTENDED', 'NO_SHOW');")
     Integer countTakenSpots(@Param("eventId") Long eventId);
 
+    // Prvi sa liste cekanja je onaj ko se najranije prijavio
+    @Query(nativeQuery = true,
+            value = "select * from event_registration where for_event_id = :eventId and is_deleted = false " +
+                    "and status = 'WAITLISTED' order by created_at asc limit 1;")
+    Optional<EventRegistration> findFirstWaitlisted(@Param("eventId") Long eventId);
+
     // Kada se dogadjaj obrise, njegove prijave prestaju da vaze
     @Transactional
     @Modifying

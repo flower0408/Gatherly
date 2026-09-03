@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.service.MailService;
 
@@ -60,6 +61,50 @@ public class MailServiceImpl implements MailService {
         message.setText("Hello " + user.getFirstName() + ",\n\n"
                 + "The password for your account has just been changed.\n\n"
                 + "If this was not you, please contact us right away.");
+
+        send(message, user);
+    }
+
+    @Override
+    public void sendRegistrationAcceptedMail(User user, Event event) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(sender);
+        message.setTo(user.getEmail());
+        message.setSubject("Gatherly - your spot is confirmed");
+        message.setText("Hello " + user.getFirstName() + ",\n\n"
+                + "Your registration for \"" + event.getTitle() + "\" has been accepted.\n\n"
+                + "When: " + event.getStartsAt() + "\n"
+                + "Where: " + event.getLocation() + "\n\n"
+                + "See you there.");
+
+        send(message, user);
+    }
+
+    @Override
+    public void sendRegistrationRejectedMail(User user, Event event) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(sender);
+        message.setTo(user.getEmail());
+        message.setSubject("Gatherly - your registration was not accepted");
+        message.setText("Hello " + user.getFirstName() + ",\n\n"
+                + "Unfortunately your registration for \"" + event.getTitle() + "\" was not accepted.\n\n"
+                + "You can still browse other events on Gatherly.");
+
+        send(message, user);
+    }
+
+    @Override
+    public void sendPromotedFromWaitlistMail(User user, Event event) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(sender);
+        message.setTo(user.getEmail());
+        message.setSubject("Gatherly - a spot opened up for you");
+        message.setText("Hello " + user.getFirstName() + ",\n\n"
+                + "Someone cancelled, so a spot opened up and you moved off the waiting list for \""
+                + event.getTitle() + "\". Your place is now confirmed.\n\n"
+                + "When: " + event.getStartsAt() + "\n"
+                + "Where: " + event.getLocation() + "\n\n"
+                + "If you can no longer make it, please cancel so someone else can take the spot.");
 
         send(message, user);
     }
