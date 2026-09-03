@@ -14,9 +14,11 @@ import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
+import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
@@ -39,16 +41,21 @@ public class EventController {
     UserService userService;
 
 
+    EventRegistrationService registrationService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(EventController.class);
 
     @Autowired
     public EventController(EventServiceImpl eventService, CommunityServiceImpl communityService,
-                           UserServiceImpl userService, TokenUtils tokenUtils) {
+                           UserServiceImpl userService, EventRegistrationServiceImpl registrationService,
+                           TokenUtils tokenUtils) {
         this.eventService = eventService;
         this.communityService = communityService;
         this.userService = userService;
+        this.registrationService = registrationService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -242,6 +249,7 @@ public class EventController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         logger.info("Deleting event with id: " + id);
+        registrationService.deleteRegistrationsForEvent(event.getId());
         eventService.deleteEventFromCommunity(event.getId());
         eventService.deleteEvent(event.getId());
 
@@ -252,6 +260,7 @@ public class EventController {
     private EventDTO toDTO(Event event) {
         EventDTO eventDTO = new EventDTO(event);
         eventDTO.setBelongsToCommunityId(eventService.findCommunityIdForEvent(event.getId()));
+        eventDTO.setTakenSpots(registrationService.countTakenSpots(event.getId()));
         return eventDTO;
     }
 

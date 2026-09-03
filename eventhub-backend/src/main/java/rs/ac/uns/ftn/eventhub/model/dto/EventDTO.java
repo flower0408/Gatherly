@@ -40,6 +40,9 @@ public class EventDTO {
 
     private Long belongsToCommunityId;
 
+    // Broj zauzetih mesta, racuna se iz prijava pa se dopisuje u kontroleru
+    private Integer takenSpots;
+
     private List<ImageDTO> images;
 
     public EventDTO(Event createdEvent) {
