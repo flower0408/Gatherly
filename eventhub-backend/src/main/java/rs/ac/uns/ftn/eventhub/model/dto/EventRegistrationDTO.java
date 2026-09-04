@@ -27,6 +27,11 @@ public class EventRegistrationDTO {
     @NotNull
     private Long forEventId;
 
+    // Ime i skor pouzdanosti ucesnika, dopisuju se u kontroleru za prikaz organizatoru
+    private String participantUsername;
+
+    private Integer participantReliability;
+
     public EventRegistrationDTO(EventRegistration eventRegistration) {
         this.id = eventRegistration.getId();
         if (eventRegistration.getStatus() != null)

@@ -64,6 +64,23 @@ public class EventRegistrationServiceImpl implements EventRegistrationService {
         return eventRegistrationRepository.findFirstWaitlisted(eventId).orElse(null);
     }
 
+
+    // Skor pouzdanosti je procenat dolazaka u odnosu na dogadjaje na kojima se korisnik ocekivao.
+    // Otkazane prijave se ne racunaju, jer je otkazivanje pozeljno ponasanje - oslobadja mesto drugome.
+    // Vraca null ako korisnik jos nema istoriju, da se ne bi prikazivala nula bez pokrica.
+    @Override
+    public Integer calculateReliability(Long userId) {
+        Integer attended = eventRegistrationRepository.countByUserAndStatus(userId, RegistrationStatus.ATTENDED.name());
+        Integer noShow = eventRegistrationRepository.countByUserAndStatus(userId, RegistrationStatus.NO_SHOW.name());
+        Integer total = attended + noShow;
+
+        if (total == 0) {
+            return null;
+        }
+
+        return Math.round((attended * 100.0f) / total);
+    }
+
     @Override
     public EventRegistration createRegistration(User user, Event event, RegistrationStatus status) {
         EventRegistration newRegistration = new EventRegistration();

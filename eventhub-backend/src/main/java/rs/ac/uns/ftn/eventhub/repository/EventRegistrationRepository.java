@@ -35,6 +35,12 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
                     "and status in ('ACCEPTED', 'ATTENDED', 'NO_SHOW');")
     Integer countTakenSpots(@Param("eventId") Long eventId);
 
+    // Osnova za skor pouzdanosti: koliko je puta korisnik dosao, a koliko izostao
+    @Query(nativeQuery = true,
+            value = "select count(*) from event_registration where created_by_user_id = :userId " +
+                    "and is_deleted = false and status = :status")
+    Integer countByUserAndStatus(@Param("userId") Long userId, @Param("status") String status);
+
     // Prvi sa liste cekanja je onaj ko se najranije prijavio
     @Query(nativeQuery = true,
             value = "select * from event_registration where for_event_id = :eventId and is_deleted = false " +

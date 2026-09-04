@@ -96,7 +96,7 @@ public class EventRegistrationController {
         EventRegistration registration = registrationService.createRegistration(user, event, status);
         logger.info("Created and sent response");
 
-        return new ResponseEntity<>(new EventRegistrationDTO(registration), HttpStatus.CREATED);
+        return new ResponseEntity<>(toDTO(registration), HttpStatus.CREATED);
     }
 
     @GetMapping("/my")
@@ -151,6 +151,18 @@ public class EventRegistrationController {
         return decide(id, token, RegistrationStatus.REJECTED);
     }
 
+    @PatchMapping("/{id}/attended")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> markAttended(@PathVariable String id, @RequestHeader("authorization") String token) {
+        return markAttendance(id, token, RegistrationStatus.ATTENDED);
+    }
+
+    @PatchMapping("/{id}/no-show")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> markNoShow(@PathVariable String id, @RequestHeader("authorization") String token) {
+        return markAttendance(id, token, RegistrationStatus.NO_SHOW);
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> cancel(@PathVariable String id, @RequestHeader("authorization") String token) {
@@ -180,7 +192,7 @@ public class EventRegistrationController {
         if (freedSpot)
             promoteFromWaitlist(eventService.findById(registration.getForEvent().getId()));
 
-        return new ResponseEntity<>(new EventRegistrationDTO(registration), HttpStatus.OK);
+        return new ResponseEntity<>(toDTO(registration), HttpStatus.OK);
     }
 
     // Prihvatanje i odbijanje se razlikuju samo po statusu, pa dele istu proveru
@@ -229,7 +241,46 @@ public class EventRegistrationController {
         if (freedSpot)
             promoteFromWaitlist(event);
 
-        return new ResponseEntity<>(new EventRegistrationDTO(registration), HttpStatus.OK);
+        return new ResponseEntity<>(toDTO(registration), HttpStatus.OK);
+    }
+
+    // Evidencija dolaska: organizator posle dogadjaja belezi ko se pojavio a ko nije.
+    // Iz toga se racuna skor pouzdanosti ucesnika.
+    private ResponseEntity<?> markAttendance(String id, String token, RegistrationStatus status) {
+        logger.info("Authentication check");
+        User user = findUserByToken(token);
+        if (user == null) {
+            logger.error("User not found with token: " + token);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        EventRegistration registration = registrationService.findById(Long.parseLong(id));
+        if (registration == null) {
+            logger.error("Registration not found with id: " + id);
+            return new ResponseEntity<>("Registration not found.", HttpStatus.NOT_FOUND);
+        }
+        Event event = eventService.findById(registration.getForEvent().getId());
+        if (event == null) {
+            logger.error("Event not found for registration with id: " + id);
+            return new ResponseEntity<>("Event not found.", HttpStatus.NOT_FOUND);
+        }
+        if (!canManage(user, event)) {
+            logger.error("User with id: " + user.getId() + " is not allowed to mark attendance for event with id: " + event.getId());
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        if (event.getStartsAt().isAfter(LocalDateTime.now())) {
+            logger.error("Event with id: " + event.getId() + " has not started yet");
+            return new ResponseEntity<>("This event has not started yet.", HttpStatus.BAD_REQUEST);
+        }
+        // Dolazak se belezi samo onima koji su imali potvrdjeno mesto
+        if (registration.getStatus() != RegistrationStatus.ACCEPTED
+                && registration.getStatus() != RegistrationStatus.ATTENDED
+                && registration.getStatus() != RegistrationStatus.NO_SHOW) {
+            logger.error("Registration with id: " + id + " was never accepted");
+            return new ResponseEntity<>("Attendance can only be marked for accepted registrations.", HttpStatus.CONFLICT);
+        }
+        registration = registrationService.updateStatus(registration, status);
+
+        return new ResponseEntity<>(toDTO(registration), HttpStatus.OK);
     }
 
     // Kada se oslobodi mesto, prvi sa liste cekanja automatski prelazi u prihvacene i dobija obavestenje
@@ -260,10 +311,21 @@ public class EventRegistrationController {
         return communityId != null && communityService.checkOrganizer(communityId, user.getId());
     }
 
+    // Uz prijavu se salje i ko je ucesnik i koliko je pouzdan, da organizator ima na osnovu cega da odluci
+    private EventRegistrationDTO toDTO(EventRegistration registration) {
+        EventRegistrationDTO dto = new EventRegistrationDTO(registration);
+        User participant = userService.findById(registration.getCreatedBy().getId());
+        if (participant != null) {
+            dto.setParticipantUsername(participant.getUsername());
+            dto.setParticipantReliability(registrationService.calculateReliability(participant.getId()));
+        }
+        return dto;
+    }
+
     private List<EventRegistrationDTO> toDTOs(List<EventRegistration> registrations) {
         List<EventRegistrationDTO> dtos = new ArrayList<>();
         for (EventRegistration temp : registrations) {
-            dtos.add(new EventRegistrationDTO(temp));
+            dtos.add(toDTO(temp));
         }
         return dtos;
     }
