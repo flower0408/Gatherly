@@ -36,6 +36,9 @@ public class Event {
     private LocalDateTime startsAt;
 
     @Column(nullable = false)
+    private LocalDateTime endsAt;
+
+    @Column(nullable = false)
     private Integer capacity;
 
     @Column(nullable = false)

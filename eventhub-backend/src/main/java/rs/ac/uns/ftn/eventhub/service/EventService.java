@@ -26,6 +26,8 @@ public interface EventService {
 
     Long findCommunityIdForEvent(Long eventId);
 
+    String findConflictingEventTitle(Long userId, Event event);
+
     Event createEvent(EventDTO eventDTO, User createdBy);
 
     Event updateEvent(Event event);

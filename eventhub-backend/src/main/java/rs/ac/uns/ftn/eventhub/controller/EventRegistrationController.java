@@ -92,11 +92,20 @@ public class EventRegistrationController {
             logger.info("Event with id: " + eventId + " is full, registration goes to the waiting list");
             status = RegistrationStatus.WAITLISTED;
         }
+        // Preklapanje se proverava pre upisa, da nova prijava ne bi bila sama sebi konflikt
+        String conflictsWith = eventService.findConflictingEventTitle(user.getId(), event);
+        if (conflictsWith != null)
+            logger.info("Event with id: " + eventId + " overlaps with \"" + conflictsWith
+                    + "\" for user with id: " + user.getId());
+
         logger.info("Creating registration of user with id: " + user.getId() + " for event with id: " + eventId);
         EventRegistration registration = registrationService.createRegistration(user, event, status);
         logger.info("Created and sent response");
 
-        return new ResponseEntity<>(toDTO(registration), HttpStatus.CREATED);
+        EventRegistrationDTO dto = toDTO(registration);
+        dto.setConflictsWith(conflictsWith);
+
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
     @GetMapping("/my")

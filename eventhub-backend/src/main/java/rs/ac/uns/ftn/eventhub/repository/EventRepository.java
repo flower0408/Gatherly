@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,6 +61,19 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                     "     or e.id not in (select event_id from community_events)) " +
                     "order by e.starts_at asc;")
     Optional<List<Event>> findHomepageEvents(@Param("userId") Long userId);
+
+    // Trazi dogadjaj koji se vremenski preklapa sa zadatim, a na koji je korisnik vec prijavljen.
+    // Dva intervala se preklapaju ako svaki pocinje pre nego sto se onaj drugi zavrsi.
+    @Query(nativeQuery = true,
+            value = "select e.title from `event` e " +
+                    "join event_registration r on r.for_event_id = e.id " +
+                    "where r.created_by_user_id = :userId and r.is_deleted = false " +
+                    "and r.status in ('PENDING', 'ACCEPTED', 'WAITLISTED') " +
+                    "and e.is_deleted = false and e.id <> :eventId " +
+                    "and e.starts_at < :endsAt and e.ends_at > :startsAt " +
+                    "limit 1")
+    Optional<String> findConflictingEventTitle(@Param("userId") Long userId, @Param("eventId") Long eventId,
+                                               @Param("startsAt") LocalDateTime startsAt, @Param("endsAt") LocalDateTime endsAt);
 
     // Vraca se samo id zajednice, jer Spring Data nativan upit ne ume da mapira u pojedinacan entitet
     @Query(nativeQuery = true,

@@ -32,6 +32,9 @@ public class EventRegistrationDTO {
 
     private Integer participantReliability;
 
+    // Upozorenje da se dogadjaj vremenski preklapa sa necim na sta je korisnik vec prijavljen
+    private String conflictsWith;
+
     public EventRegistrationDTO(EventRegistration eventRegistration) {
         this.id = eventRegistration.getId();
         if (eventRegistration.getStatus() != null)

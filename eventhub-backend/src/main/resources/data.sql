@@ -11,27 +11,27 @@ values (true, true, null, 'zika@mail.com', 'Zika', false, null, 'Zikic', '$2a$12
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, role)
 values (true, true, null, 'djura@mail.com', 'Djura', false, null, 'Djuric', '$2a$12$TeQF.oCNjgTsl9rFWA9Tb.zA3716nzJZ5wwxONeu1tTzHoqBkk7FK', 'djurica', 'USER');
 
-insert into `event` (title, description, location, starts_at, capacity, creation_date, is_deleted, created_by_user_id)
+insert into `event` (title, description, location, starts_at, ends_at, capacity, creation_date, is_deleted, created_by_user_id)
 values ('Frontend meetup', 'This is first event by me. I am glad if you can see it.', 'Novi Sad, SPENS',
-        '2026-09-12 18:00:00', 50, '2026-08-12 12:00:00', false, 1);
-insert into `event` (title, description, location, starts_at, capacity, creation_date, is_deleted, created_by_user_id)
+        '2026-09-12 18:00:00', '2026-09-12 20:00:00', 50, '2026-08-12 12:00:00', false, 1);
+insert into `event` (title, description, location, starts_at, ends_at, capacity, creation_date, is_deleted, created_by_user_id)
 values ('Cancelled workshop', 'This is new event for today, happy to be here.', 'Beograd, Startit Centar',
-        '2026-09-08 18:20:30', 30, '2026-08-08 18:20:30', true, 2);
-insert into `event` (title, description, location, starts_at, capacity, creation_date, is_deleted, created_by_user_id)
+        '2026-09-08 18:20:30', '2026-09-08 20:20:30', 30, '2026-08-08 18:20:30', true, 2);
+insert into `event` (title, description, location, starts_at, ends_at, capacity, creation_date, is_deleted, created_by_user_id)
 values ('Community gathering', 'This is an event in a community. If you see it, you are inside a community', 'Novi Sad, FTN',
-        '2026-09-14 15:23:35', 20, '2026-05-14 15:23:35', false, 1);
-insert into `event` (title, description, location, starts_at, capacity, creation_date, is_deleted, created_by_user_id)
+        '2026-09-14 15:23:35', '2026-09-14 17:23:35', 20, '2026-05-14 15:23:35', false, 1);
+insert into `event` (title, description, location, starts_at, ends_at, capacity, creation_date, is_deleted, created_by_user_id)
 values ('Board games night', 'This is another event for a community. Say hi to everyone in this community', 'Novi Sad, Kvartic',
-        '2026-09-15 14:56:55', 2, '2026-05-15 14:56:55', false, 2);
-insert into `event` (title, description, location, starts_at, capacity, creation_date, is_deleted, created_by_user_id)
+        '2026-09-15 14:56:55', '2026-09-15 16:56:55', 2, '2026-05-15 14:56:55', false, 2);
+insert into `event` (title, description, location, starts_at, ends_at, capacity, creation_date, is_deleted, created_by_user_id)
 values ('Photography walk', 'This is test event for second community. Say hi to everyone in this community', 'Novi Sad, Petrovaradin',
-        '2026-09-13 12:12:12', 15, '2026-06-13 12:12:12', false, 3);
-insert into `event` (title, description, location, starts_at, capacity, creation_date, is_deleted, created_by_user_id)
+        '2026-09-13 12:12:12', '2026-09-13 14:12:12', 15, '2026-06-13 12:12:12', false, 3);
+insert into `event` (title, description, location, starts_at, ends_at, capacity, creation_date, is_deleted, created_by_user_id)
 values ('Open air concert', 'This is Anas public event. Everyone can see it. Sending good vibes to everyone.', 'Novi Sad, Strand',
-        '2026-09-20 05:22:12', 200, '2026-07-20 05:22:12', false, 3);
-insert into `event` (title, description, location, starts_at, capacity, creation_date, is_deleted, created_by_user_id)
+        '2026-09-20 05:22:12', '2026-09-20 07:22:12', 200, '2026-07-20 05:22:12', false, 3);
+insert into `event` (title, description, location, starts_at, ends_at, capacity, creation_date, is_deleted, created_by_user_id)
 values ('Running club', 'This is Mikas public event. Everyone can see it. Sending good vibes to everyone.', 'Novi Sad, Kej',
-        '2026-08-10 01:12:39', 40, '2026-07-27 01:12:39', false, 2);
+        '2026-08-10 01:12:39', '2026-08-10 03:12:39', 40, '2026-07-27 01:12:39', false, 2);
 
 insert into comment (is_deleted, text, timestamp, belongs_to_event_id, belongs_to_user_id, replies_to_comment_id)
 values (false, 'Good thoughts', '2026-08-11', 1, 2, null);

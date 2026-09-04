@@ -156,9 +156,17 @@ public class EventController {
             logger.error("Event capacity must be at least one");
             return new ResponseEntity<>("Capacity must be at least one.", HttpStatus.BAD_REQUEST);
         }
+        if (newEvent.getStartsAt() == null || newEvent.getEndsAt() == null) {
+            logger.error("Event must have a start and an end");
+            return new ResponseEntity<>("An event must have a start and an end.", HttpStatus.BAD_REQUEST);
+        }
         if (LocalDateTime.parse(newEvent.getStartsAt()).isBefore(LocalDateTime.now())) {
             logger.error("Event cannot start in the past");
             return new ResponseEntity<>("An event cannot start in the past.", HttpStatus.BAD_REQUEST);
+        }
+        if (!LocalDateTime.parse(newEvent.getEndsAt()).isAfter(LocalDateTime.parse(newEvent.getStartsAt()))) {
+            logger.error("Event cannot end before it starts");
+            return new ResponseEntity<>("An event must end after it starts.", HttpStatus.BAD_REQUEST);
         }
         // Dogadjaj moze da pripada zajednici, ali ne mora
         Community community = null;
@@ -217,6 +225,12 @@ public class EventController {
             oldEvent.setLocation(editedEvent.getLocation());
         if (editedEvent.getStartsAt() != null)
             oldEvent.setStartsAt(LocalDateTime.parse(editedEvent.getStartsAt()));
+        if (editedEvent.getEndsAt() != null)
+            oldEvent.setEndsAt(LocalDateTime.parse(editedEvent.getEndsAt()));
+        if (!oldEvent.getEndsAt().isAfter(oldEvent.getStartsAt())) {
+            logger.error("Event cannot end before it starts");
+            return new ResponseEntity<>("An event must end after it starts.", HttpStatus.BAD_REQUEST);
+        }
         if (editedEvent.getCapacity() != null) {
             if (editedEvent.getCapacity() < 1) {
                 logger.error("Event capacity must be at least one");

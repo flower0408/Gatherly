@@ -30,6 +30,9 @@ public class EventDTO {
     private String startsAt;
 
     @NotNull
+    private String endsAt;
+
+    @NotNull
     private Integer capacity;
 
     @NotNull
@@ -51,6 +54,7 @@ public class EventDTO {
         this.description = createdEvent.getDescription();
         this.location = createdEvent.getLocation();
         this.startsAt = createdEvent.getStartsAt().toString();
+        this.endsAt = createdEvent.getEndsAt().toString();
         this.capacity = createdEvent.getCapacity();
         this.creationDate = createdEvent.getCreationDate().toString();
         this.createdByUserId = createdEvent.getCreatedBy().getId();

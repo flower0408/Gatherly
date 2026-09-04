@@ -80,12 +80,19 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public String findConflictingEventTitle(Long userId, Event event) {
+        return eventRepository.findConflictingEventTitle(userId, event.getId(),
+                event.getStartsAt(), event.getEndsAt()).orElse(null);
+    }
+
+    @Override
     public Event createEvent(EventDTO eventDTO, User createdBy) {
         Event newEvent = new Event();
         newEvent.setTitle(eventDTO.getTitle());
         newEvent.setDescription(eventDTO.getDescription());
         newEvent.setLocation(eventDTO.getLocation());
         newEvent.setStartsAt(LocalDateTime.parse(eventDTO.getStartsAt()));
+        newEvent.setEndsAt(LocalDateTime.parse(eventDTO.getEndsAt()));
         newEvent.setCapacity(eventDTO.getCapacity());
         newEvent.setCreationDate(LocalDateTime.parse(eventDTO.getCreationDate()));
         newEvent.setCreatedBy(createdBy);
