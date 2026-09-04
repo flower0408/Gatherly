@@ -198,7 +198,7 @@ public class EventController {
 
     @PatchMapping("/edit/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<?> editEvent(@PathVariable String id, @RequestBody @Validated EventDTO editedEvent,
+    public ResponseEntity<?> editEvent(@PathVariable String id, @RequestBody EventDTO editedEvent,
                                        @RequestHeader("authorization") String token) {
         logger.info("Authentication check");
         User user = findUserByToken(token);
@@ -215,6 +215,13 @@ public class EventController {
         if (!oldEvent.getCreatedBy().getId().equals(user.getId()) && !user.isAdmin()) {
             logger.error("User with id: " + user.getId() + " is not allowed to edit event with id: " + id);
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        // Izmena je delimicna, ali prazna vrednost nije dozvoljena
+        if ((editedEvent.getTitle() != null && editedEvent.getTitle().isBlank())
+                || (editedEvent.getDescription() != null && editedEvent.getDescription().isBlank())
+                || (editedEvent.getLocation() != null && editedEvent.getLocation().isBlank())) {
+            logger.error("Event title, description and location cannot be blank");
+            return new ResponseEntity<>("Title, description and location cannot be blank.", HttpStatus.BAD_REQUEST);
         }
         logger.info("Applying changes of event");
         if (editedEvent.getTitle() != null)

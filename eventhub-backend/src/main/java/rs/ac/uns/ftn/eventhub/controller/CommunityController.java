@@ -147,7 +147,7 @@ public class CommunityController {
 
     @PatchMapping("/edit/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommunityDTO> editCommunity(@PathVariable String id, @RequestBody @Validated CommunityDTO editedCommunity,
+    public ResponseEntity<CommunityDTO> editCommunity(@PathVariable String id, @RequestBody CommunityDTO editedCommunity,
                                                       @RequestHeader("authorization") String token) {
         logger.info("Authentication check");
         User user = findUserByToken(token);
@@ -165,6 +165,12 @@ public class CommunityController {
             logger.error("User with id: " + user.getId() + " is not allowed to edit community with id: " + id);
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+        // Izmena je delimicna, salju se samo polja koja se menjaju, ali prazna vrednost nije dozvoljena
+        if ((editedCommunity.getName() != null && editedCommunity.getName().isBlank())
+                || (editedCommunity.getDescription() != null && editedCommunity.getDescription().isBlank())) {
+            logger.error("Community name and description cannot be blank");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         logger.info("Applying changes of community");
         if (editedCommunity.getName() != null)
             oldCommunity.setName(editedCommunity.getName());
@@ -178,7 +184,7 @@ public class CommunityController {
 
     @PatchMapping("/suspend/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommunityDTO> suspendCommunity(@PathVariable String id, @RequestBody @Validated CommunityDTO suspendRequest,
+    public ResponseEntity<CommunityDTO> suspendCommunity(@PathVariable String id, @RequestBody CommunityDTO suspendRequest,
                                                          @RequestHeader("authorization") String token) {
         logger.info("Authentication check");
         User user = findUserByToken(token);
@@ -191,6 +197,10 @@ public class CommunityController {
         if (community == null) {
             logger.error("Community not found with id: " + id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (suspendRequest.getSuspendedReason() == null || suspendRequest.getSuspendedReason().isBlank()) {
+            logger.error("Suspension must have a reason");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         logger.info("Suspending community with id: " + id);
         community.setSuspended(true);

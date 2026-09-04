@@ -38,7 +38,7 @@ public class EventDTO {
     @NotNull
     private String creationDate;
 
-    @NotNull
+    // Tvorac se uzima iz tokena, klijent ga ne salje
     private Long createdByUserId;
 
     private Long belongsToCommunityId;

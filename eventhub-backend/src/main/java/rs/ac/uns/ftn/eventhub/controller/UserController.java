@@ -184,7 +184,7 @@ public class UserController {
 
     @PatchMapping("/edit")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<UserDTO> editUser(@RequestBody @Validated UserDTO editedUser, @RequestHeader("authorization") String token) {
+    public ResponseEntity<UserDTO> editUser(@RequestBody UserDTO editedUser, @RequestHeader("authorization") String token) {
         logger.info("Authentication check");
         String cleanToken = token.substring(7);
         String username = tokenUtils.getUsernameFromToken(cleanToken);
