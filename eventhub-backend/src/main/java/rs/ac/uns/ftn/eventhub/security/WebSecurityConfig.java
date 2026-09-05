@@ -82,6 +82,7 @@ public class WebSecurityConfig {
                 .antMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/images/profile/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/reactions/event/**", "/api/reactions/comment/**").permitAll()
 
                 .anyRequest().authenticated().and()
                 .cors().and()

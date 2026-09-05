@@ -10,7 +10,7 @@ public interface CommentService {
 
     Comment findById(Long id);
 
-    List<Comment> findCommentsForEvent(Long eventId, String order);
+    List<Comment> findCommentsForEvent(Long eventId, String sortBy, String order);
 
     List<Comment> findRepliesForComment(Long commentId);
 

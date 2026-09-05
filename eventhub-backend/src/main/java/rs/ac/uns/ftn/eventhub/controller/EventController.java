@@ -20,12 +20,14 @@ import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
+import rs.ac.uns.ftn.eventhub.service.ReactionService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommentServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.ReactionServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
 import java.time.LocalDateTime;
@@ -56,6 +58,9 @@ public class EventController {
     CommentService commentService;
 
 
+    ReactionService reactionService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(EventController.class);
@@ -63,13 +68,15 @@ public class EventController {
     @Autowired
     public EventController(EventServiceImpl eventService, CommunityServiceImpl communityService,
                            UserServiceImpl userService, EventRegistrationServiceImpl registrationService,
-                           ImageServiceImpl imageService, CommentServiceImpl commentService, TokenUtils tokenUtils) {
+                           ImageServiceImpl imageService, CommentServiceImpl commentService,
+                           ReactionServiceImpl reactionService, TokenUtils tokenUtils) {
         this.eventService = eventService;
         this.communityService = communityService;
         this.userService = userService;
         this.registrationService = registrationService;
         this.imageService = imageService;
         this.commentService = commentService;
+        this.reactionService = reactionService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -299,6 +306,7 @@ public class EventController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         logger.info("Deleting event with id: " + id);
+        reactionService.deleteReactionsForEvent(event.getId());
         commentService.deleteCommentsForEvent(event.getId());
         imageService.deleteImagesForEvent(event.getId());
         registrationService.deleteRegistrationsForEvent(event.getId());

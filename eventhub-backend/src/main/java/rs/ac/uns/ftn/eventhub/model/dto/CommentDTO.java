@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -29,8 +30,10 @@ public class CommentDTO {
 
     private Long belongsToEventId;
 
-    // Ime autora se dopisuje u kontroleru, radi prikaza uz komentar
+    // Ime autora i broj reakcija se dopisuju u kontroleru, radi prikaza uz komentar
     private String authorUsername;
+
+    private Map<String, Integer> reactions;
 
     public CommentDTO(Comment comment) {
         this.id = comment.getId();

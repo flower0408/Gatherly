@@ -29,6 +29,24 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                     "order by c.timestamp asc")
     Optional<List<Comment>> findCommentsForEventAsc(@Param("eventId") Long eventId);
 
+    // Sortiranje po broju reakcija zadatog tipa. Smer se ne moze proslediti kao parametar,
+    // pa postoje dva upita, a tip reakcije jeste parametar.
+    @Query(nativeQuery = true,
+            value = "select c.* from comment c join `user` u on c.belongs_to_user_id = u.id " +
+                    "where c.belongs_to_event_id = :eventId and c.replies_to_comment_id is null " +
+                    "and c.is_deleted = false and u.is_deleted = false " +
+                    "order by (select count(*) from reaction r where r.on_comment_id = c.id " +
+                    "          and r.type = :type and r.is_deleted = false) desc, c.timestamp desc")
+    Optional<List<Comment>> findCommentsForEventByReactionDesc(@Param("eventId") Long eventId, @Param("type") String type);
+
+    @Query(nativeQuery = true,
+            value = "select c.* from comment c join `user` u on c.belongs_to_user_id = u.id " +
+                    "where c.belongs_to_event_id = :eventId and c.replies_to_comment_id is null " +
+                    "and c.is_deleted = false and u.is_deleted = false " +
+                    "order by (select count(*) from reaction r where r.on_comment_id = c.id " +
+                    "          and r.type = :type and r.is_deleted = false) asc, c.timestamp desc")
+    Optional<List<Comment>> findCommentsForEventByReactionAsc(@Param("eventId") Long eventId, @Param("type") String type);
+
     @Query(nativeQuery = true,
             value = "select c.* from comment c join `user` u on c.belongs_to_user_id = u.id " +
                     "where c.replies_to_comment_id = :commentId " +

@@ -14,9 +14,11 @@ import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.CommentService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
+import rs.ac.uns.ftn.eventhub.service.ReactionService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommentServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.ReactionServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
 import java.util.ArrayList;
@@ -40,16 +42,20 @@ public class CommentController {
     UserService userService;
 
 
+    ReactionService reactionService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(CommentController.class);
 
     @Autowired
     public CommentController(CommentServiceImpl commentService, EventServiceImpl eventService,
-                             UserServiceImpl userService, TokenUtils tokenUtils) {
+                             UserServiceImpl userService, ReactionServiceImpl reactionService, TokenUtils tokenUtils) {
         this.commentService = commentService;
         this.eventService = eventService;
         this.userService = userService;
+        this.reactionService = reactionService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -60,15 +66,18 @@ public class CommentController {
         logger.info("Finding comments for event with id: " + eventId);
         logger.info("Created and sent response");
 
-        return new ResponseEntity<>(toDTOs(commentService.findCommentsForEvent(Long.parseLong(eventId), "desc")), HttpStatus.OK);
+        return new ResponseEntity<>(toDTOs(commentService.findCommentsForEvent(Long.parseLong(eventId), "date", "desc")), HttpStatus.OK);
     }
 
-    @GetMapping("/event/{eventId}/sort/{order}")
-    public ResponseEntity<List<CommentDTO>> getCommentsForEventSorted(@PathVariable String eventId, @PathVariable String order) {
-        logger.info("Finding comments for event with id: " + eventId + " sorted " + order);
+    // sortBy je 'date', 'like', 'dislike' ili 'heart', a order 'asc' ili 'desc'
+    @GetMapping("/event/{eventId}/sort/{sortBy}/{order}")
+    public ResponseEntity<List<CommentDTO>> getCommentsForEventSorted(@PathVariable String eventId,
+                                                                     @PathVariable String sortBy,
+                                                                     @PathVariable String order) {
+        logger.info("Finding comments for event with id: " + eventId + " sorted by " + sortBy + " " + order);
         logger.info("Created and sent response");
 
-        return new ResponseEntity<>(toDTOs(commentService.findCommentsForEvent(Long.parseLong(eventId), order)), HttpStatus.OK);
+        return new ResponseEntity<>(toDTOs(commentService.findCommentsForEvent(Long.parseLong(eventId), sortBy, order)), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/replies")
@@ -209,6 +218,7 @@ public class CommentController {
         User author = userService.findById(comment.getBelongsToUser().getId());
         if (author != null)
             dto.setAuthorUsername(author.getUsername());
+        dto.setReactions(reactionService.countsForComment(comment.getId()));
         return dto;
     }
 
