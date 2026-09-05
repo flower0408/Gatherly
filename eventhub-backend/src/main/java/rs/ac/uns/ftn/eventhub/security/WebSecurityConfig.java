@@ -78,6 +78,9 @@ public class WebSecurityConfig {
                 // gost moze da pregleda javne dogadjaje i zajednice bez prijave na sistem
                 .antMatchers(HttpMethod.GET, "/api/events/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/communities/**").permitAll()
+                // slike moraju biti dostupne svima, inace se ne prikazuju na javnim stranicama
+                .antMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/images/profile/**").permitAll()
 
                 .anyRequest().authenticated().and()
                 .cors().and()

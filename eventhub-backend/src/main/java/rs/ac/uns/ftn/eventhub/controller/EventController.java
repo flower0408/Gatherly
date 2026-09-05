@@ -9,17 +9,21 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.eventhub.model.dto.EventDTO;
+import rs.ac.uns.ftn.eventhub.model.dto.ImageDTO;
 import rs.ac.uns.ftn.eventhub.model.entity.Community;
+import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
+import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
 import java.time.LocalDateTime;
@@ -44,6 +48,9 @@ public class EventController {
     EventRegistrationService registrationService;
 
 
+    ImageService imageService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(EventController.class);
@@ -51,11 +58,12 @@ public class EventController {
     @Autowired
     public EventController(EventServiceImpl eventService, CommunityServiceImpl communityService,
                            UserServiceImpl userService, EventRegistrationServiceImpl registrationService,
-                           TokenUtils tokenUtils) {
+                           ImageServiceImpl imageService, TokenUtils tokenUtils) {
         this.eventService = eventService;
         this.communityService = communityService;
         this.userService = userService;
         this.registrationService = registrationService;
+        this.imageService = imageService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -187,6 +195,13 @@ public class EventController {
         }
         logger.info("Creating event from DTO");
         Event createdEvent = eventService.createEvent(newEvent, user);
+        // Slike su vec otpremljene, ovde se samo vezuju za dogadjaj cim on dobije id
+        if (newEvent.getImages() != null) {
+            for (ImageDTO imageDTO : newEvent.getImages()) {
+                if (imageDTO.getPath() != null && !imageDTO.getPath().isBlank())
+                    imageService.createEventImage(imageDTO.getPath(), createdEvent);
+            }
+        }
         if (community != null) {
             logger.info("Adding event with id: " + createdEvent.getId() + " to community with id: " + community.getId());
             eventService.addEventToCommunity(community.getId(), createdEvent.getId());
@@ -246,6 +261,14 @@ public class EventController {
             oldEvent.setCapacity(editedEvent.getCapacity());
         }
         oldEvent = eventService.updateEvent(oldEvent);
+        // Ako su poslate slike, one zamenjuju postojece
+        if (editedEvent.getImages() != null) {
+            imageService.deleteImagesForEvent(oldEvent.getId());
+            for (ImageDTO imageDTO : editedEvent.getImages()) {
+                if (imageDTO.getPath() != null && !imageDTO.getPath().isBlank())
+                    imageService.createEventImage(imageDTO.getPath(), oldEvent);
+            }
+        }
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(toDTO(oldEvent), HttpStatus.OK);
@@ -270,6 +293,7 @@ public class EventController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         logger.info("Deleting event with id: " + id);
+        imageService.deleteImagesForEvent(event.getId());
         registrationService.deleteRegistrationsForEvent(event.getId());
         eventService.deleteEventFromCommunity(event.getId());
         eventService.deleteEvent(event.getId());
@@ -282,6 +306,11 @@ public class EventController {
         EventDTO eventDTO = new EventDTO(event);
         eventDTO.setBelongsToCommunityId(eventService.findCommunityIdForEvent(event.getId()));
         eventDTO.setTakenSpots(registrationService.countTakenSpots(event.getId()));
+        List<ImageDTO> imageDTOS = new ArrayList<>();
+        for (Image image : imageService.findImagesForEvent(event.getId())) {
+            imageDTOS.add(new ImageDTO(image));
+        }
+        eventDTO.setImages(imageDTOS);
         return eventDTO;
     }
 

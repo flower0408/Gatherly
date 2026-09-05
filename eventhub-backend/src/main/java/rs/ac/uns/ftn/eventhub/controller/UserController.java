@@ -16,10 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.eventhub.model.dto.*;
+import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
+import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.MailService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
+import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +47,9 @@ public class UserController {
     MailService mailService;
 
 
+    ImageService imageService;
+
+
     AuthenticationManager authenticationManager;
 
 
@@ -53,12 +59,23 @@ public class UserController {
 
     @Autowired
     public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
-                          UserDetailsService userDetailsService, MailService mailService, TokenUtils tokenUtils) {
+                          UserDetailsService userDetailsService, MailService mailService,
+                          ImageServiceImpl imageService, TokenUtils tokenUtils) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.mailService = mailService;
+        this.imageService = imageService;
         this.tokenUtils = tokenUtils;
+    }
+
+    // Uz korisnika se salje i njegova profilna slika, da front ne bi za svakog slao poseban zahtev
+    private UserDTO toDTO(User user) {
+        UserDTO userDTO = new UserDTO(user);
+        Image profileImage = imageService.findProfileImageForUser(user.getId());
+        if (profileImage != null)
+            userDTO.setProfileImage(new ImageDTO(profileImage));
+        return userDTO;
     }
 
     @PostMapping("/signup")
@@ -72,7 +89,7 @@ public class UserController {
         logger.info("Sending verification mail to new user");
         mailService.sendVerificationMail(createdUser);
         logger.info("Creating response");
-        UserDTO userDTO = new UserDTO(createdUser);
+        UserDTO userDTO = toDTO(createdUser);
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
@@ -152,7 +169,7 @@ public class UserController {
             logger.error("User not found with id: " + userId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        UserDTO userDTO = new UserDTO(findUser);
+        UserDTO userDTO = toDTO(findUser);
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
@@ -176,7 +193,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         logger.info("Creating response");
-        UserDTO userDTO = new UserDTO(findUser);
+        UserDTO userDTO = toDTO(findUser);
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
@@ -206,7 +223,7 @@ public class UserController {
             oldUser.setDescription(editedUser.getDescription());
         oldUser = userService.saveUser(oldUser);
         logger.info("Creating response");
-        UserDTO updatedUser = new UserDTO(oldUser);
+        UserDTO updatedUser = toDTO(oldUser);
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
@@ -238,7 +255,7 @@ public class UserController {
         mailService.sendPasswordChangedMail(user);
 
         logger.info("You have successfully updated your password");
-        return new ResponseEntity<>(new UserDTO(user), HttpStatus.OK);
+        return new ResponseEntity<>(toDTO(user), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -277,7 +294,7 @@ public class UserController {
         List<UserDTO> userDTOS = new ArrayList<>();
         logger.info("Creating response");
         for (User temp : users) {
-            userDTOS.add(new UserDTO(temp));
+            userDTOS.add(toDTO(temp));
         }
         logger.info("Created and sent response");
 
@@ -297,7 +314,7 @@ public class UserController {
         }
         List<UserDTO> userDTOS = new ArrayList<>();
         for (User temp : userService.findAll()) {
-            userDTOS.add(new UserDTO(temp));
+            userDTOS.add(toDTO(temp));
         }
         logger.info("Created and sent response");
 
@@ -315,6 +332,6 @@ public class UserController {
         }
         logger.info("Created and sent response");
 
-        return new ResponseEntity<>(new UserDTO(user), HttpStatus.OK);
+        return new ResponseEntity<>(toDTO(user), HttpStatus.OK);
     }
 }

@@ -9,13 +9,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.eventhub.model.dto.CommunityDTO;
+import rs.ac.uns.ftn.eventhub.model.dto.ImageDTO;
 import rs.ac.uns.ftn.eventhub.model.dto.UserDTO;
 import rs.ac.uns.ftn.eventhub.model.entity.Community;
+import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
+import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
 import java.util.ArrayList;
@@ -33,14 +37,19 @@ public class CommunityController {
     UserService userService;
 
 
+    ImageService imageService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(CommunityController.class);
 
     @Autowired
-    public CommunityController(CommunityServiceImpl communityService, UserServiceImpl userService, TokenUtils tokenUtils) {
+    public CommunityController(CommunityServiceImpl communityService, UserServiceImpl userService,
+                               ImageServiceImpl imageService, TokenUtils tokenUtils) {
         this.communityService = communityService;
         this.userService = userService;
+        this.imageService = imageService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -78,7 +87,7 @@ public class CommunityController {
         for (Long memberId : communityService.findMembersByCommunityId(Long.parseLong(communityId))) {
             User member = userService.findById(memberId);
             if (member != null)
-                userDTOS.add(new UserDTO(member));
+                userDTOS.add(toDTO(member));
         }
         logger.info("Created and sent response");
 
@@ -92,7 +101,7 @@ public class CommunityController {
         for (Long organizerId : communityService.findOrganizersByCommunityId(Long.parseLong(communityId))) {
             User organizer = userService.findById(organizerId);
             if (organizer != null)
-                userDTOS.add(new UserDTO(organizer));
+                userDTOS.add(toDTO(organizer));
         }
         logger.info("Created and sent response");
 
@@ -344,6 +353,15 @@ public class CommunityController {
         }
 
         return new ResponseEntity<>("Organizer removed.", HttpStatus.OK);
+    }
+
+    // Uz korisnika se salje i njegova profilna slika, da front ne bi za svakog clana slao poseban zahtev
+    private UserDTO toDTO(User user) {
+        UserDTO userDTO = new UserDTO(user);
+        Image profileImage = imageService.findProfileImageForUser(user.getId());
+        if (profileImage != null)
+            userDTO.setProfileImage(new ImageDTO(profileImage));
+        return userDTO;
     }
 
     // substring(7) skida prefiks "Bearer " iz zaglavlja Authorization
