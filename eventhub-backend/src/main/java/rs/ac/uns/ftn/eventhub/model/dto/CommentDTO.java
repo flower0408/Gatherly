@@ -29,6 +29,9 @@ public class CommentDTO {
 
     private Long belongsToEventId;
 
+    // Ime autora se dopisuje u kontroleru, radi prikaza uz komentar
+    private String authorUsername;
+
     public CommentDTO(Comment comment) {
         this.id = comment.getId();
         this.text = comment.getText();

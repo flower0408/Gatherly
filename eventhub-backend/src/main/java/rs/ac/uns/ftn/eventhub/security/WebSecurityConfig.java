@@ -81,6 +81,7 @@ public class WebSecurityConfig {
                 // slike moraju biti dostupne svima, inace se ne prikazuju na javnim stranicama
                 .antMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/images/profile/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
 
                 .anyRequest().authenticated().and()
                 .cors().and()

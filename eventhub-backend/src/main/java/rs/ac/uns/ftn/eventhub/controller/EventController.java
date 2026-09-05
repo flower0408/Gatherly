@@ -15,11 +15,13 @@ import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
+import rs.ac.uns.ftn.eventhub.service.CommentService;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
+import rs.ac.uns.ftn.eventhub.service.implementation.CommentServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
@@ -51,6 +53,9 @@ public class EventController {
     ImageService imageService;
 
 
+    CommentService commentService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(EventController.class);
@@ -58,12 +63,13 @@ public class EventController {
     @Autowired
     public EventController(EventServiceImpl eventService, CommunityServiceImpl communityService,
                            UserServiceImpl userService, EventRegistrationServiceImpl registrationService,
-                           ImageServiceImpl imageService, TokenUtils tokenUtils) {
+                           ImageServiceImpl imageService, CommentServiceImpl commentService, TokenUtils tokenUtils) {
         this.eventService = eventService;
         this.communityService = communityService;
         this.userService = userService;
         this.registrationService = registrationService;
         this.imageService = imageService;
+        this.commentService = commentService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -293,6 +299,7 @@ public class EventController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         logger.info("Deleting event with id: " + id);
+        commentService.deleteCommentsForEvent(event.getId());
         imageService.deleteImagesForEvent(event.getId());
         registrationService.deleteRegistrationsForEvent(event.getId());
         eventService.deleteEventFromCommunity(event.getId());
