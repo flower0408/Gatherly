@@ -15,6 +15,7 @@ import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
+import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.CommentService;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
@@ -22,6 +23,7 @@ import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.ReactionService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
+import rs.ac.uns.ftn.eventhub.service.implementation.BannedServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommentServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
@@ -61,6 +63,9 @@ public class EventController {
     ReactionService reactionService;
 
 
+    BannedService bannedService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(EventController.class);
@@ -69,7 +74,8 @@ public class EventController {
     public EventController(EventServiceImpl eventService, CommunityServiceImpl communityService,
                            UserServiceImpl userService, EventRegistrationServiceImpl registrationService,
                            ImageServiceImpl imageService, CommentServiceImpl commentService,
-                           ReactionServiceImpl reactionService, TokenUtils tokenUtils) {
+                           ReactionServiceImpl reactionService, BannedServiceImpl bannedService,
+                           TokenUtils tokenUtils) {
         this.eventService = eventService;
         this.communityService = communityService;
         this.userService = userService;
@@ -77,6 +83,7 @@ public class EventController {
         this.imageService = imageService;
         this.commentService = commentService;
         this.reactionService = reactionService;
+        this.bannedService = bannedService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -200,6 +207,10 @@ public class EventController {
             if (community.isSuspended()) {
                 logger.error("Community with id: " + community.getId() + " is suspended");
                 return new ResponseEntity<>("This community is suspended.", HttpStatus.FORBIDDEN);
+            }
+            if (bannedService.isBannedFromCommunity(user.getId(), community.getId())) {
+                logger.error("User with id: " + user.getId() + " is banned from community with id: " + community.getId());
+                return new ResponseEntity<>("You are banned from this community.", HttpStatus.FORBIDDEN);
             }
             if (!communityService.checkOrganizer(community.getId(), user.getId()) && !user.isAdmin()) {
                 logger.error("User with id: " + user.getId() + " is not an organizer of community with id: " + community.getId());

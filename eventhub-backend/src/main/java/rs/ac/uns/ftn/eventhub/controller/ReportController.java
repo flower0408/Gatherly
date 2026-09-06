@@ -41,6 +41,9 @@ public class ReportController {
     UserService userService;
 
 
+    BannedService bannedService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(ReportController.class);
@@ -48,12 +51,13 @@ public class ReportController {
     @Autowired
     public ReportController(ReportServiceImpl reportService, EventServiceImpl eventService,
                             CommentServiceImpl commentService, CommunityServiceImpl communityService,
-                            UserServiceImpl userService, TokenUtils tokenUtils) {
+                            UserServiceImpl userService, BannedServiceImpl bannedService, TokenUtils tokenUtils) {
         this.reportService = reportService;
         this.eventService = eventService;
         this.commentService = commentService;
         this.communityService = communityService;
         this.userService = userService;
+        this.bannedService = bannedService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -219,6 +223,14 @@ public class ReportController {
             if (report.getOnEvent() != null) {
                 logger.info("Suspending event with id: " + report.getOnEvent().getId());
                 eventService.deleteEvent(report.getOnEvent().getId());
+            }
+            // Prihvacena prijava na korisnika znaci blokadu na nivou sistema, a nju izrice administrator
+            if (report.getOnUser() != null) {
+                User reported = userService.findById(report.getOnUser().getId());
+                if (reported != null && !bannedService.isBannedFromSystem(reported.getId())) {
+                    logger.info("Banning user with id: " + reported.getId() + " after an accepted report");
+                    bannedService.ban(user, reported, null);
+                }
             }
         }
 

@@ -26,14 +26,16 @@ public class Banned {
     @Column(nullable = false)
     private LocalDate timestamp;
 
+    // Ko je izrekao blokadu: organizator zajednice ili administrator sistema
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "by_organizer_id", referencedColumnName = "id")
-    private Organizer organizer;
+    @JoinColumn(name = "banned_by_user_id", referencedColumnName = "id")
+    private User bannedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "towards_user_id", referencedColumnName = "id")
     private User towardsUser;
 
+    // Prazno znaci blokada na nivou celog sistema, inace vazi samo za tu zajednicu
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "for_community_id", referencedColumnName = "id")
     private Community community;

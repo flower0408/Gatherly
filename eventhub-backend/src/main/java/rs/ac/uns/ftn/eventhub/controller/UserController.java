@@ -19,9 +19,11 @@ import rs.ac.uns.ftn.eventhub.model.dto.*;
 import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
+import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.MailService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
+import rs.ac.uns.ftn.eventhub.service.implementation.BannedServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -50,6 +52,9 @@ public class UserController {
     ImageService imageService;
 
 
+    BannedService bannedService;
+
+
     AuthenticationManager authenticationManager;
 
 
@@ -60,12 +65,13 @@ public class UserController {
     @Autowired
     public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
                           UserDetailsService userDetailsService, MailService mailService,
-                          ImageServiceImpl imageService, TokenUtils tokenUtils) {
+                          ImageServiceImpl imageService, BannedServiceImpl bannedService, TokenUtils tokenUtils) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.mailService = mailService;
         this.imageService = imageService;
+        this.bannedService = bannedService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -118,6 +124,11 @@ public class UserController {
         User requestingUser = userService.findByUsername(authenticationRequest.getUsername());
         if (!requestingUser.isVerified()) {
             logger.error("Account of user with id: " + requestingUser.getId() + " is not verified");
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        }
+        // Blokiran korisnik ne moze da se prijavi na sistem
+        if (bannedService.isBannedFromSystem(requestingUser.getId())) {
+            logger.error("User with id: " + requestingUser.getId() + " is banned from the system");
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         logger.info("Putting user in security context");

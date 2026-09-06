@@ -93,5 +93,5 @@ values ('ATTENDED', '2026-08-10', '2026-07-28', false, 3, 7);
 insert into event_registration (status, at, created_at, is_deleted, created_by_user_id, for_event_id)
 values ('NO_SHOW', '2026-08-10', '2026-07-29', false, 1, 7);
 
-insert into banned (is_deleted, timestamp, by_organizer_id, towards_user_id, for_community_id)
+insert into banned (is_deleted, timestamp, banned_by_user_id, towards_user_id, for_community_id)
 values (false, '2026-05-13', null, 1, null);

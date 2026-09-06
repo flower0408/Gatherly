@@ -15,9 +15,11 @@ import rs.ac.uns.ftn.eventhub.model.entity.Community;
 import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
+import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
+import rs.ac.uns.ftn.eventhub.service.implementation.BannedServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
@@ -40,16 +42,20 @@ public class CommunityController {
     ImageService imageService;
 
 
+    BannedService bannedService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(CommunityController.class);
 
     @Autowired
     public CommunityController(CommunityServiceImpl communityService, UserServiceImpl userService,
-                               ImageServiceImpl imageService, TokenUtils tokenUtils) {
+                               ImageServiceImpl imageService, BannedServiceImpl bannedService, TokenUtils tokenUtils) {
         this.communityService = communityService;
         this.userService = userService;
         this.imageService = imageService;
+        this.bannedService = bannedService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -265,6 +271,10 @@ public class CommunityController {
         if (community.isSuspended()) {
             logger.error("Community with id: " + communityId + " is suspended and cannot be joined");
             return new ResponseEntity<>("This community is suspended.", HttpStatus.FORBIDDEN);
+        }
+        if (bannedService.isBannedFromCommunity(user.getId(), community.getId())) {
+            logger.error("User with id: " + user.getId() + " is banned from community with id: " + communityId);
+            return new ResponseEntity<>("You are banned from this community.", HttpStatus.FORBIDDEN);
         }
         if (communityService.checkMember(community.getId(), user.getId())) {
             logger.error("User with id: " + user.getId() + " is already a member of community with id: " + communityId);
