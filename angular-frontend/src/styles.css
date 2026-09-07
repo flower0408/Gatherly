@@ -1,1 +1,61 @@
-/* You can add global styles to this file, and also import other style files */
+/* Tema je Bootswatch Pulse (MIT), ucitava se iz angular.json.
+   Ovde stoje samo dopune specificne za Gatherly. */
+
+body {
+  min-height: 100vh;
+  background-color: var(--bs-body-bg);
+}
+
+.page {
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+}
+
+/* Kartica dogadjaja, po ugledu na prikaz na Meetup-u */
+.event-card {
+  height: 100%;
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.event-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.event-card .card-img-top {
+  height: 180px;
+  object-fit: cover;
+}
+
+.event-date {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.event-placeholder {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bs-secondary-bg);
+  color: var(--bs-secondary-color);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-lg {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.form-narrow {
+  max-width: 26rem;
+  margin: 0 auto;
+}

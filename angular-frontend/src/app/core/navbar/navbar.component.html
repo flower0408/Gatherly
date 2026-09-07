@@ -1,0 +1,46 @@
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+  <div class="container">
+    <a class="navbar-brand fw-bold" [routerLink]="['/events']">Gatherly</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/events']" routerLinkActive="active">Events</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/communities']" routerLinkActive="active">Communities</a>
+        </li>
+        <li class="nav-item" *ngIf="auth.isLoggedIn()">
+          <a class="nav-link" [routerLink]="['/registrations']" routerLinkActive="active">My registrations</a>
+        </li>
+        <li class="nav-item" *ngIf="auth.isAdmin()">
+          <a class="nav-link" [routerLink]="['/reports']" routerLinkActive="active">Reports</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <ng-container *ngIf="!auth.isLoggedIn()">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/users/login']">Sign in</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-light btn-sm ms-lg-2 mt-2 mt-lg-0" [routerLink]="['/users/register']">Sign up</a>
+          </li>
+        </ng-container>
+
+        <ng-container *ngIf="auth.isLoggedIn()">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/users/profile']">{{ auth.getUsername() }}</a>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-light btn-sm ms-lg-2 mt-2 mt-lg-0" (click)="logout()">Sign out</button>
+          </li>
+        </ng-container>
+      </ul>
+    </div>
+  </div>
+</nav>
