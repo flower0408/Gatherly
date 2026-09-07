@@ -1,0 +1,23 @@
+<a class="card event-card text-decoration-none" [routerLink]="['/events', event.id]">
+  <img *ngIf="coverImage" class="card-img-top" [src]="coverImage" [alt]="event.title">
+  <div *ngIf="!coverImage" class="event-placeholder card-img-top">
+    <span class="small">No image</span>
+  </div>
+
+  <div class="card-body">
+    <p class="event-date text-primary small mb-1">
+      {{ event.startsAt | date: 'EEE, d MMM' }} &middot; {{ event.startsAt | date: 'HH:mm' }}
+    </p>
+
+    <h3 class="h6 card-title text-body">{{ event.title }}</h3>
+
+    <p class="card-text text-body-secondary small mb-2">{{ event.location }}</p>
+
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge" [ngClass]="isFull ? 'text-bg-secondary' : 'text-bg-light'">
+        {{ event.takenSpots }} / {{ event.capacity }} taken
+      </span>
+      <span class="badge text-bg-warning" *ngIf="isFull">Waiting list</span>
+    </div>
+  </div>
+</a>

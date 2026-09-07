@@ -12,6 +12,8 @@ import { LoginComponent } from './user/login/login.component';
 import { RegisterComponent } from './user/register/register.component';
 import { VerifyComponent } from './user/verify/verify.component';
 import { EventListComponent } from './event/event-list/event-list.component';
+import { EventCardComponent } from './event/event-card/event-card.component';
+import { EventDetailComponent } from './event/event-detail/event-detail.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,9 @@ import { EventListComponent } from './event/event-list/event-list.component';
     LoginComponent,
     RegisterComponent,
     VerifyComponent,
-    EventListComponent
+    EventListComponent,
+    EventCardComponent,
+    EventDetailComponent
   ],
   imports: [
     BrowserModule,

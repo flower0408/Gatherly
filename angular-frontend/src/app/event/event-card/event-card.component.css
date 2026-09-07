@@ -1,0 +1,7 @@
+.event-card {
+  overflow: hidden;
+}
+
+.event-card .card-title {
+  line-height: 1.3;
+}

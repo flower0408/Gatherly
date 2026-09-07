@@ -1,13 +1,31 @@
 <div class="bg-primary text-white py-5">
   <div class="container">
     <h1 class="display-5 fw-bold mb-2">Find your people</h1>
-    <p class="lead mb-0">
-      Browse events from communities near you, and save your spot.
-    </p>
+    <p class="lead mb-0">Browse events from communities near you, and save your spot.</p>
   </div>
 </div>
 
 <div class="container page">
-  <h2 class="h4 mb-3">Upcoming events</h2>
-  <p class="text-body-secondary">The event list is coming next.</p>
+  <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+    <h2 class="h4 mb-0">{{ showPast ? 'All events' : 'Upcoming events' }}</h2>
+
+    <div class="btn-group btn-group-sm">
+      <button class="btn" [ngClass]="!showPast ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="togglePast(false)">Upcoming</button>
+      <button class="btn" [ngClass]="showPast ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="togglePast(true)">All</button>
+    </div>
+  </div>
+
+  <p *ngIf="loading" class="text-body-secondary">Loading events…</p>
+
+  <p *ngIf="!loading && events.length === 0" class="text-body-secondary">
+    There are no events to show yet.
+  </p>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+    <div class="col" *ngFor="let event of events">
+      <app-event-card [event]="event"></app-event-card>
+    </div>
+  </div>
 </div>

@@ -1,0 +1,4 @@
+.cover {
+  max-height: 340px;
+  object-fit: cover;
+}
