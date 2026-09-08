@@ -44,4 +44,21 @@ export class CommunityService {
   update(id: number, community: Partial<Community>): Observable<Community> {
     return this.http.patch('api/communities/edit/' + id, community) as Observable<Community>;
   }
+
+  // Odgovori na ove rute su obican tekst, pa se trazi takav odgovor
+  join(id: number): Observable<string> {
+    return this.http.post('api/communities/' + id + '/member', null, { responseType: 'text' });
+  }
+
+  leave(id: number): Observable<string> {
+    return this.http.delete('api/communities/' + id + '/member', { responseType: 'text' });
+  }
+
+  addOrganizer(id: number, userId: number): Observable<string> {
+    return this.http.post('api/communities/' + id + '/organizer/' + userId, null, { responseType: 'text' });
+  }
+
+  removeOrganizer(id: number, userId: number): Observable<string> {
+    return this.http.delete('api/communities/delete/' + id + '/organizer/' + userId, { responseType: 'text' });
+  }
 }

@@ -1,0 +1,7 @@
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  object-fit: cover;
+  line-height: 2rem;
+  font-size: .9rem;
+}

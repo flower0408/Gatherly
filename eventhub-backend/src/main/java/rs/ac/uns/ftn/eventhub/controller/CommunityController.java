@@ -315,6 +315,11 @@ public class CommunityController {
             logger.error("User not found with token: " + token);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // Organizator koji izadje iz zajednice bi joj i dalje vodio dogadjaje, zato se prvo mora povuci
+        if (communityService.checkOrganizer(Long.parseLong(communityId), user.getId())) {
+            logger.error("User with id: " + user.getId() + " is still an organizer of community with id: " + communityId);
+            return new ResponseEntity<>("Step down as an organizer before leaving this community.", HttpStatus.CONFLICT);
+        }
         logger.info("Removing user with id: " + user.getId() + " from community with id: " + communityId);
         Integer removed = communityService.deleteCommunityMember(Long.parseLong(communityId), user.getId());
         if (removed == 0) {
@@ -365,8 +370,9 @@ public class CommunityController {
         return new ResponseEntity<>("Organizer added.", HttpStatus.OK);
     }
 
+    // Administrator sme da skine bilo kog organizatora, a organizator sme da povuce jedino sam sebe
     @DeleteMapping("/delete/{communityId}/organizer/{organizerId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<String> deleteCommunityOrganizer(@PathVariable String communityId, @PathVariable String organizerId,
                                                            @RequestHeader("authorization") String token) {
         logger.info("Authentication check");
@@ -374,6 +380,15 @@ public class CommunityController {
         if (user == null) {
             logger.error("User not found with token: " + token);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (!user.isAdmin() && !user.getId().equals(Long.parseLong(organizerId))) {
+            logger.error("User with id: " + user.getId() + " is not allowed to remove organizer with id: " + organizerId);
+            return new ResponseEntity<>("Only an administrator can remove another organizer.", HttpStatus.FORBIDDEN);
+        }
+        // Zajednica bez ijednog organizatora ne bi imala ko da vodi njene dogadjaje
+        if (communityService.findOrganizersByCommunityId(Long.parseLong(communityId)).size() <= 1) {
+            logger.error("Community with id: " + communityId + " would be left without an organizer");
+            return new ResponseEntity<>("A community cannot be left without an organizer.", HttpStatus.CONFLICT);
         }
         logger.info("Removing organizer with id: " + organizerId + " from community with id: " + communityId);
         Integer removed = communityService.deleteCommunityOrganizer(Long.parseLong(communityId), Long.parseLong(organizerId));
