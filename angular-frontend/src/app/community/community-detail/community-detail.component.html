@@ -1,0 +1,56 @@
+<div class="container page">
+
+  <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+
+  <div *ngIf="notFound" class="text-center py-5">
+    <h1 class="h4 mb-3">Community not found</h1>
+    <p class="text-body-secondary">It may have been removed.</p>
+    <a class="btn btn-primary" [routerLink]="['/communities']">Back to communities</a>
+  </div>
+
+  <div *ngIf="community">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-2">
+      <h1 class="h2 mb-0">{{ community.name }}</h1>
+
+      <div class="d-flex gap-2" *ngIf="canManage">
+        <a class="btn btn-primary btn-sm" *ngIf="!community.suspended"
+           [routerLink]="['/events/new']" [queryParams]="{ community: community.id }">Create event here</a>
+        <a class="btn btn-outline-primary btn-sm"
+           [routerLink]="['/communities', community.id, 'edit']">Edit</a>
+      </div>
+    </div>
+
+    <p class="text-body-secondary">
+      Since {{ community.creationDate | date: 'MMMM y' }}
+    </p>
+
+    <div class="alert alert-warning" *ngIf="community.suspended">
+      <strong>This community is suspended.</strong>
+      <span *ngIf="community.suspendedReason"> {{ community.suspendedReason }}</span>
+    </div>
+
+    <p class="mb-4">{{ community.description }}</p>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+      <h2 class="h4 mb-0">Events</h2>
+
+      <div class="btn-group btn-group-sm">
+        <button class="btn" [ngClass]="order === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="sortBy('asc')">Soonest first</button>
+        <button class="btn" [ngClass]="order === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="sortBy('desc')">Latest first</button>
+      </div>
+    </div>
+
+    <p *ngIf="events.length === 0" class="text-body-secondary">
+      This community has no events yet.
+    </p>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+      <div class="col" *ngFor="let event of events">
+        <app-event-card [event]="event"></app-event-card>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,24 @@
+<div class="container page">
+  <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+    <div>
+      <h1 class="h3 mb-1">Communities</h1>
+      <p class="text-body-secondary mb-0">Groups of people who meet around a shared interest.</p>
+    </div>
+
+    <a class="btn btn-primary" *ngIf="auth.isLoggedIn()" [routerLink]="['/communities/new']">
+      Start a community
+    </a>
+  </div>
+
+  <p *ngIf="loading" class="text-body-secondary">Loading communities…</p>
+
+  <p *ngIf="!loading && communities.length === 0" class="text-body-secondary">
+    There are no communities yet.
+  </p>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+    <div class="col" *ngFor="let community of communities">
+      <app-community-card [community]="community"></app-community-card>
+    </div>
+  </div>
+</div>

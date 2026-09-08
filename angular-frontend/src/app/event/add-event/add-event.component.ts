@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { EventService } from '../services/event.service';
 import { ImageService } from '../services/image.service';
@@ -28,6 +28,7 @@ export class AddEventComponent implements OnInit {
     private eventService: EventService,
     private imageService: ImageService,
     private communityService: CommunityService,
+    private route: ActivatedRoute,
     private router: Router
   ) {
     this.form = this.fb.group({
@@ -42,9 +43,31 @@ export class AddEventComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Sa stranice zajednice se dolazi sa njenim id-em, pa je unapred izabrana
+    const fromCommunity = Number(this.route.snapshot.queryParamMap.get('community')) || null;
+
     this.communityService.getMineOrganizing().subscribe({
-      next: (result) => this.communities = result,
+      next: (result) => {
+        this.communities = result;
+        if (fromCommunity)
+          this.preselectCommunity(fromCommunity);
+      },
       error: () => this.communities = []
+    });
+  }
+
+  // Administrator sme da otvori dogadjaj i u zajednici koju ne vodi, a nje nema u listi, pa se dopisuje
+  private preselectCommunity(id: number): void {
+    if (this.communities.some((c) => c.id === id)) {
+      this.form.patchValue({ belongsToCommunityId: id });
+      return;
+    }
+    this.communityService.getOne(id).subscribe({
+      next: (community) => {
+        this.communities = [community, ...this.communities];
+        this.form.patchValue({ belongsToCommunityId: id });
+      },
+      error: () => this.form.patchValue({ belongsToCommunityId: null })
     });
   }
 

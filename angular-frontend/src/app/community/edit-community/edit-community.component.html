@@ -1,0 +1,25 @@
+<div class="container page">
+  <div class="mx-auto form-wide">
+    <h1 class="h3 mb-4">Edit community</h1>
+
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!loading">
+      <div class="mb-3">
+        <label class="form-label" for="name">Name</label>
+        <input class="form-control" type="text" id="name" formControlName="name">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="description">Description</label>
+        <textarea class="form-control" id="description" rows="4" formControlName="description"></textarea>
+      </div>
+
+      <button class="btn btn-primary" type="submit" [disabled]="!form.valid || saving">
+        {{ saving ? 'Saving…' : 'Save changes' }}
+      </button>
+      <a class="btn btn-outline-secondary ms-2" [routerLink]="['/communities', communityId]">Cancel</a>
+    </form>
+  </div>
+</div>

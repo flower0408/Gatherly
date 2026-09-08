@@ -16,6 +16,11 @@ import { EventCardComponent } from './event/event-card/event-card.component';
 import { EventDetailComponent } from './event/event-detail/event-detail.component';
 import { AddEventComponent } from './event/add-event/add-event.component';
 import { EditEventComponent } from './event/edit-event/edit-event.component';
+import { CommunityCardComponent } from './community/community-card/community-card.component';
+import { CommunityListComponent } from './community/community-list/community-list.component';
+import { CommunityDetailComponent } from './community/community-detail/community-detail.component';
+import { AddCommunityComponent } from './community/add-community/add-community.component';
+import { EditCommunityComponent } from './community/edit-community/edit-community.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +34,12 @@ import { EditEventComponent } from './event/edit-event/edit-event.component';
     EventCardComponent,
     EventDetailComponent,
     AddEventComponent,
-    EditEventComponent
+    EditEventComponent,
+    CommunityCardComponent,
+    CommunityListComponent,
+    CommunityDetailComponent,
+    AddCommunityComponent,
+    EditCommunityComponent
   ],
   imports: [
     BrowserModule,

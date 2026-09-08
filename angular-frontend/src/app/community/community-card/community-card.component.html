@@ -1,0 +1,13 @@
+<a class="card h-100 text-decoration-none text-body" [routerLink]="['/communities', community.id]">
+  <div class="card-body">
+    <h3 class="h5 card-title mb-1">{{ community.name }}</h3>
+
+    <p class="text-body-secondary small mb-2">
+      Since {{ community.creationDate | date: 'MMMM y' }}
+    </p>
+
+    <span class="badge text-bg-warning mb-2" *ngIf="community.suspended">Suspended</span>
+
+    <p class="card-text description">{{ community.description }}</p>
+  </div>
+</a>
