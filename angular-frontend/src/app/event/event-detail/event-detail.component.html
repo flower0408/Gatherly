@@ -16,7 +16,14 @@
         {{ event.startsAt | date: 'EEEE, d MMMM y' }}
       </p>
 
-      <h1 class="h2 mb-3">{{ event.title }}</h1>
+      <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
+        <h1 class="h2 mb-0">{{ event.title }}</h1>
+
+        <div class="btn-group btn-group-sm" *ngIf="canManage">
+          <a class="btn btn-outline-primary" [routerLink]="['/events', event.id, 'edit']">Edit</a>
+          <button class="btn btn-outline-danger" (click)="remove()">Delete</button>
+        </div>
+      </div>
 
       <p class="text-body-secondary mb-4" *ngIf="community">
         Hosted by

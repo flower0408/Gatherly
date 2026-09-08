@@ -57,6 +57,11 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
+    public List<Community> findCommunitiesForOrganizer(Long userId) {
+        return this.communityRepository.findCommunitiesByOrganizerId(userId).orElse(Collections.emptyList());
+    }
+
+    @Override
     public Community createCommunity(CommunityDTO communityDTO) {
         Optional<Community> community = communityRepository.findByName(communityDTO.getName());
 

@@ -14,6 +14,8 @@ import { VerifyComponent } from './user/verify/verify.component';
 import { EventListComponent } from './event/event-list/event-list.component';
 import { EventCardComponent } from './event/event-card/event-card.component';
 import { EventDetailComponent } from './event/event-detail/event-detail.component';
+import { AddEventComponent } from './event/add-event/add-event.component';
+import { EditEventComponent } from './event/edit-event/edit-event.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { EventDetailComponent } from './event/event-detail/event-detail.componen
     VerifyComponent,
     EventListComponent,
     EventCardComponent,
-    EventDetailComponent
+    EventDetailComponent,
+    AddEventComponent,
+    EditEventComponent
   ],
   imports: [
     BrowserModule,

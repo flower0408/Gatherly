@@ -64,6 +64,10 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     Optional<List<Community>> findCommunitiesByMemberId(@Param("memberId") Long memberId);
 
     @Query(nativeQuery = true,
+            value = "select * from community where id in (select community_id from community_organizers where organizer_id = :organizerId)")
+    Optional<List<Community>> findCommunitiesByOrganizerId(@Param("organizerId") Long organizerId);
+
+    @Query(nativeQuery = true,
             value = "select count(*) from community_members where community_id = :communityId and member_id = :userId")
     Integer findUserInCommunity(@Param("communityId") Long communityId, @Param("userId") Long userId);
 

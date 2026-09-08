@@ -1,0 +1,70 @@
+<div class="container page">
+  <div class="mx-auto form-wide">
+    <h1 class="h3 mb-1">Create an event</h1>
+    <p class="text-body-secondary mb-4">Set a time, a place and how many people can come.</p>
+
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <label class="form-label" for="title">Title</label>
+        <input class="form-control" type="text" id="title" formControlName="title">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="description">Description</label>
+        <textarea class="form-control" id="description" rows="4" formControlName="description"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="location">Location</label>
+        <input class="form-control" type="text" id="location" formControlName="location" placeholder="Venue, city">
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="startsAt">Starts at</label>
+          <input class="form-control" type="datetime-local" id="startsAt" formControlName="startsAt">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="endsAt">Ends at</label>
+          <input class="form-control" type="datetime-local" id="endsAt" formControlName="endsAt">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label" for="capacity">Capacity</label>
+          <input class="form-control" type="number" id="capacity" min="1" formControlName="capacity">
+          <div class="form-text text-danger"
+               *ngIf="form.controls['capacity'].touched && form.controls['capacity'].errors?.['min']">
+            At least one spot.
+          </div>
+        </div>
+
+        <div class="col-md-8 mb-3">
+          <label class="form-label" for="community">Community</label>
+          <select class="form-select" id="community" formControlName="belongsToCommunityId">
+            <option [ngValue]="null">No community — a public event</option>
+            <option *ngFor="let c of communities" [ngValue]="c.id">{{ c.name }}</option>
+          </select>
+          <div class="form-text">You can only choose a community you organize.</div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="image">Cover image</label>
+        <input class="form-control" type="file" id="image" accept="image/*" (change)="onFileSelected($event)">
+        <div class="form-text" *ngIf="uploading">Uploading…</div>
+        <div class="mt-2" *ngIf="uploadedImage">
+          <img class="rounded preview" [src]="uploadedImage.path" alt="Cover preview">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" type="submit" [disabled]="!form.valid || saving || uploading">
+        {{ saving ? 'Creating…' : 'Create event' }}
+      </button>
+      <a class="btn btn-outline-secondary ms-2" [routerLink]="['/events']">Cancel</a>
+    </form>
+  </div>
+</div>

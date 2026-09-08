@@ -38,4 +38,16 @@ export class EventService {
   getHomepage(): Observable<Event[]> {
     return this.http.get('api/events/homepage') as Observable<Event[]>;
   }
+
+  create(event: Event): Observable<Event> {
+    return this.http.post('api/events/add', event) as Observable<Event>;
+  }
+
+  update(id: number, event: Partial<Event>): Observable<Event> {
+    return this.http.patch('api/events/edit/' + id, event) as Observable<Event>;
+  }
+
+  delete(id: number): Observable<any> {
+    return this.http.delete('api/events/delete/' + id) as Observable<any>;
+  }
 }

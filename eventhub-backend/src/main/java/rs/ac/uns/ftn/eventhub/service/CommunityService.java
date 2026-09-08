@@ -15,6 +15,8 @@ public interface CommunityService {
 
     List<Community> findCommunitiesForUser(Long userId);
 
+    List<Community> findCommunitiesForOrganizer(Long userId);
+
     Community createCommunity(CommunityDTO communityDTO);
 
     Community updateCommunity(Community community);

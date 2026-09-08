@@ -1,0 +1,58 @@
+<div class="container page">
+  <div class="mx-auto form-wide">
+    <h1 class="h3 mb-4">Edit event</h1>
+
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!loading">
+      <div class="mb-3">
+        <label class="form-label" for="title">Title</label>
+        <input class="form-control" type="text" id="title" formControlName="title">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="description">Description</label>
+        <textarea class="form-control" id="description" rows="4" formControlName="description"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="location">Location</label>
+        <input class="form-control" type="text" id="location" formControlName="location">
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="startsAt">Starts at</label>
+          <input class="form-control" type="datetime-local" id="startsAt" formControlName="startsAt">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="endsAt">Ends at</label>
+          <input class="form-control" type="datetime-local" id="endsAt" formControlName="endsAt">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="capacity">Capacity</label>
+        <input class="form-control" type="number" id="capacity" min="1" formControlName="capacity">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="image">Cover image</label>
+        <div class="mb-2" *ngIf="currentImage && !uploadedImage">
+          <img class="rounded preview" [src]="currentImage" alt="Current cover">
+        </div>
+        <input class="form-control" type="file" id="image" accept="image/*" (change)="onFileSelected($event)">
+        <div class="form-text" *ngIf="uploading">Uploading…</div>
+        <div class="mt-2" *ngIf="uploadedImage">
+          <img class="rounded preview" [src]="uploadedImage.path" alt="New cover">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" type="submit" [disabled]="!form.valid || saving || uploading">
+        {{ saving ? 'Saving…' : 'Save changes' }}
+      </button>
+      <a class="btn btn-outline-secondary ms-2" [routerLink]="['/events', eventId]">Cancel</a>
+    </form>
+  </div>
+</div>

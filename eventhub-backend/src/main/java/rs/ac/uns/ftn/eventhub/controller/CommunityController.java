@@ -135,6 +135,26 @@ public class CommunityController {
         return new ResponseEntity<>(communityDTOS, HttpStatus.OK);
     }
 
+    // Zajednice u kojima korisnik moze da otvara dogadjaje, dakle one gde je organizator
+    @GetMapping("/my/organizing")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<List<CommunityDTO>> getCommunitiesIOrganize(@RequestHeader("authorization") String token) {
+        logger.info("Authentication check");
+        User user = findUserByToken(token);
+        if (user == null) {
+            logger.error("User not found with token: " + token);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        logger.info("Finding communities organized by user with id: " + user.getId());
+        List<CommunityDTO> communityDTOS = new ArrayList<>();
+        for (Community temp : communityService.findCommunitiesForOrganizer(user.getId())) {
+            communityDTOS.add(new CommunityDTO(temp));
+        }
+        logger.info("Created and sent response");
+
+        return new ResponseEntity<>(communityDTOS, HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CommunityDTO> createCommunity(@RequestBody @Validated CommunityDTO newCommunity,

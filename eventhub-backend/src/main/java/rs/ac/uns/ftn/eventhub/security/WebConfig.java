@@ -20,7 +20,11 @@ public class WebConfig implements WebMvcConfigurer {
     // mestu umesto anotacijom nad svakim kontrolerom
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins("http://localhost:4200");
+        // Podrazumevano su dozvoljeni samo GET, HEAD i POST, pa se izmena i brisanje moraju dopisati
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "HEAD", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
     }
 
     // Otpremljene slike se serviraju sa diska, da bi bile dostupne preko putanje iz baze.
