@@ -55,13 +55,34 @@
             <span class="badge text-bg-warning ms-1" *ngIf="isFull">Full</span>
           </p>
 
-          <div class="alert alert-secondary small mb-0" *ngIf="hasStarted">
+          <div class="alert alert-secondary small" *ngIf="hasStarted">
             This event has already started.
           </div>
 
-          <div class="alert alert-warning small mb-0" *ngIf="!hasStarted && isFull">
+          <div class="alert alert-warning small" *ngIf="!hasStarted && isFull && !registration">
             All spots are taken. New sign-ups join the waiting list.
           </div>
+
+          <div class="alert alert-success small" *ngIf="message">{{ message }}</div>
+          <div class="alert alert-danger small" *ngIf="error">{{ error }}</div>
+
+          <div *ngIf="registration" class="mb-3">
+            <span class="badge" [ngClass]="statusClass">{{ statusLabel }}</span>
+            <p class="small text-body-secondary mt-2 mb-0" *ngIf="registration.conflictsWith">
+              This overlaps with &ldquo;{{ registration.conflictsWith }}&rdquo;, which you are already signed up for.
+            </p>
+          </div>
+
+          <button class="btn btn-primary w-100" *ngIf="auth.isLoggedIn() && !registration && !hasStarted"
+                  (click)="register()">
+            {{ isFull ? 'Join the waiting list' : 'Sign up' }}
+          </button>
+
+          <button class="btn btn-outline-secondary w-100" *ngIf="registration && !hasStarted"
+                  (click)="cancelRegistration()">Cancel registration</button>
+
+          <a class="btn btn-primary w-100" *ngIf="!auth.isLoggedIn() && !hasStarted"
+             [routerLink]="['/users/login']">Sign in to attend</a>
         </div>
       </div>
     </div>

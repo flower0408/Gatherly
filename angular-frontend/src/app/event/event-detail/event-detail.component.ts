@@ -3,9 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EventService } from '../services/event.service';
 import { CommunityService } from '../../community/services/community.service';
 import { UserService } from '../../user/services/user.service';
+import { RegistrationService } from '../services/registration.service';
 import { AuthenticationService } from '../../user/services/authentication.service';
 import { Event } from '../model/event.model';
 import { Community } from '../../community/model/community.model';
+import { Registration } from '../model/registration.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-event-detail',
@@ -19,6 +22,9 @@ export class EventDetailComponent implements OnInit {
   loading = true;
   notFound = false;
   canManage = false;
+  registration: Registration | null = null;
+  message: string | null = null;
+  error: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -26,6 +32,7 @@ export class EventDetailComponent implements OnInit {
     private eventService: EventService,
     private communityService: CommunityService,
     private userService: UserService,
+    private registrationService: RegistrationService,
     public auth: AuthenticationService
   ) {}
 
@@ -41,6 +48,7 @@ export class EventDetailComponent implements OnInit {
           this.loadCommunity(result.belongsToCommunityId);
         }
         this.checkOwnership(result);
+        this.loadMyRegistration(result.id);
       },
       error: () => {
         this.notFound = true;
@@ -62,6 +70,72 @@ export class EventDetailComponent implements OnInit {
       next: (me) => this.canManage = me.id === event.createdByUserId,
       error: () => this.canManage = false
     });
+  }
+
+  // Prijava prijavljenog korisnika za ovaj dogadjaj, ako je ima
+  private loadMyRegistration(eventId: number): void {
+    if (!this.auth.isLoggedIn()) {
+      return;
+    }
+    this.registrationService.getMine().subscribe({
+      next: (result) => {
+        this.registration = result.find((r) => r.forEventId === eventId && r.status !== 'CANCELLED') || null;
+      },
+      error: () => this.registration = null
+    });
+  }
+
+  register(): void {
+    if (!this.event) {
+      return;
+    }
+    this.message = null;
+    this.error = null;
+
+    this.registrationService.register(this.event.id).subscribe({
+      next: (created) => {
+        this.registration = created;
+        this.message = created.status === 'WAITLISTED'
+          ? 'The event is full, so you are on the waiting list. You will be notified if a spot opens up.'
+          : 'Your request has been sent, the organizer will confirm it.';
+        this.reload();
+      },
+      error: (response: HttpErrorResponse) => this.error = this.textOf(response)
+    });
+  }
+
+  cancelRegistration(): void {
+    if (!this.registration || !confirm('Cancel your registration for this event?')) {
+      return;
+    }
+    this.message = null;
+    this.error = null;
+
+    this.registrationService.cancel(this.registration.id).subscribe({
+      next: () => {
+        this.registration = null;
+        this.message = 'Your registration has been cancelled.';
+        this.reload();
+      },
+      error: (response: HttpErrorResponse) => this.error = this.textOf(response)
+    });
+  }
+
+  // Broj zauzetih mesta se menja posle prijave, pa se dogadjaj ucitava ponovo
+  private reload(): void {
+    if (!this.event) {
+      return;
+    }
+    this.eventService.getOne(this.event.id).subscribe({
+      next: (result) => this.event = result,
+      error: () => {}
+    });
+  }
+
+  private textOf(response: HttpErrorResponse): string {
+    return typeof response.error === 'string' && response.error.length > 0
+      ? response.error
+      : 'That action could not be completed.';
   }
 
   remove(): void {
@@ -97,6 +171,30 @@ export class EventDetailComponent implements OnInit {
 
   get isFull(): boolean {
     return this.freeSpots <= 0;
+  }
+
+  // Statusi se korisniku prikazuju recima, a ne kao vrednosti iz baze
+  get statusLabel(): string {
+    switch (this.registration?.status) {
+      case 'PENDING': return 'Waiting for the organizer';
+      case 'WAITLISTED': return 'On the waiting list';
+      case 'ACCEPTED': return 'You are going';
+      case 'REJECTED': return 'Not accepted';
+      case 'ATTENDED': return 'You attended';
+      case 'NO_SHOW': return 'Marked as no-show';
+      default: return '';
+    }
+  }
+
+  get statusClass(): string {
+    switch (this.registration?.status) {
+      case 'ACCEPTED':
+      case 'ATTENDED': return 'text-bg-success';
+      case 'REJECTED':
+      case 'NO_SHOW': return 'text-bg-danger';
+      case 'WAITLISTED': return 'text-bg-warning';
+      default: return 'text-bg-secondary';
+    }
   }
 
   get hasStarted(): boolean {
