@@ -20,6 +20,7 @@
         <h1 class="h2 mb-0">{{ event.title }}</h1>
 
         <div class="btn-group btn-group-sm" *ngIf="canManage">
+          <a class="btn btn-outline-primary" [routerLink]="['/events', event.id, 'registrations']">Registrations</a>
           <a class="btn btn-outline-primary" [routerLink]="['/events', event.id, 'edit']">Edit</a>
           <button class="btn btn-outline-danger" (click)="remove()">Delete</button>
         </div>

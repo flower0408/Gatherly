@@ -16,6 +16,7 @@ import { EventCardComponent } from './event/event-card/event-card.component';
 import { EventDetailComponent } from './event/event-detail/event-detail.component';
 import { AddEventComponent } from './event/add-event/add-event.component';
 import { EditEventComponent } from './event/edit-event/edit-event.component';
+import { EventRegistrationsComponent } from './event/event-registrations/event-registrations.component';
 import { MyRegistrationsComponent } from './event/my-registrations/my-registrations.component';
 import { CommunityCardComponent } from './community/community-card/community-card.component';
 import { CommunityListComponent } from './community/community-list/community-list.component';
@@ -37,6 +38,7 @@ import { EditCommunityComponent } from './community/edit-community/edit-communit
     AddEventComponent,
     EditEventComponent,
     MyRegistrationsComponent,
+    EventRegistrationsComponent,
     CommunityCardComponent,
     CommunityListComponent,
     CommunityDetailComponent,

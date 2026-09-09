@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.service.MailService;
@@ -35,6 +37,10 @@ public class MailServiceImpl implements MailService {
     }
 
     private static final Logger logger = LogManager.getLogger(MailServiceImpl.class);
+
+    // Vreme u mejlu se ispisuje recima, jer je podrazumevani zapis LocalDateTime-a namenjen masinama.
+    // Jezik se zadaje izricito, da naziv meseca ne bi zavisio od podesavanja racunara na kome server radi.
+    private static final DateTimeFormatter MAIL_DATE = DateTimeFormatter.ofPattern("d MMMM yyyy, HH:mm", Locale.ENGLISH);
 
     @Override
     public void sendVerificationMail(User user) {
@@ -73,7 +79,7 @@ public class MailServiceImpl implements MailService {
         message.setSubject("Gatherly - your spot is confirmed");
         message.setText("Hello " + user.getFirstName() + ",\n\n"
                 + "Your registration for \"" + event.getTitle() + "\" has been accepted.\n\n"
-                + "When: " + event.getStartsAt() + "\n"
+                + "When: " + event.getStartsAt().format(MAIL_DATE) + "\n"
                 + "Where: " + event.getLocation() + "\n\n"
                 + "See you there.");
 
@@ -102,7 +108,7 @@ public class MailServiceImpl implements MailService {
         message.setText("Hello " + user.getFirstName() + ",\n\n"
                 + "Someone cancelled, so a spot opened up and you moved off the waiting list for \""
                 + event.getTitle() + "\". Your place is now confirmed.\n\n"
-                + "When: " + event.getStartsAt() + "\n"
+                + "When: " + event.getStartsAt().format(MAIL_DATE) + "\n"
                 + "Where: " + event.getLocation() + "\n\n"
                 + "If you can no longer make it, please cancel so someone else can take the spot.");
 

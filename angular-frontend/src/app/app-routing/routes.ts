@@ -7,6 +7,7 @@ import { EventListComponent } from '../event/event-list/event-list.component';
 import { EventDetailComponent } from '../event/event-detail/event-detail.component';
 import { AddEventComponent } from '../event/add-event/add-event.component';
 import { EditEventComponent } from '../event/edit-event/edit-event.component';
+import { EventRegistrationsComponent } from '../event/event-registrations/event-registrations.component';
 import { MyRegistrationsComponent } from '../event/my-registrations/my-registrations.component';
 import { CommunityListComponent } from '../community/community-list/community-list.component';
 import { CommunityDetailComponent } from '../community/community-detail/community-detail.component';
@@ -23,6 +24,8 @@ export const routes: Routes = [
   { path: 'events/:id', component: EventDetailComponent, title: 'Event - Gatherly' },
   { path: 'events/:id/edit', component: EditEventComponent, canActivate: [RoleGuardService],
     data: { expectedRoles: 'USER|ADMIN' }, title: 'Edit event - Gatherly' },
+  { path: 'events/:id/registrations', component: EventRegistrationsComponent, canActivate: [RoleGuardService],
+    data: { expectedRoles: 'USER|ADMIN' }, title: 'Registrations - Gatherly' },
 
   { path: 'registrations', component: MyRegistrationsComponent, canActivate: [RoleGuardService],
     data: { expectedRoles: 'USER|ADMIN' }, title: 'My registrations - Gatherly' },

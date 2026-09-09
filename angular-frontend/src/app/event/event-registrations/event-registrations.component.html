@@ -1,0 +1,84 @@
+<div class="container page">
+
+  <div *ngIf="forbidden" class="text-center py-5">
+    <h1 class="h4 mb-3">Not allowed</h1>
+    <p class="text-body-secondary">Only an organizer of this event can see its registrations.</p>
+    <a class="btn btn-primary" [routerLink]="['/events']">Back to events</a>
+  </div>
+
+  <div *ngIf="!forbidden">
+    <h1 class="h3 mb-1">Registrations</h1>
+    <p class="text-body-secondary mb-4" *ngIf="event">
+      <a [routerLink]="['/events', event.id]">{{ event.title }}</a>
+      · {{ event.takenSpots }} of {{ event.capacity }} taken
+      <span *ngIf="freeSpots > 0">· {{ freeSpots }} left</span>
+    </p>
+
+    <div class="alert alert-success" *ngIf="message">{{ message }}</div>
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+
+    <p *ngIf="!loading && registrations.length === 0" class="text-body-secondary">
+      Nobody has signed up for this event yet.
+    </p>
+
+    <ng-container *ngIf="registrations.length > 0">
+      <ng-container *ngTemplateOutlet="group; context: { list: waiting, title: 'Waiting for your decision' }"></ng-container>
+      <ng-container *ngTemplateOutlet="group; context: { list: going, title: 'Going' }"></ng-container>
+      <ng-container *ngTemplateOutlet="group; context: { list: waitlisted, title: 'Waiting list' }"></ng-container>
+      <ng-container *ngTemplateOutlet="group; context: { list: settled, title: 'Settled' }"></ng-container>
+    </ng-container>
+  </div>
+
+  <ng-template #group let-list="list" let-title="title">
+    <div class="mb-4" *ngIf="list.length > 0">
+      <h2 class="h5 mb-3">{{ title }} <span class="text-body-secondary">({{ list.length }})</span></h2>
+
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Participant</th>
+              <th>Reliability</th>
+              <th>Signed up</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let registration of list">
+              <td>{{ registration.participantUsername }}</td>
+              <td [ngClass]="reliabilityClass(registration.participantReliability)">
+                {{ registration.participantReliability !== null ? registration.participantReliability + '%' : '—' }}
+              </td>
+              <td class="small">{{ registration.createdAt | date: 'd MMM y, HH:mm' }}</td>
+              <td>
+                <span class="badge" [ngClass]="badge(registration.status)">{{ label(registration.status) }}</span>
+              </td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm"
+                     *ngIf="registration.status === 'PENDING' || registration.status === 'WAITLISTED'">
+                  <button class="btn btn-outline-success" (click)="accept(registration)">Accept</button>
+                  <button class="btn btn-outline-danger" (click)="reject(registration)">Reject</button>
+                </div>
+
+                <div class="btn-group btn-group-sm"
+                     *ngIf="hasStarted && (registration.status === 'ACCEPTED'
+                            || registration.status === 'ATTENDED' || registration.status === 'NO_SHOW')">
+                  <button class="btn btn-outline-success" (click)="markAttended(registration)">Attended</button>
+                  <button class="btn btn-outline-danger" (click)="markNoShow(registration)">No-show</button>
+                </div>
+
+                <button class="btn btn-outline-danger btn-sm"
+                        *ngIf="!hasStarted && registration.status === 'ACCEPTED'"
+                        (click)="reject(registration)">Remove</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-template>
+
+</div>
