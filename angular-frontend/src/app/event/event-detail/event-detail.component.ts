@@ -22,6 +22,7 @@ export class EventDetailComponent implements OnInit {
   loading = true;
   notFound = false;
   canManage = false;
+  myId: number | null = null;
   registration: Registration | null = null;
   message: string | null = null;
   error: string | null = null;
@@ -62,13 +63,12 @@ export class EventDetailComponent implements OnInit {
     if (!this.auth.isLoggedIn()) {
       return;
     }
-    if (this.auth.isAdmin()) {
-      this.canManage = true;
-      return;
-    }
     this.userService.whoAmI().subscribe({
-      next: (me) => this.canManage = me.id === event.createdByUserId,
-      error: () => this.canManage = false
+      next: (me) => {
+        this.myId = me.id;
+        this.canManage = this.auth.isAdmin() || me.id === event.createdByUserId;
+      },
+      error: () => this.canManage = this.auth.isAdmin()
     });
   }
 

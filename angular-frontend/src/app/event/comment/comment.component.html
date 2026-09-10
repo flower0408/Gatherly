@@ -1,0 +1,47 @@
+<div class="comment">
+  <div class="d-flex justify-content-between align-items-baseline gap-2">
+    <div>
+      <span class="fw-semibold">{{ comment.authorUsername }}</span>
+      <span class="small text-body-secondary ms-2">{{ comment.timestamp | date: 'd MMM y' }}</span>
+    </div>
+
+    <div class="btn-group btn-group-sm">
+      <button class="btn btn-link btn-sm text-decoration-none p-0 me-3"
+              *ngIf="myId !== null" (click)="startReply()">Reply</button>
+      <button class="btn btn-link btn-sm text-decoration-none p-0 me-3"
+              *ngIf="isMine" (click)="startEdit()">Edit</button>
+      <button class="btn btn-link btn-sm text-decoration-none p-0 text-danger"
+              *ngIf="isMine || canModerate" (click)="remove()">Delete</button>
+    </div>
+  </div>
+
+  <p class="mb-2" *ngIf="!editing">{{ comment.text }}</p>
+
+  <div class="alert alert-danger py-2 small" *ngIf="error">{{ error }}</div>
+
+  <div class="mb-2" *ngIf="editing">
+    <textarea class="form-control form-control-sm mb-2" rows="2" [(ngModel)]="draft"></textarea>
+    <button class="btn btn-primary btn-sm" (click)="submitEdit()" [disabled]="!draft.trim()">Save</button>
+    <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
+  </div>
+
+  <div class="mb-2" *ngIf="replying">
+    <textarea class="form-control form-control-sm mb-2" rows="2" [(ngModel)]="draft"
+              placeholder="Write a reply…"></textarea>
+    <button class="btn btn-primary btn-sm" (click)="submitReply()" [disabled]="!draft.trim()">Reply</button>
+    <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
+  </div>
+
+  <button class="btn btn-link btn-sm text-decoration-none p-0" *ngIf="replies.length > 0"
+          (click)="showReplies = !showReplies">
+    {{ showReplies ? 'Hide' : 'Show' }} {{ replies.length }}
+    {{ replies.length === 1 ? 'reply' : 'replies' }}
+  </button>
+
+  <!-- Odgovor je opet komentar, pa se komponenta poziva sama -->
+  <div class="replies" *ngIf="showReplies">
+    <app-comment *ngFor="let reply of replies"
+                 [comment]="reply" [eventId]="eventId" [myId]="myId" [canModerate]="canModerate"
+                 (removed)="loadReplies()"></app-comment>
+  </div>
+</div>
