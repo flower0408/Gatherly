@@ -17,6 +17,7 @@ export class CommentListComponent implements OnInit {
   comments: Comment[] = [];
   loading = true;
   order = 'desc';
+  sortField = 'date';
   draft = '';
   error: string | null = null;
 
@@ -29,7 +30,7 @@ export class CommentListComponent implements OnInit {
   load(): void {
     this.loading = true;
 
-    this.commentService.getForEvent(this.eventId, 'date', this.order).subscribe({
+    this.commentService.getForEvent(this.eventId, this.sortField, this.order).subscribe({
       next: (result) => {
         this.comments = result;
         this.loading = false;
@@ -41,12 +42,18 @@ export class CommentListComponent implements OnInit {
     });
   }
 
-  sortBy(order: string): void {
-    if (this.order === order) {
+  // Po datumu se bira smer, a po reakciji se uvek prikazuju najpopularniji prvi
+  sortBy(field: string, order: string): void {
+    if (this.sortField === field && this.order === order) {
       return;
     }
+    this.sortField = field;
     this.order = order;
     this.load();
+  }
+
+  isSorted(field: string, order: string): boolean {
+    return this.sortField === field && this.order === order;
   }
 
   submit(): void {

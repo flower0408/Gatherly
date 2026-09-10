@@ -3,10 +3,14 @@
     <h2 class="h4 mb-0">Comments <span class="text-body-secondary">({{ comments.length }})</span></h2>
 
     <div class="btn-group btn-group-sm" *ngIf="comments.length > 1">
-      <button class="btn" [ngClass]="order === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
-              (click)="sortBy('desc')">Newest first</button>
-      <button class="btn" [ngClass]="order === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
-              (click)="sortBy('asc')">Oldest first</button>
+      <button class="btn" [ngClass]="isSorted('date', 'desc') ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="sortBy('date', 'desc')">Newest</button>
+      <button class="btn" [ngClass]="isSorted('date', 'asc') ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="sortBy('date', 'asc')">Oldest</button>
+      <button class="btn" [ngClass]="isSorted('like', 'desc') ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="sortBy('like', 'desc')">Most liked</button>
+      <button class="btn" [ngClass]="isSorted('heart', 'desc') ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="sortBy('heart', 'desc')">Most loved</button>
     </div>
   </div>
 

@@ -32,7 +32,9 @@
     <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
   </div>
 
-  <button class="btn btn-link btn-sm text-decoration-none p-0" *ngIf="replies.length > 0"
+  <app-reactions class="d-inline-block mb-2" [commentId]="comment.id" [canReact]="myId !== null"></app-reactions>
+
+  <button class="btn btn-link btn-sm text-decoration-none p-0 d-block" *ngIf="replies.length > 0"
           (click)="showReplies = !showReplies">
     {{ showReplies ? 'Hide' : 'Show' }} {{ replies.length }}
     {{ replies.length === 1 ? 'reply' : 'replies' }}

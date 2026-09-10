@@ -1,0 +1,4 @@
+/* Gostu se brojevi i dalje prikazuju, samo dugmad ne reaguju */
+.reaction:disabled {
+  opacity: 1;
+}

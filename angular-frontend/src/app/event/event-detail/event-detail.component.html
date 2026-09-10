@@ -34,6 +34,8 @@
       <h2 class="h6 text-uppercase text-body-secondary">About</h2>
       <p class="mb-4">{{ event.description }}</p>
 
+      <app-reactions [eventId]="event.id" [canReact]="myId !== null"></app-reactions>
+      
       <app-comment-list [eventId]="event.id" [myId]="myId" [canModerate]="canManage"></app-comment-list>
     </div>
 
