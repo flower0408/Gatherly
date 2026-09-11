@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserDetailsServiceImpl;
 
 @Configuration
@@ -35,6 +36,14 @@ public class WebSecurityConfig {
     @Autowired
     public void setTokenUtils(TokenUtils tokenUtils) {
         this.tokenUtils = tokenUtils;
+    }
+
+    // Filter uz svaki zahtev proverava i da li je korisnik blokiran, zato mu treba i ovaj servis
+    private BannedService bannedService;
+
+    @Autowired
+    public void setBannedService(BannedService bannedService) {
+        this.bannedService = bannedService;
     }
 
     @Bean
@@ -89,7 +98,7 @@ public class WebSecurityConfig {
 
                 // Token se proverava pre nego sto zahtev dodje do BasicAuthenticationFilter-a,
                 // jer se prijava ne radi korisnickim imenom i lozinkom nego tokenom
-                .addFilterBefore(new AuthenticationTokenFilter(userDetailsService(), tokenUtils), BasicAuthenticationFilter.class);
+                .addFilterBefore(new AuthenticationTokenFilter(userDetailsService(), tokenUtils, bannedService), BasicAuthenticationFilter.class);
 
         // CSRF zastita nije potrebna: token se salje u zaglavlju Authorization, ne u kolacicu,
         // pa ga pregledac ne prilaze sam uz zahtev sa tudje stranice

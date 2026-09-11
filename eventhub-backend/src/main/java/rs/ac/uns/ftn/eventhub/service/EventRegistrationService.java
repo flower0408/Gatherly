@@ -21,6 +21,8 @@ public interface EventRegistrationService {
 
     EventRegistration findFirstWaitlisted(Long eventId);
 
+    void promoteFromWaitlist(Event event);
+
     Integer calculateReliability(Long userId);
 
     EventRegistration createRegistration(User user, Event event, RegistrationStatus status);

@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import rs.ac.uns.ftn.eventhub.service.BannedService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,10 +23,14 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final TokenUtils tokenUtils;
 
+    private final BannedService bannedService;
+
     @Autowired
-    public AuthenticationTokenFilter(UserDetailsService userDetailsService, TokenUtils tokenUtils) {
+    public AuthenticationTokenFilter(UserDetailsService userDetailsService, TokenUtils tokenUtils,
+                                     BannedService bannedService) {
         this.userDetailsService = userDetailsService;
         this.tokenUtils = tokenUtils;
+        this.bannedService = bannedService;
     }
 
 
@@ -43,7 +48,9 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            if (tokenUtils.validateToken(token, userDetails)) {
+            // Blokada se proverava uz svaki zahtev, a ne samo pri prijavi. Inace bi onaj ko je
+            // vec prijavljen nastavio da radi sve do isteka tokena.
+            if (tokenUtils.validateToken(token, userDetails) && !isBanned(username)) {
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
                 );
@@ -53,5 +60,9 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isBanned(String username) {
+        return bannedService.isBannedFromSystem(username);
     }
 }

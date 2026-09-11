@@ -24,7 +24,10 @@
 
         <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
            [routerLink]="['/communities', community.id, 'reports']">Reports</a>
-           
+
+        <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
+           [routerLink]="['/communities', community.id, 'bans']">Banned</a>
+
         <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
            [routerLink]="['/communities', community.id, 'edit']">Edit</a>
       </div>
@@ -96,6 +99,10 @@
                       *ngIf="auth.isAdmin() && isOrganizer(member) && !isMe(member)"
                       (click)="removeOrganizer(member)">Remove</button>
 
+              <button class="btn btn-outline-danger btn-sm"
+                      *ngIf="canManage && !isOrganizer(member) && !isMe(member) && !community.suspended"
+                      (click)="banMember(member)">Ban</button>
+                              
               <button class="btn btn-outline-secondary btn-sm"
                       *ngIf="isOrganizer(member) && isMe(member)"
                       (click)="removeOrganizer(member)">Step down</button>

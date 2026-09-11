@@ -21,6 +21,7 @@ import { CommentComponent } from './event/comment/comment.component';
 import { CommentListComponent } from './event/comment-list/comment-list.component';
 import { EventRegistrationsComponent } from './event/event-registrations/event-registrations.component';
 import { MyRegistrationsComponent } from './event/my-registrations/my-registrations.component';
+import { BanListComponent } from './banned/ban-list/ban-list.component';
 import { ReportButtonComponent } from './report/report-button/report-button.component';
 import { ReportListComponent } from './report/report-list/report-list.component';
 import { CommunityCardComponent } from './community/community-card/community-card.component';
@@ -49,6 +50,7 @@ import { EditCommunityComponent } from './community/edit-community/edit-communit
     CommentListComponent,
     ReportButtonComponent,
     ReportListComponent,
+    BanListComponent,
     CommunityCardComponent,
     CommunityListComponent,
     CommunityDetailComponent,

@@ -25,6 +25,9 @@ public class BannedDTO {
 
     private String towardsUsername;
 
+    // Naziv zajednice, prazno kod blokade na nivou sistema. Dopisuje se u kontroleru.
+    private String communityName;
+
     public BannedDTO(Banned banned) {
         this.id = banned.getId();
         this.timestamp = banned.getTimestamp().toString();

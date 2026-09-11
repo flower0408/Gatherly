@@ -5,6 +5,7 @@ import { CommunityService } from '../services/community.service';
 import { EventService } from '../../event/services/event.service';
 import { AuthenticationService } from '../../user/services/authentication.service';
 import { UserService } from '../../user/services/user.service';
+import { BanService } from '../../banned/services/ban.service';
 import { Community } from '../model/community.model';
 import { Event } from '../../event/model/event.model';
 import { User } from '../../user/model/user.model';
@@ -36,6 +37,7 @@ export class CommunityDetailComponent implements OnInit {
     private communityService: CommunityService,
     private eventService: EventService,
     private userService: UserService,
+    private banService: BanService,
     public auth: AuthenticationService
   ) {}
 
@@ -184,6 +186,21 @@ export class CommunityDetailComponent implements OnInit {
     });
   }
 
+  // Blokada u zajednici je posao njenog organizatora, blokiran korisnik prestaje da bude clan
+  banMember(user: User): void {
+    if (!this.community || !confirm('Ban ' + user.username + ' from this community?')) {
+      return;
+    }
+    this.clearNotices();
+    this.banService.banFromCommunity(this.community.id, user.id).subscribe({
+      next: () => {
+        this.message = user.username + ' has been banned from this community.';
+        this.loadPeople();
+      },
+      error: (response: HttpErrorResponse) => this.error = this.textOf(response)
+    });
+  }
+  
   private clearNotices(): void {
     this.message = null;
     this.error = null;

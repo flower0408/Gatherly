@@ -10,6 +10,8 @@ import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.model.enums.RegistrationStatus;
 import rs.ac.uns.ftn.eventhub.repository.EventRegistrationRepository;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
+import rs.ac.uns.ftn.eventhub.service.MailService;
+import rs.ac.uns.ftn.eventhub.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -23,9 +25,38 @@ public class EventRegistrationServiceImpl implements EventRegistrationService {
     private EventRegistrationRepository eventRegistrationRepository;
 
 
+    private UserService userService;
+
+
+    private MailService mailService;
+
+
     @Autowired
-    public EventRegistrationServiceImpl(EventRegistrationRepository eventRegistrationRepository) {
+    public EventRegistrationServiceImpl(EventRegistrationRepository eventRegistrationRepository,
+                                        UserServiceImpl userService, MailService mailService) {
         this.eventRegistrationRepository = eventRegistrationRepository;
+        this.userService = userService;
+        this.mailService = mailService;
+    }
+
+    // Kada se oslobodi mesto, prvi sa liste cekanja prelazi u prihvacene i dobija obavestenje.
+    // Stoji u servisu jer mesto moze da oslobodi i otkazivanje i odluka organizatora i blokada.
+    @Override
+    public void promoteFromWaitlist(Event event) {
+        if (event == null)
+            return;
+        if (countTakenSpots(event.getId()) >= event.getCapacity()) {
+            logger.info("Event with id: " + event.getId() + " is still full, nobody is promoted");
+            return;
+        }
+        EventRegistration next = findFirstWaitlisted(event.getId());
+        if (next == null) {
+            logger.info("Waiting list for event with id: " + event.getId() + " is empty");
+            return;
+        }
+        logger.info("Promoting registration with id: " + next.getId() + " from the waiting list");
+        updateStatus(next, RegistrationStatus.ACCEPTED);
+        mailService.sendPromotedFromWaitlistMail(userService.findById(next.getCreatedBy().getId()), event);
     }
 
     private static final Logger logger = LogManager.getLogger(EventRegistrationServiceImpl.class);

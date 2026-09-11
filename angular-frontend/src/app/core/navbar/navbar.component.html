@@ -23,6 +23,9 @@
         <li class="nav-item" *ngIf="auth.isAdmin()">
           <a class="nav-link" [routerLink]="['/reports']" routerLinkActive="active">Reports</a>
         </li>
+        <li class="nav-item" *ngIf="auth.isAdmin()">
+          <a class="nav-link" [routerLink]="['/bans']" routerLinkActive="active">Banned</a>
+        </li>
       </ul>
 
       <ul class="navbar-nav">

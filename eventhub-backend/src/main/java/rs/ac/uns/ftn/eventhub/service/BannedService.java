@@ -16,9 +16,13 @@ public interface BannedService {
 
     boolean isBannedFromSystem(Long userId);
 
+    boolean isBannedFromSystem(String username);
+
     boolean isBannedFromCommunity(Long userId, Long communityId);
 
     List<Banned> findAllSystemBans();
+
+    List<Banned> findAllBans();
 
     List<Banned> findBansForCommunity(Long communityId);
 

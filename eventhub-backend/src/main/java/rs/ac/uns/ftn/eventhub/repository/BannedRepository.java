@@ -24,9 +24,20 @@ public interface BannedRepository extends JpaRepository<Banned, Long> {
                     "and is_deleted = false limit 1")
     Optional<Banned> findCommunityBan(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
+    // Filter uz svaki zahtev ima samo korisnicko ime, a ne i id
+    @Query(nativeQuery = true,
+            value = "select count(*) from banned b join `user` u on u.id = b.towards_user_id " +
+                    "where u.username = :username and b.for_community_id is null and b.is_deleted = false")
+    Integer countSystemBansForUsername(@Param("username") String username);
+
     @Query(nativeQuery = true,
             value = "select * from banned where for_community_id is null and is_deleted = false order by timestamp desc")
     Optional<List<Banned>> findAllSystemBans();
+
+    // Administrator treba da vidi celu sliku, i blokade sa sistema i one po zajednicama
+    @Query(nativeQuery = true,
+            value = "select * from banned where is_deleted = false order by timestamp desc")
+    Optional<List<Banned>> findAllBans();
 
     @Query(nativeQuery = true,
             value = "select * from banned where for_community_id = :communityId and is_deleted = false " +

@@ -1,0 +1,61 @@
+<div class="container page">
+
+  <div *ngIf="forbidden" class="text-center py-5">
+    <h1 class="h4 mb-3">Not allowed</h1>
+    <p class="text-body-secondary">You are not allowed to see these bans.</p>
+    <a class="btn btn-primary" [routerLink]="['/events']">Back to events</a>
+  </div>
+
+  <div *ngIf="!forbidden">
+    <h1 class="h3 mb-1">Banned people</h1>
+
+    <p class="text-body-secondary mb-4" *ngIf="community">
+      Banned from
+      <a [routerLink]="['/communities', community.id]">{{ community.name }}</a>.
+      They can still use Gatherly, but not this community.
+    </p>
+
+    <p class="text-body-secondary mb-4" *ngIf="!community">
+      Every ban on Gatherly. A ban from the whole platform stops someone from signing in,
+      while a ban from a community only shuts them out of that one.
+    </p>
+
+    <div class="alert alert-success" *ngIf="message">{{ message }}</div>
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+
+    <p *ngIf="!loading && bans.length === 0" class="text-body-secondary">
+      Nobody is banned.
+    </p>
+
+    <div class="table-responsive" *ngIf="bans.length > 0">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Person</th>
+            <th *ngIf="communityId === null">Banned from</th>
+            <th>Banned on</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ban of bans">
+            <td>{{ ban.towardsUsername }}</td>
+            <td *ngIf="communityId === null">
+              <span class="badge text-bg-danger" *ngIf="!ban.communityName">The whole of Gatherly</span>
+              <a *ngIf="ban.communityName" [routerLink]="['/communities', ban.forCommunityId]">
+                {{ ban.communityName }}
+              </a>
+            </td>
+            <td class="small">{{ ban.timestamp | date: 'd MMM y' }}</td>
+            <td class="text-end">
+              <button class="btn btn-outline-secondary btn-sm" (click)="unban(ban)">Lift ban</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

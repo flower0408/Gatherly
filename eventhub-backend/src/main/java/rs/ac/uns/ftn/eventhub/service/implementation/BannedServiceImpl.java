@@ -49,6 +49,12 @@ public class BannedServiceImpl implements BannedService {
     }
 
     @Override
+    public boolean isBannedFromSystem(String username) {
+        Integer count = bannedRepository.countSystemBansForUsername(username);
+        return count != null && count > 0;
+    }
+
+    @Override
     public boolean isBannedFromCommunity(Long userId, Long communityId) {
         return findCommunityBan(userId, communityId) != null;
     }
@@ -56,6 +62,11 @@ public class BannedServiceImpl implements BannedService {
     @Override
     public List<Banned> findAllSystemBans() {
         return bannedRepository.findAllSystemBans().orElse(Collections.emptyList());
+    }
+
+    @Override
+    public List<Banned> findAllBans() {
+        return bannedRepository.findAllBans().orElse(Collections.emptyList());
     }
 
     @Override
