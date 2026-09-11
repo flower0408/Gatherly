@@ -176,7 +176,7 @@ public class ReportController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity<>(new ReportDTO(report), HttpStatus.OK);
+        return new ResponseEntity<>(toDTO(report), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/accept")
@@ -234,7 +234,7 @@ public class ReportController {
             }
         }
 
-        return new ResponseEntity<>(new ReportDTO(report), HttpStatus.OK);
+        return new ResponseEntity<>(toDTO(report), HttpStatus.OK);
     }
 
     // Prijavu na sadrzaj u zajednici resava njen organizator, sve ostalo administrator sistema
@@ -270,9 +270,44 @@ public class ReportController {
     private List<ReportDTO> toDTOs(List<Report> reports) {
         List<ReportDTO> dtos = new ArrayList<>();
         for (Report temp : reports) {
-            dtos.add(new ReportDTO(temp));
+            dtos.add(toDTO(temp));
         }
         return dtos;
+    }
+
+    // Uz prijavu se salje i kratak opis onoga na sta se odnosi, da bi onaj ko odlucuje
+    // video o cemu je rec bez otvaranja dodatnih ekrana
+    private ReportDTO toDTO(Report report) {
+        ReportDTO dto = new ReportDTO(report);
+
+        if (report.getOnEvent() != null) {
+            Event event = eventService.findById(report.getOnEvent().getId());
+            if (event != null) {
+                dto.setTargetLabel(event.getTitle());
+                dto.setTargetEventId(event.getId());
+            }
+        }
+        if (report.getOnComment() != null) {
+            Comment comment = commentService.findById(report.getOnComment().getId());
+            if (comment != null) {
+                dto.setTargetLabel(shorten(comment.getText()));
+                if (comment.getBelongsToEvent() != null)
+                    dto.setTargetEventId(comment.getBelongsToEvent().getId());
+            }
+        }
+        if (report.getOnUser() != null) {
+            User reported = userService.findById(report.getOnUser().getId());
+            if (reported != null)
+                dto.setTargetLabel(reported.getUsername());
+        }
+
+        return dto;
+    }
+
+    private String shorten(String text) {
+        if (text == null || text.length() <= 80)
+            return text;
+        return text.substring(0, 80) + "…";
     }
 
     private User findUserByToken(String token) {

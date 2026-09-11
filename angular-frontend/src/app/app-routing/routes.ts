@@ -13,6 +13,7 @@ import { CommunityListComponent } from '../community/community-list/community-li
 import { CommunityDetailComponent } from '../community/community-detail/community-detail.component';
 import { AddCommunityComponent } from '../community/add-community/add-community.component';
 import { EditCommunityComponent } from '../community/edit-community/edit-community.component';
+import { ReportListComponent } from '../report/report-list/report-list.component';
 import { LoginGuardService } from '../guards/login-guard.service';
 import { RoleGuardService } from '../guards/role-guard.service';
 
@@ -37,6 +38,11 @@ export const routes: Routes = [
   { path: 'communities/:id/edit', component: EditCommunityComponent, canActivate: [RoleGuardService],
     data: { expectedRoles: 'USER|ADMIN' }, title: 'Edit community - Gatherly' },
 
+  { path: 'reports', component: ReportListComponent, canActivate: [RoleGuardService],
+    data: { expectedRoles: 'ADMIN' }, title: 'Reports - Gatherly' },
+  { path: 'communities/:id/reports', component: ReportListComponent, canActivate: [RoleGuardService],
+    data: { expectedRoles: 'USER|ADMIN' }, title: 'Community reports - Gatherly' },
+    
   { path: 'users/login', component: LoginComponent, canActivate: [LoginGuardService], title: 'Sign in - Gatherly' },
   { path: 'users/register', component: RegisterComponent, canActivate: [LoginGuardService], title: 'Sign up - Gatherly' },
   { path: 'users/verify', component: VerifyComponent, title: 'Account activation - Gatherly' },

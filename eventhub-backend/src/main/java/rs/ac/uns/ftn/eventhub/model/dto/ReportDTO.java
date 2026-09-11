@@ -34,11 +34,20 @@ public class ReportDTO {
 
     private Long onCommentId;
 
+    // Kratak opis prijavljene stvari i dogadjaj na kome se nalazi, dopisuju se u kontroleru.
+    // Bez toga bi onaj ko odlucuje video samo vrstu sadrzaja, a ne i o cemu se radi.
+    private String targetLabel;
+
+    private Long targetEventId;
+
     public ReportDTO(Report report){
         this.id = report.getId();
         this.reason = report.getReason().toString();
         this.timestamp = report.getTimestamp().toString();
-        this.byUserId = report.getByUser().getId();
+        this.accepted = report.getAccepted();
+        // Autor prijave moze da nedostaje ako je nalog obrisan
+        if (report.getByUser() != null)
+            this.byUserId = report.getByUser().getId();
         if (report.getOnUser() != null)
             this.onUserId = report.getOnUser().getId();
         if (report.getOnEvent() != null)

@@ -23,6 +23,9 @@
            [routerLink]="['/events/new']" [queryParams]="{ community: community.id }">Create event here</a>
 
         <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
+           [routerLink]="['/communities', community.id, 'reports']">Reports</a>
+           
+        <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
            [routerLink]="['/communities', community.id, 'edit']">Edit</a>
       </div>
     </div>

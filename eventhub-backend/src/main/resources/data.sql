@@ -1,5 +1,5 @@
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, display_name, description, role)
-values (false, true, null, 'pera@mail.com', 'Pera', true, null, 'Peric', '$2a$12$6LRoZ4kDywW7WnK9bg16A.XXVHgKXxpi6YZ5JYptFnwW3y97DZGju', 'pera',
+values (false, true, null, 'pera@mail.com', 'Pera', true, null, 'Peric', '$2a$12$uVuGNCVu62e8v7YtlF9yZurtYkvWgOj9N5UEdb51eB1EM959We.v.', 'pera',
         "pera", "I am admin of this app", 'ADMIN');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, display_name, role)
 values (false, true, null, 'mika@mail.com', 'Mika', false, null, 'Mikic', '$2a$12$15ymkpdnVT1DGRfGjjqIY.SnwcaMTyiIUb71f3r3Be8i3zHuNRM.i', 'mika',
@@ -7,9 +7,9 @@ values (false, true, null, 'mika@mail.com', 'Mika', false, null, 'Mikic', '$2a$1
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, role)
 values (false, true, null, 'ana@mail.com', 'Ana', false, null, 'Anic', '$2a$12$uVuGNCVu62e8v7YtlF9yZurtYkvWgOj9N5UEdb51eB1EM959We.v.', 'ana', 'USER');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, role)
-values (true, true, null, 'zika@mail.com', 'Zika', false, null, 'Zikic', '$2a$12$TeQF.oCNjgTsl9rFWA9Tb.zA3716nzJZ5wwxONeu1tTzHoqBkk7FK', 'zika', 'USER');
+values (false, true, null, 'zika@mail.com', 'Zika', false, null, 'Zikic', '$2a$12$TeQF.oCNjgTsl9rFWA9Tb.zA3716nzJZ5wwxONeu1tTzHoqBkk7FK', 'zika', 'USER');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, role)
-values (true, true, null, 'djura@mail.com', 'Djura', false, null, 'Djuric', '$2a$12$TeQF.oCNjgTsl9rFWA9Tb.zA3716nzJZ5wwxONeu1tTzHoqBkk7FK', 'djurica', 'USER');
+values (false, true, null, 'djura@mail.com', 'Djura', false, null, 'Djuric', '$2a$12$TeQF.oCNjgTsl9rFWA9Tb.zA3716nzJZ5wwxONeu1tTzHoqBkk7FK', 'djurica', 'USER');
 
 insert into `event` (title, description, location, starts_at, ends_at, capacity, creation_date, is_deleted, created_by_user_id)
 values ('Frontend meetup', 'This is first event by me. I am glad if you can see it.', 'Novi Sad, SPENS',
@@ -43,7 +43,7 @@ values (false, 'Another comment', '2026-06-22 21:05:00', 1, 3, null);
 insert into report (accepted, is_deleted, reason, timestamp, by_user_id, on_comment_id, on_event_id, on_user_id)
 values (true, false, 'HARASSMENT', '2026-05-12', 3, null, null, 4);
 insert into report (accepted, is_deleted, reason, timestamp, by_user_id, on_comment_id, on_event_id, on_user_id)
-values (true, false, 'HARASSMENT', '2026-05-12', 2, 1, null, null);
+values (null, false, 'SPAM', '2026-08-20', 2, 1, null, null);
 insert into report (accepted, is_deleted, reason, timestamp, by_user_id, on_comment_id, on_event_id, on_user_id)
 values (true, false, 'HARASSMENT', '2026-05-12', 5, null, 2, null);
 
@@ -94,4 +94,4 @@ insert into event_registration (status, at, created_at, is_deleted, created_by_u
 values ('NO_SHOW', '2026-08-10', '2026-07-29', false, 1, 7);
 
 insert into banned (is_deleted, timestamp, banned_by_user_id, towards_user_id, for_community_id)
-values (false, '2026-05-13', null, 1, null);
+values (false, '2026-05-13', null, 5, null);

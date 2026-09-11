@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
@@ -31,7 +33,10 @@ public class Report {
     @Column(nullable = false)
     private LocalDate timestamp;
 
+    // Prijavu je mogao da napise korisnik koji je u medjuvremenu obrisan, a prijava i dalje vazi.
+    // Bez ovoga bi obrisan nalog rusio ceo spisak, jer ga @Where nad korisnikom vise ne vraca.
     @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "by_user_id", referencedColumnName = "id", nullable = false)
     private User byUser;
 
@@ -42,14 +47,17 @@ public class Report {
     private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "on_user_id", referencedColumnName = "id")
     private User onUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "on_event_id", referencedColumnName = "id")
     private Event onEvent;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "on_comment_id", referencedColumnName = "id")
     private Comment onComment;
 }
