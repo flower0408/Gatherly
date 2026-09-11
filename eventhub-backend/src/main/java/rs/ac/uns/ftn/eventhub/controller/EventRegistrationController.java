@@ -100,6 +100,13 @@ public class EventRegistrationController {
 
         logger.info("Creating registration of user with id: " + user.getId() + " for event with id: " + eventId);
         EventRegistration registration = registrationService.createRegistration(user, event, status);
+
+        // Ko dolazi na dogadjaj zajednice, postaje i njen clan, da bi mogao da ucestvuje u razgovoru
+        Long communityId = eventService.findCommunityIdForEvent(event.getId());
+        if (communityId != null && !communityService.checkMember(communityId, user.getId())) {
+            logger.info("Adding user with id: " + user.getId() + " to community with id: " + communityId);
+            communityService.addCommunityMember(communityId, user.getId());
+        }
         logger.info("Created and sent response");
 
         EventRegistrationDTO dto = toDTO(registration);

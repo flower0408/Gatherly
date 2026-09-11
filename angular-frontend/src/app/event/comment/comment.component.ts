@@ -16,6 +16,7 @@ export class CommentComponent implements OnInit {
   @Input() myId: number | null = null;
   // Autor dogadjaja i administrator mogu da obrisu tudji komentar
   @Input() canModerate = false;
+  @Input() canWrite = true;
   @Output() removed = new EventEmitter<void>();
 
   replies: Comment[] = [];

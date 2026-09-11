@@ -7,7 +7,7 @@
 
     <div class="btn-group btn-group-sm">
       <button class="btn btn-link btn-sm text-decoration-none p-0 me-3"
-              *ngIf="myId !== null" (click)="startReply()">Reply</button>
+              *ngIf="myId !== null && canWrite" (click)="startReply()">Reply</button>
       <button class="btn btn-link btn-sm text-decoration-none p-0 me-3"
               *ngIf="isMine" (click)="startEdit()">Edit</button>
       <button class="btn btn-link btn-sm text-decoration-none p-0 text-danger"
@@ -32,7 +32,10 @@
     <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
   </div>
 
-  <app-reactions class="d-inline-block mb-2" [commentId]="comment.id" [canReact]="myId !== null"></app-reactions>
+  <div class="d-flex align-items-center gap-3 flex-wrap mb-2">
+    <app-reactions [commentId]="comment.id" [canReact]="myId !== null && canWrite"></app-reactions>
+    <app-report-button [commentId]="comment.id" [canReport]="myId !== null && !isMine"></app-report-button>
+  </div>
 
   <button class="btn btn-link btn-sm text-decoration-none p-0 d-block" *ngIf="replies.length > 0"
           (click)="showReplies = !showReplies">
@@ -43,7 +46,8 @@
   <!-- Odgovor je opet komentar, pa se komponenta poziva sama -->
   <div class="replies" *ngIf="showReplies">
     <app-comment *ngFor="let reply of replies"
-                 [comment]="reply" [eventId]="eventId" [myId]="myId" [canModerate]="canModerate"
+                 [comment]="reply" [eventId]="eventId" [myId]="myId"
+                 [canModerate]="canModerate" [canWrite]="canWrite"
                  (removed)="loadReplies()"></app-comment>
   </div>
 </div>

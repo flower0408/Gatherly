@@ -19,7 +19,7 @@
           <div class="lead mb-0">{{ event.startsAt | date: 'y · HH:mm' }}</div>
         </div>
       </div>
-      
+
       <p class="event-date text-primary mb-1">
         {{ event.startsAt | date: 'EEEE, d MMMM y' }}
       </p>
@@ -42,9 +42,13 @@
       <h2 class="h6 text-uppercase text-body-secondary">About</h2>
       <p class="mb-4">{{ event.description }}</p>
 
-      <app-reactions [eventId]="event.id" [canReact]="myId !== null"></app-reactions>
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <app-reactions [eventId]="event.id" [canReact]="myId !== null && canWrite"></app-reactions>
+        <app-report-button [eventId]="event.id" [canReport]="myId !== null && !canManage"></app-report-button>
+      </div>
 
-      <app-comment-list [eventId]="event.id" [myId]="myId" [canModerate]="canManage"></app-comment-list>
+      <app-comment-list [eventId]="event.id" [myId]="myId" [canModerate]="canManage"
+                        [canWrite]="canWrite" [communityId]="event.belongsToCommunityId"></app-comment-list>
     </div>
 
     <div class="col-lg-4">

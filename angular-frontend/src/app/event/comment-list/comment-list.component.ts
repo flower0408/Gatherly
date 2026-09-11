@@ -13,6 +13,9 @@ export class CommentListComponent implements OnInit {
   @Input() eventId!: number;
   @Input() myId: number | null = null;
   @Input() canModerate = false;
+  // Razgovor uz dogadjaj zajednice vode njeni clanovi
+  @Input() canWrite = true;
+  @Input() communityId: number | null = null;
 
   comments: Comment[] = [];
   loading = true;

@@ -13,10 +13,12 @@ import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.CommentService;
+import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.ReactionService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommentServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ReactionServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
@@ -39,6 +41,9 @@ public class CommentController {
     EventService eventService;
 
 
+    CommunityService communityService;
+
+
     UserService userService;
 
 
@@ -51,9 +56,11 @@ public class CommentController {
 
     @Autowired
     public CommentController(CommentServiceImpl commentService, EventServiceImpl eventService,
-                             UserServiceImpl userService, ReactionServiceImpl reactionService, TokenUtils tokenUtils) {
+                             CommunityServiceImpl communityService, UserServiceImpl userService,
+                             ReactionServiceImpl reactionService, TokenUtils tokenUtils) {
         this.commentService = commentService;
         this.eventService = eventService;
+        this.communityService = communityService;
         this.userService = userService;
         this.reactionService = reactionService;
         this.tokenUtils = tokenUtils;
@@ -109,6 +116,10 @@ public class CommentController {
             logger.error("Event not found with id: " + eventId);
             return new ResponseEntity<>("Event not found.", HttpStatus.NOT_FOUND);
         }
+        ResponseEntity<String> membershipProblem = checkMembership(user, event);
+        if (membershipProblem != null)
+            return membershipProblem;
+
         logger.info("Creating comment of user with id: " + user.getId() + " on event with id: " + eventId);
         Comment comment = commentService.createComment(newComment.getText(), user, event, null);
 
@@ -135,6 +146,14 @@ public class CommentController {
             return new ResponseEntity<>("Comment not found.", HttpStatus.NOT_FOUND);
         }
         Event event = eventService.findById(parent.getBelongsToEvent().getId());
+        if (event == null) {
+            logger.error("Event not found for comment with id: " + id);
+            return new ResponseEntity<>("Event not found.", HttpStatus.NOT_FOUND);
+        }
+        ResponseEntity<String> membershipProblem = checkMembership(user, event);
+        if (membershipProblem != null)
+            return membershipProblem;
+
         logger.info("Creating reply of user with id: " + user.getId() + " to comment with id: " + id);
         Comment reply = commentService.createComment(newReply.getText(), user, event, parent);
 
@@ -198,6 +217,22 @@ public class CommentController {
         commentService.deleteComment(comment.getId());
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    // Razgovor uz dogadjaj zajednice vode njeni clanovi. Dogadjaj koji ne pripada zajednici
+    // je otvoren za sve, jer tu nema cemu da se pristupi.
+    private ResponseEntity<String> checkMembership(User user, Event event) {
+        Long communityId = eventService.findCommunityIdForEvent(event.getId());
+        if (communityId == null)
+            return null;
+        if (communityService.checkMember(communityId, user.getId())
+                || communityService.checkOrganizer(communityId, user.getId())
+                || user.isAdmin())
+            return null;
+
+        logger.error("User with id: " + user.getId() + " is not a member of community with id: " + communityId);
+        return new ResponseEntity<>("Join this community to join the conversation.", HttpStatus.FORBIDDEN);
     }
 
     private ResponseEntity<String> checkText(String text) {

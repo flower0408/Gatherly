@@ -15,10 +15,12 @@ import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.model.enums.ReactionType;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.CommentService;
+import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.ReactionService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommentServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ReactionServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
@@ -40,6 +42,9 @@ public class ReactionController {
     CommentService commentService;
 
 
+    CommunityService communityService;
+
+
     UserService userService;
 
 
@@ -49,10 +54,12 @@ public class ReactionController {
 
     @Autowired
     public ReactionController(ReactionServiceImpl reactionService, EventServiceImpl eventService,
-                              CommentServiceImpl commentService, UserServiceImpl userService, TokenUtils tokenUtils) {
+                              CommentServiceImpl commentService, CommunityServiceImpl communityService,
+                              UserServiceImpl userService, TokenUtils tokenUtils) {
         this.reactionService = reactionService;
         this.eventService = eventService;
         this.commentService = commentService;
+        this.communityService = communityService;
         this.userService = userService;
         this.tokenUtils = tokenUtils;
     }
@@ -95,6 +102,10 @@ public class ReactionController {
             logger.error("Event not found with id: " + eventId);
             return new ResponseEntity<>("Event not found.", HttpStatus.NOT_FOUND);
         }
+        ResponseEntity<String> membershipProblem = checkMembership(user, event);
+        if (membershipProblem != null)
+            return membershipProblem;
+
         Reaction reaction = reactionService.reactToEvent(user, event, type);
         // Kada se ista reakcija ponovi, ona se povlaci i nema sta da se vrati
         if (reaction == null)
@@ -123,6 +134,15 @@ public class ReactionController {
             logger.error("Comment not found with id: " + commentId);
             return new ResponseEntity<>("Comment not found.", HttpStatus.NOT_FOUND);
         }
+        if (comment.getBelongsToEvent() != null) {
+            Event commentEvent = eventService.findById(comment.getBelongsToEvent().getId());
+            if (commentEvent != null) {
+                ResponseEntity<String> membershipProblem = checkMembership(user, commentEvent);
+                if (membershipProblem != null)
+                    return membershipProblem;
+            }
+        }
+
         Reaction reaction = reactionService.reactToComment(user, comment, type);
         if (reaction == null)
             return new ResponseEntity<>(reactionService.countsForComment(comment.getId()), HttpStatus.OK);
@@ -162,6 +182,22 @@ public class ReactionController {
         return new ResponseEntity<>(new ReactionDTO(reaction), HttpStatus.OK);
     }
 
+
+    // Reakcija odredjuje redosled komentara, pa u zajednici sme samo onaj ko joj pripada.
+    // Dogadjaj van zajednice je otvoren, tu nema cemu da se pristupi.
+    private ResponseEntity<String> checkMembership(User user, Event event) {
+        Long communityId = eventService.findCommunityIdForEvent(event.getId());
+        if (communityId == null)
+            return null;
+        if (communityService.checkMember(communityId, user.getId())
+                || communityService.checkOrganizer(communityId, user.getId())
+                || user.isAdmin())
+            return null;
+
+        logger.error("User with id: " + user.getId() + " is not a member of community with id: " + communityId);
+        return new ResponseEntity<>("Join this community to react here.", HttpStatus.FORBIDDEN);
+    }
+    
     private ReactionType parseType(String value) {
         if (value == null)
             return null;

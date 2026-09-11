@@ -16,7 +16,7 @@
 
   <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
 
-  <div class="mb-3" *ngIf="myId !== null">
+  <div class="mb-3" *ngIf="myId !== null && canWrite">
     <textarea class="form-control mb-2" rows="3" [(ngModel)]="draft"
               placeholder="Ask something about this event…"></textarea>
     <button class="btn btn-primary" (click)="submit()" [disabled]="!draft.trim()">Post comment</button>
@@ -26,6 +26,10 @@
     <a [routerLink]="['/users/login']">Sign in</a> to join the conversation.
   </p>
 
+  <p class="text-body-secondary" *ngIf="myId !== null && !canWrite">
+    <a [routerLink]="['/communities', communityId]">Join this community</a> to join the conversation.
+  </p>
+
   <p *ngIf="loading" class="text-body-secondary">Loading comments…</p>
 
   <p *ngIf="!loading && comments.length === 0" class="text-body-secondary">
@@ -33,6 +37,7 @@
   </p>
 
   <app-comment *ngFor="let comment of comments"
-               [comment]="comment" [eventId]="eventId" [myId]="myId" [canModerate]="canModerate"
+               [comment]="comment" [eventId]="eventId" [myId]="myId"
+               [canModerate]="canModerate" [canWrite]="canWrite"
                (removed)="load()"></app-comment>
 </div>

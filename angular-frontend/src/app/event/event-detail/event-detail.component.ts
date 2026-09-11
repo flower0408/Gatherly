@@ -23,6 +23,8 @@ export class EventDetailComponent implements OnInit {
   notFound = false;
   canManage = false;
   myId: number | null = null;
+  // Dogadjaj van zajednice je otvoren za razgovor, u zajednici pisu njeni clanovi
+  canWrite = true;
   registration: Registration | null = null;
   message: string | null = null;
   error: string | null = null;
@@ -47,6 +49,8 @@ export class EventDetailComponent implements OnInit {
         // Dogadjaj ne mora da pripada zajednici
         if (result.belongsToCommunityId) {
           this.loadCommunity(result.belongsToCommunityId);
+          this.canWrite = false;
+          this.checkMembership(result.belongsToCommunityId);
         }
         this.checkOwnership(result);
         this.loadMyRegistration(result.id);
@@ -99,6 +103,9 @@ export class EventDetailComponent implements OnInit {
           ? 'The event is full, so you are on the waiting list. You will be notified if a spot opens up.'
           : 'Your request has been sent, the organizer will confirm it.';
         this.reload();
+        if (this.event && this.event.belongsToCommunityId) {
+          this.checkMembership(this.event.belongsToCommunityId);
+        }
       },
       error: (response: HttpErrorResponse) => this.error = this.textOf(response)
     });
@@ -148,6 +155,26 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
+  // Clanstvo se proverava tek kad znamo i zajednicu i prijavljenog korisnika
+  private checkMembership(communityId: number): void {
+    if (!this.auth.isLoggedIn()) {
+      return;
+    }
+    if (this.auth.isAdmin()) {
+      this.canWrite = true;
+      return;
+    }
+    this.userService.whoAmI().subscribe({
+      next: (me) => {
+        this.communityService.getMembers(communityId).subscribe({
+          next: (members) => this.canWrite = members.some((m) => m.id === me.id),
+          error: () => this.canWrite = false
+        });
+      },
+      error: () => this.canWrite = false
+    });
+  }
+  
   private loadCommunity(id: number): void {
     this.communityService.getOne(id).subscribe({
       next: (result) => this.community = result,
