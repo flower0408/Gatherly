@@ -34,11 +34,11 @@ values ('Running club', 'This is Mikas public event. Everyone can see it. Sendin
         '2026-08-10 01:12:39', '2026-08-10 03:12:39', 40, '2026-07-27 01:12:39', false, 2);
 
 insert into comment (is_deleted, text, timestamp, belongs_to_event_id, belongs_to_user_id, replies_to_comment_id)
-values (false, 'Good thoughts', '2026-08-11', 1, 2, null);
+values (false, 'Good thoughts', '2026-08-11 19:40:00', 1, 2, null);
 insert into comment (is_deleted, text, timestamp, belongs_to_event_id, belongs_to_user_id, replies_to_comment_id)
-values (false, 'Fine answer to message', '2026-08-04', 1, 1, 1);
+values (false, 'Fine answer to message', '2026-08-04 09:15:00', 1, 1, 1);
 insert into comment (is_deleted, text, timestamp, belongs_to_event_id, belongs_to_user_id, replies_to_comment_id)
-values (false, 'Another comment', '2026-06-22', 1, 3, null);
+values (false, 'Another comment', '2026-06-22 21:05:00', 1, 3, null);
 
 insert into report (accepted, is_deleted, reason, timestamp, by_user_id, on_comment_id, on_event_id, on_user_id)
 values (true, false, 'HARASSMENT', '2026-05-12', 3, null, null, 4);

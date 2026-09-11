@@ -2,3 +2,9 @@
   max-height: 340px;
   object-fit: cover;
 }
+
+/* Traka koja stoji umesto naslovne slike, u tonu teme */
+.placeholder-cover {
+  height: 220px;
+  background: linear-gradient(135deg, var(--bs-primary), var(--bs-purple, #6f42c1));
+}

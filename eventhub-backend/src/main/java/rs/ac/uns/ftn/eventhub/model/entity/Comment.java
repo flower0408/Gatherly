@@ -8,7 +8,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -28,7 +28,7 @@ public class Comment {
     private String text;
 
     @Column(nullable = false)
-    private LocalDate timestamp;
+    private LocalDateTime timestamp;
 
     @Column(nullable = false)
     private boolean isDeleted;

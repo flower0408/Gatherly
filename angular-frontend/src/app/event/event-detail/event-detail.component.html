@@ -12,6 +12,14 @@
     <div class="col-lg-8">
       <img *ngIf="coverImage" class="img-fluid rounded mb-4 w-100 cover" [src]="coverImage" [alt]="event.title">
 
+      <!-- Bez slike bi stranica pocinjala praznim tekstom, pa naslovno mesto popunjava traka sa datumom -->
+      <div *ngIf="!coverImage" class="rounded mb-4 w-100 cover placeholder-cover d-flex align-items-end">
+        <div class="p-4 text-white">
+          <div class="display-6 fw-bold mb-0">{{ event.startsAt | date: 'd MMM' }}</div>
+          <div class="lead mb-0">{{ event.startsAt | date: 'y · HH:mm' }}</div>
+        </div>
+      </div>
+      
       <p class="event-date text-primary mb-1">
         {{ event.startsAt | date: 'EEEE, d MMMM y' }}
       </p>
@@ -35,7 +43,7 @@
       <p class="mb-4">{{ event.description }}</p>
 
       <app-reactions [eventId]="event.id" [canReact]="myId !== null"></app-reactions>
-      
+
       <app-comment-list [eventId]="event.id" [myId]="myId" [canModerate]="canManage"></app-comment-list>
     </div>
 

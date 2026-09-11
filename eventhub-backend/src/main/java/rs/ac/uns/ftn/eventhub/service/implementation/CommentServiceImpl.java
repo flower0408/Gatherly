@@ -12,7 +12,7 @@ import rs.ac.uns.ftn.eventhub.repository.CommentRepository;
 import rs.ac.uns.ftn.eventhub.service.CommentService;
 import rs.ac.uns.ftn.eventhub.service.ReactionService;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +82,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment createComment(String text, User author, Event event, Comment repliesTo) {
         Comment newComment = new Comment();
         newComment.setText(text);
-        newComment.setTimestamp(LocalDate.now());
+        newComment.setTimestamp(LocalDateTime.now());
         newComment.setBelongsToUser(author);
         newComment.setBelongsToEvent(event);
         newComment.setRepliesTo(repliesTo);
