@@ -87,7 +87,8 @@
                     *ngIf="!member.profileImage">{{ member.username.charAt(0) | uppercase }}</span>
 
               <div class="flex-grow-1">
-                <div class="small fw-semibold">{{ member.displayName || member.username }}</div>
+                <a class="small fw-semibold d-block text-decoration-none"
+                   [routerLink]="['/users', member.id]">{{ member.displayName || member.username }}</a>
                 <div class="small text-body-secondary" *ngIf="isOrganizer(member)">Organizer</div>
               </div>
 

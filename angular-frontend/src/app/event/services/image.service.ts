@@ -18,4 +18,8 @@ export class ImageService {
 
     return this.http.post('api/images/upload', data) as Observable<Image>;
   }
+
+  delete(id: number): Observable<any> {
+    return this.http.delete('api/images/' + id) as Observable<any>;
+  }
 }

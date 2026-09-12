@@ -31,6 +31,11 @@ export class EventService {
     return this.http.get('api/events/community/' + communityId + '/sort/' + order) as Observable<Event[]>;
   }
 
+  // Dogadjaji koje jedan korisnik organizuje, samo oni koji tek predstoje
+  getForUser(userId: number): Observable<Event[]> {
+    return this.http.get('api/events/user/' + userId) as Observable<Event[]>;
+  }
+
   getMine(): Observable<Event[]> {
     return this.http.get('api/events/my') as Observable<Event[]>;
   }

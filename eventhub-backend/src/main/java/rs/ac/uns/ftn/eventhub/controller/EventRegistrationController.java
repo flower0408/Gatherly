@@ -329,6 +329,7 @@ public class EventRegistrationController {
         if (participant != null) {
             dto.setParticipantUsername(participant.getUsername());
             dto.setParticipantReliability(registrationService.calculateReliability(participant.getId()));
+            dto.setParticipantAttendanceCount(registrationService.countAttendanceRecords(participant.getId()));
         }
         return dto;
     }

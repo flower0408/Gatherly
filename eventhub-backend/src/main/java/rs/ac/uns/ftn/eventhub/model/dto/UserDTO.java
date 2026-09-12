@@ -43,6 +43,12 @@ public class UserDTO {
 
     private ImageDTO profileImage;
 
+    // Skor pouzdanosti i broj dogadjaja iz kojih je izracunat, dopisuju se u kontroleru.
+    // Broj se salje da bi front znao kada istorija jos nije dovoljna da se skor prikaze.
+    private Integer reliability;
+
+    private Integer attendanceCount;
+
     public UserDTO(User createdUser) {
         this.id = createdUser.getId();
         this.username = createdUser.getUsername();

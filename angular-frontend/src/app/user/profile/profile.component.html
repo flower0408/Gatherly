@@ -1,0 +1,166 @@
+<div class="container page">
+
+  <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+
+  <div *ngIf="notFound" class="text-center py-5">
+    <h1 class="h4 mb-3">Profile not found</h1>
+    <p class="text-body-secondary">This account may have been removed.</p>
+    <a class="btn btn-primary" [routerLink]="['/events']">Back to events</a>
+  </div>
+
+  <div *ngIf="user" class="row g-4">
+    <div class="col-md-4">
+      <img class="avatar rounded-circle mb-3" *ngIf="user.profileImage"
+           [src]="user.profileImage.path" [alt]="user.username">
+      <div class="avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mb-3"
+           *ngIf="!user.profileImage">
+        <span class="display-4">{{ user.username.charAt(0) | uppercase }}</span>
+      </div>
+
+      <!-- Biranje fajla je sakriveno iza dugmeta, kao na profilima na kojima se ugledamo -->
+      <div class="d-flex flex-wrap gap-2" *ngIf="isMine">
+        <input class="d-none" type="file" id="picture" accept="image/*" (change)="onFileSelected($event)">
+
+        <label class="btn btn-outline-primary btn-sm mb-0" for="picture">
+          {{ user.profileImage ? 'Change picture' : 'Add a picture' }}
+        </label>
+
+        <button class="btn btn-outline-secondary btn-sm" *ngIf="user.profileImage"
+                (click)="removePicture()">Remove</button>
+      </div>
+
+      <p class="small text-body-secondary mt-2 mb-0" *ngIf="uploading">Uploading…</p>
+    </div>
+
+    <div class="col-md-8">
+      <h1 class="h3 mb-1">{{ user.displayName || user.username }}</h1>
+      <p class="text-body-secondary mb-1">
+        &#64;{{ user.username }}
+        <span class="badge text-bg-secondary ms-2" *ngIf="user.role === 'ADMIN'">Administrator</span>
+      </p>
+
+      <p class="text-body-secondary small mb-1" *ngIf="user.firstName || user.lastName">
+        {{ user.firstName }} {{ user.lastName }}
+      </p>
+
+
+
+      <div class="alert alert-success" *ngIf="message">{{ message }}</div>
+      <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+      <p class="mb-4" *ngIf="user.description && !editing">{{ user.description }}</p>
+      <p class="text-body-secondary mb-4" *ngIf="!user.description && !editing && !isMine">
+        This person has not written anything about themselves yet.
+      </p>
+
+      <p class="text-body-secondary mb-4" *ngIf="!user.description && !editing && isMine">
+        Say a few words about yourself so people know who they are meeting.
+        <a role="button" class="link-primary" (click)="startEdit()">Add them now</a>.
+      </p>
+
+      <div class="card mb-4" *ngIf="editing">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-6 mb-3">
+              <label class="form-label" for="firstName">First name</label>
+              <input class="form-control" type="text" id="firstName" [(ngModel)]="firstName">
+            </div>
+            <div class="col-sm-6 mb-3">
+              <label class="form-label" for="lastName">Last name</label>
+              <input class="form-control" type="text" id="lastName" [(ngModel)]="lastName">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="displayName">Display name</label>
+            <input class="form-control" type="text" id="displayName" [(ngModel)]="displayName">
+            <div class="form-text">This is the name shown next to your comments and in community lists.</div>
+          </div>
+
+
+
+          <div class="mb-3">
+            <label class="form-label" for="description">About you</label>
+            <textarea class="form-control" id="description" rows="3" [(ngModel)]="description"></textarea>
+          </div>
+
+          <button class="btn btn-primary" (click)="saveProfile()" [disabled]="saving">
+            {{ saving ? 'Saving…' : 'Save' }}
+          </button>
+          <button class="btn btn-outline-secondary ms-2" (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="card mb-4" *ngIf="changingPassword">
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label" for="oldPassword">Current password</label>
+            <input class="form-control" type="password" id="oldPassword" [(ngModel)]="oldPassword">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="newPassword">New password</label>
+            <input class="form-control" type="password" id="newPassword" [(ngModel)]="newPassword">
+            <div class="form-text">At least 8 characters, and different from the one you use now.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="repeatPassword">Repeat new password</label>
+            <input class="form-control" type="password" id="repeatPassword" [(ngModel)]="repeatPassword">
+            <div class="form-text text-danger" *ngIf="repeatPassword && newPassword !== repeatPassword">
+              The two passwords do not match.
+            </div>
+          </div>
+
+          <button class="btn btn-primary" (click)="savePassword()"
+                  [disabled]="saving || !oldPassword || !newPassword || newPassword !== repeatPassword">
+            {{ saving ? 'Saving…' : 'Change password' }}
+          </button>
+          <button class="btn btn-outline-secondary ms-2" (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Skor pouzdanosti: srz teme, pa stoji uz coveka a ne zakopan u tabeli prijava -->
+      <p class="mb-4" *ngIf="showsReliability && !editing && !changingPassword">
+        <span class="fw-semibold" [ngClass]="reliabilityClass">{{ user.reliability }}% reliable</span>
+        <span class="text-body-secondary"> · {{ reliabilityText }}</span>
+      </p>
+
+      <p class="small text-body-secondary" *ngIf="isMine && !editing && !changingPassword">
+        {{ user.email }} <span class="ms-1">· only you can see this</span>
+      </p>
+
+      <div class="d-flex flex-wrap gap-2" *ngIf="!editing && !changingPassword">
+        <button class="btn btn-outline-primary btn-sm" *ngIf="isMine" (click)="startEdit()">Edit profile</button>
+        <button class="btn btn-outline-primary btn-sm" *ngIf="isMine"
+                (click)="startPasswordChange()">Change password</button>
+
+        <app-report-button [userId]="user.id" [canReport]="!isMine && auth.isLoggedIn()"></app-report-button>
+
+        <button class="btn btn-outline-danger btn-sm" *ngIf="!isMine && auth.isAdmin()"
+                (click)="banFromSystem()">Ban from Gatherly</button>
+      </div>
+
+      <div class="mt-5" *ngIf="communities.length > 0">
+        <h2 class="h6 text-uppercase text-body-secondary mb-2">Communities</h2>
+        <p class="mb-0">
+          <a class="me-3" *ngFor="let community of communities"
+             [routerLink]="['/communities', community.id]">{{ community.name }}</a>
+        </p>
+      </div>
+
+      <div class="mt-4" *ngIf="organizing.length > 0">
+        <h2 class="h6 text-uppercase text-body-secondary mb-2">Hosting next</h2>
+        <ul class="list-unstyled mb-0">
+          <li class="mb-2" *ngFor="let event of organizing">
+            <a [routerLink]="['/events', event.id]">{{ event.title }}</a>
+            <span class="small text-body-secondary">
+              · {{ event.startsAt | date: 'd MMM y, HH:mm' }} · {{ event.location }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>

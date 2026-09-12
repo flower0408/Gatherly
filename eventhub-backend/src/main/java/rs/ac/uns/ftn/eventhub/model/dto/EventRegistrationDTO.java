@@ -32,6 +32,10 @@ public class EventRegistrationDTO {
 
     private Integer participantReliability;
 
+    // Na koliko se dogadjaja skor odnosi. Procenat bez toga nije podatak nego utisak:
+    // nula od jednog i nula od dvadeset nisu ista stvar.
+    private Integer participantAttendanceCount;
+
     // Upozorenje da se dogadjaj vremenski preklapa sa necim na sta je korisnik vec prijavljen
     private String conflictsWith;
 

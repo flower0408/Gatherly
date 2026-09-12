@@ -40,8 +40,15 @@
       <div class="mb-4">
         <label class="form-label" for="image">Cover image</label>
         <div class="mb-2" *ngIf="currentImage && !uploadedImage">
-          <img class="rounded preview" [src]="currentImage" alt="Current cover">
+          <img class="rounded preview d-block mb-2" [src]="currentImage" alt="Current cover">
+          <button class="btn btn-outline-secondary btn-sm" type="button" (click)="removeImage()">
+            Remove image
+          </button>
         </div>
+
+        <p class="small text-body-secondary" *ngIf="imageRemoved && !uploadedImage">
+          The image will be removed when you save.
+        </p>
         <input class="form-control" type="file" id="image" accept="image/*" (change)="onFileSelected($event)">
         <div class="form-text" *ngIf="uploading">Uploading…</div>
         <div class="mt-2" *ngIf="uploadedImage">

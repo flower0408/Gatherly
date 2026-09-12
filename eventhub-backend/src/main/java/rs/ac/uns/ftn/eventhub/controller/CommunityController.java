@@ -114,6 +114,19 @@ public class CommunityController {
         return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }
 
+    // Zajednice kojima jedan korisnik pripada, za prikaz na njegovom profilu
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CommunityDTO>> getCommunitiesOfUser(@PathVariable String userId) {
+        logger.info("Finding communities of user with id: " + userId);
+        List<CommunityDTO> communityDTOS = new ArrayList<>();
+        for (Community temp : communityService.findCommunitiesForUser(Long.parseLong(userId))) {
+            communityDTOS.add(new CommunityDTO(temp));
+        }
+        logger.info("Created and sent response");
+
+        return new ResponseEntity<>(communityDTOS, HttpStatus.OK);
+    }
+
     // Od ove tacke rute traze prijavljenog korisnika
 
     @GetMapping("/my")

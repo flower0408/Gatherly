@@ -25,6 +25,8 @@ public interface EventRegistrationService {
 
     Integer calculateReliability(Long userId);
 
+    Integer countAttendanceRecords(Long userId);
+
     EventRegistration createRegistration(User user, Event event, RegistrationStatus status);
 
     EventRegistration updateStatus(EventRegistration registration, RegistrationStatus status);

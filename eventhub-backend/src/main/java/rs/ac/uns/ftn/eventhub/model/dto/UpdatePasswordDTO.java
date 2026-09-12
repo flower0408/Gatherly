@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -17,5 +18,6 @@ public class UpdatePasswordDTO {
     private String oldPassword;
 
     @NotBlank
+    @Size(min = 8, message = "The new password must have at least 8 characters.")
     private String newPassword;
 }

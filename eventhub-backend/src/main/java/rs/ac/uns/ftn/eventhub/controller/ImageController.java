@@ -110,6 +110,15 @@ public class ImageController {
             logger.error("Image not found with id: " + id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // Sliku brise onaj cija je: svoju profilnu, ili sliku dogadjaja koji vodi
+        boolean isMine = image.getBelongsToUser() != null
+                && image.getBelongsToUser().getId().equals(user.getId());
+        boolean managesEvent = image.getBelongsToEvent() != null
+                && image.getBelongsToEvent().getCreatedBy().getId().equals(user.getId());
+        if (!isMine && !managesEvent && !user.isAdmin()) {
+            logger.error("User with id: " + user.getId() + " is not allowed to delete image with id: " + id);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         logger.info("Deleting image with id: " + id);
         imageService.deleteImage(image.getId());
 

@@ -27,6 +27,11 @@ export class CommunityService {
     return this.http.get('api/communities/organizers/' + id) as Observable<User[]>;
   }
 
+  // Zajednice kojima pripada bilo koji korisnik, za prikaz na njegovom profilu
+  getForUser(userId: number): Observable<Community[]> {
+    return this.http.get('api/communities/user/' + userId) as Observable<Community[]>;
+  }
+
   // Zajednice ciji je prijavljeni korisnik clan
   getMine(): Observable<Community[]> {
     return this.http.get('api/communities/my') as Observable<Community[]>;

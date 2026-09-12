@@ -20,10 +20,12 @@ import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.BannedService;
+import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.MailService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.BannedServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -55,6 +57,9 @@ public class UserController {
     BannedService bannedService;
 
 
+    EventRegistrationService registrationService;
+
+
     AuthenticationManager authenticationManager;
 
 
@@ -65,13 +70,15 @@ public class UserController {
     @Autowired
     public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
                           UserDetailsService userDetailsService, MailService mailService,
-                          ImageServiceImpl imageService, BannedServiceImpl bannedService, TokenUtils tokenUtils) {
+                          ImageServiceImpl imageService, BannedServiceImpl bannedService,
+                          EventRegistrationServiceImpl registrationService, TokenUtils tokenUtils) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.mailService = mailService;
         this.imageService = imageService;
         this.bannedService = bannedService;
+        this.registrationService = registrationService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -81,6 +88,8 @@ public class UserController {
         Image profileImage = imageService.findProfileImageForUser(user.getId());
         if (profileImage != null)
             userDTO.setProfileImage(new ImageDTO(profileImage));
+        userDTO.setReliability(registrationService.calculateReliability(user.getId()));
+        userDTO.setAttendanceCount(registrationService.countAttendanceRecords(user.getId()));
         return userDTO;
     }
 
@@ -227,7 +236,16 @@ public class UserController {
             logger.error("Original user not found with id: " + editedUser.getId());
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+        // Svoj profil menja samo njegov vlasnik
+        if (!oldUser.getId().equals(user.getId())) {
+            logger.error("User with id: " + user.getId() + " tried to edit profile of user with id: " + oldUser.getId());
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         logger.info("Applying changes of user");
+        if (editedUser.getFirstName() != null && !editedUser.getFirstName().isBlank())
+            oldUser.setFirstName(editedUser.getFirstName());
+        if (editedUser.getLastName() != null && !editedUser.getLastName().isBlank())
+            oldUser.setLastName(editedUser.getLastName());
         if (editedUser.getDisplayName() != null)
             oldUser.setDisplayName(editedUser.getDisplayName());
         if (editedUser.getDescription() != null)
@@ -242,7 +260,7 @@ public class UserController {
 
     @PostMapping("/change-password")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<UserDTO> changePassword(@RequestBody @Validated UpdatePasswordDTO changePasswordRequest,
+    public ResponseEntity<?> changePassword(@RequestBody @Validated UpdatePasswordDTO changePasswordRequest,
             @RequestHeader("authorization") String token) {
         logger.info("Authentication check");
         String cleanToken = token.substring(7);
@@ -257,7 +275,13 @@ public class UserController {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (!passwordEncoder.matches(oldPassRequest, user.getPassword())) {
             logger.error("Hashes do not match");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Your current password is not correct.", HttpStatus.BAD_REQUEST);
+        }
+        // Ista lozinka nije promena, a korisniku bi izgledalo kao da jeste
+        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword())) {
+            logger.error("New password is the same as the old one");
+            return new ResponseEntity<>("The new password must be different from the current one.",
+                    HttpStatus.BAD_REQUEST);
         }
         logger.info("Updating password for user with id: " + user.getId());
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
@@ -281,6 +305,11 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         User userToDelete = userService.findById(id);
+        // Nalog gasi njegov vlasnik ili administrator, niko treci
+        if (userToDelete != null && !userToDelete.getId().equals(user.getId()) && !user.isAdmin()) {
+            logger.error("User with id: " + user.getId() + " tried to delete account of user with id: " + id);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         if (userToDelete != null) {
             userService.deleteUser(id);
             return new ResponseEntity<>(HttpStatus.OK);

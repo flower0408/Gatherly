@@ -20,6 +20,8 @@ export class EditEventComponent implements OnInit {
   uploadedImage: Image | null = null;
   uploading = false;
   saving = false;
+  // Kada je slika sklonjena, uz izmenu se salje prazan spisak pa je backend brise
+  imageRemoved = false;
   loading = true;
 
   constructor(
@@ -76,6 +78,7 @@ export class EditEventComponent implements OnInit {
     this.imageService.upload(file).subscribe({
       next: (result) => {
         this.uploadedImage = result;
+        this.imageRemoved = false;
         this.uploading = false;
       },
       error: (response: HttpErrorResponse) => {
@@ -83,6 +86,12 @@ export class EditEventComponent implements OnInit {
         this.uploading = false;
       }
     });
+  }
+
+  removeImage(): void {
+    this.currentImage = null;
+    this.uploadedImage = null;
+    this.imageRemoved = true;
   }
 
   submit(): void {
@@ -98,9 +107,12 @@ export class EditEventComponent implements OnInit {
       capacity: this.form.value.capacity
     };
 
-    // Slike se salju samo ako je izabrana nova, inace ostaju kakve jesu
+    // Spisak slika se salje samo ako je izabrana nova ili je stara sklonjena,
+    // inace slika ostaje kakva jeste
     if (this.uploadedImage) {
       changes.images = [{ path: this.uploadedImage.path }];
+    } else if (this.imageRemoved) {
+      changes.images = [];
     }
 
     this.eventService.update(this.eventId, changes).subscribe({

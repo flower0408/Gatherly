@@ -139,6 +139,21 @@ public class EventController {
         return new ResponseEntity<>(toDTOs(events), HttpStatus.OK);
     }
 
+    // Dogadjaji koje jedan korisnik organizuje, za prikaz na njegovom profilu.
+    // Prosli se izostavljaju, jer profil govori sta tek predstoji.
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<EventDTO>> getUpcomingEventsOfUser(@PathVariable String userId) {
+        logger.info("Finding upcoming events created by user with id: " + userId);
+        List<Event> upcoming = new ArrayList<>();
+        for (Event temp : eventService.findEventsForCreator(Long.parseLong(userId))) {
+            if (temp.getStartsAt().isAfter(LocalDateTime.now()))
+                upcoming.add(temp);
+        }
+        logger.info("Created and sent response");
+
+        return new ResponseEntity<>(toDTOs(upcoming), HttpStatus.OK);
+    }
+
     // Od ove tacke rute traze prijavljenog korisnika
 
     @GetMapping("/homepage")

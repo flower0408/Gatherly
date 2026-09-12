@@ -12,4 +12,7 @@ export class User {
   description: string | null = null;
   verified: boolean = false;
   profileImage: Image | null = null;
+  // Skor pouzdanosti i broj dogadjaja iz kojih je izracunat
+  reliability: number | null = null;
+  attendanceCount: number = 0;
 }

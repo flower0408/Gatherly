@@ -49,8 +49,19 @@
           <tbody>
             <tr *ngFor="let registration of list">
               <td>{{ registration.participantUsername }}</td>
-              <td [ngClass]="reliabilityClass(registration.participantReliability)">
-                {{ registration.participantReliability !== null ? registration.participantReliability + '%' : '—' }}
+              <td>
+                <span [ngClass]="reliabilityClass(registration.participantReliability)"
+                      *ngIf="registration.participantReliability !== null">
+                  {{ registration.participantReliability }}%
+                </span>
+                <span class="small text-body-secondary d-block"
+                      *ngIf="registration.participantReliability !== null">
+                  of {{ registration.participantAttendanceCount }}
+                  {{ registration.participantAttendanceCount === 1 ? 'event' : 'events' }}
+                </span>
+                <span class="small text-body-secondary" *ngIf="registration.participantReliability === null">
+                  No history yet
+                </span>
               </td>
               <td class="small">{{ registration.createdAt | date: 'd MMM y, HH:mm' }}</td>
               <td>
