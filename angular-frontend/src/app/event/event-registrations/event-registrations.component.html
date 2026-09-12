@@ -25,7 +25,7 @@
 
     <ng-container *ngIf="registrations.length > 0">
       <ng-container *ngTemplateOutlet="group; context: { list: waiting, title: 'Waiting for your decision' }"></ng-container>
-      <ng-container *ngTemplateOutlet="group; context: { list: going, title: 'Going' }"></ng-container>
+      <ng-container *ngTemplateOutlet="group; context: { list: going, title: goingTitle }"></ng-container>
       <ng-container *ngTemplateOutlet="group; context: { list: waitlisted, title: 'Waiting list' }"></ng-container>
       <ng-container *ngTemplateOutlet="group; context: { list: settled, title: 'Settled' }"></ng-container>
     </ng-container>

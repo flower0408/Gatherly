@@ -64,11 +64,25 @@ export class EventRegistrationsComponent implements OnInit {
     return this.registrations.filter((r) => r.status === 'WAITLISTED');
   }
 
+  // Pre pocetka dogadjaja se odvajaju potvrdjeni od resenih. Posle pocetka svi koji su
+  // imali mesto stoje u istom spisku, pa red ne skace u drugu grupu cim se upise dolazak
+  // i organizator moze mirno da prolazi kroz spisak odozgo nadole.
   get going(): Registration[] {
+    if (this.hasStarted) {
+      return this.registrations.filter((r) => r.status === 'ACCEPTED'
+        || r.status === 'ATTENDED' || r.status === 'NO_SHOW');
+    }
     return this.registrations.filter((r) => r.status === 'ACCEPTED');
   }
 
+  get goingTitle(): string {
+    return this.hasStarted ? 'Who turned up' : 'Going';
+  }
+
   get settled(): Registration[] {
+    if (this.hasStarted) {
+      return this.registrations.filter((r) => r.status === 'REJECTED' || r.status === 'CANCELLED');
+    }
     return this.registrations.filter((r) => r.status === 'REJECTED'
       || r.status === 'CANCELLED' || r.status === 'ATTENDED' || r.status === 'NO_SHOW');
   }
