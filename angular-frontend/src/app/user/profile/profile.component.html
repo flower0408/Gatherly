@@ -137,7 +137,8 @@
 
         <app-report-button [userId]="user.id" [canReport]="!isMine && auth.isLoggedIn()"></app-report-button>
 
-        <button class="btn btn-outline-danger btn-sm" *ngIf="!isMine && auth.isAdmin()"
+        <button class="btn btn-outline-danger btn-sm"
+                *ngIf="!isMine && auth.isAdmin() && user.role !== 'ADMIN'"
                 (click)="banFromSystem()">Ban from Gatherly</button>
       </div>
 

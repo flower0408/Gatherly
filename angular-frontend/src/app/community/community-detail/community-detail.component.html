@@ -101,7 +101,8 @@
                       (click)="removeOrganizer(member)">Remove</button>
 
               <button class="btn btn-outline-danger btn-sm"
-                      *ngIf="canManage && !isOrganizer(member) && !isMe(member) && !community.suspended"
+                      *ngIf="canManage && !isOrganizer(member) && !isMe(member)
+                             && member.role !== 'ADMIN' && !community.suspended"
                       (click)="banMember(member)">Ban</button>
                               
               <button class="btn btn-outline-secondary btn-sm"

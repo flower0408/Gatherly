@@ -227,7 +227,9 @@ public class ReportController {
             // Prihvacena prijava na korisnika znaci blokadu na nivou sistema, a nju izrice administrator
             if (report.getOnUser() != null) {
                 User reported = userService.findById(report.getOnUser().getId());
-                if (reported != null && !bannedService.isBannedFromSystem(reported.getId())) {
+                // Prijava protiv administratora se belezi kao prihvacena, ali ga ne zakljucava
+                if (reported != null && !reported.isAdmin()
+                        && !bannedService.isBannedFromSystem(reported.getId())) {
                     logger.info("Banning user with id: " + reported.getId() + " after an accepted report");
                     bannedService.ban(user, reported, null);
                 }

@@ -124,7 +124,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserTokenState> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) {
         logger.info("Checking user's username and password");
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 authenticationRequest.getUsername(), authenticationRequest.getPassword()));
@@ -133,12 +133,14 @@ public class UserController {
         User requestingUser = userService.findByUsername(authenticationRequest.getUsername());
         if (!requestingUser.isVerified()) {
             logger.error("Account of user with id: " + requestingUser.getId() + " is not verified");
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("This account has not been activated yet. "
+                    + "Open the link we sent you when you signed up.", HttpStatus.FORBIDDEN);
         }
         // Blokiran korisnik ne moze da se prijavi na sistem
         if (bannedService.isBannedFromSystem(requestingUser.getId())) {
             logger.error("User with id: " + requestingUser.getId() + " is banned from the system");
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("This account has been suspended and cannot be used any more.",
+                    HttpStatus.FORBIDDEN);
         }
         logger.info("Putting user in security context");
         SecurityContextHolder.getContext().setAuthentication(authentication);

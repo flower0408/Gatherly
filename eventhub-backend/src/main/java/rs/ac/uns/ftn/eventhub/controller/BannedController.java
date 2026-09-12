@@ -101,6 +101,12 @@ public class BannedController {
             logger.error("Administrator tried to ban themselves");
             return new ResponseEntity<>("You cannot ban yourself.", HttpStatus.BAD_REQUEST);
         }
+        // Administrator je poslednja instanca moderacije. Kada bi mogao da bude zakljucan,
+        // dvojica bi mogla da iskljuce jedan drugog i sistem bi ostao bez nadzora.
+        if (target.isAdmin()) {
+            logger.error("Administrator with id: " + target.getId() + " cannot be banned");
+            return new ResponseEntity<>("An administrator cannot be banned.", HttpStatus.FORBIDDEN);
+        }
         if (bannedService.isBannedFromSystem(target.getId())) {
             logger.error("User with id: " + userId + " is already banned from the system");
             return new ResponseEntity<>("This user is already banned.", HttpStatus.CONFLICT);
@@ -154,6 +160,10 @@ public class BannedController {
         if (target == null) {
             logger.error("User not found with id: " + userId);
             return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+        }
+        if (target.isAdmin()) {
+            logger.error("Administrator with id: " + target.getId() + " cannot be banned from a community");
+            return new ResponseEntity<>("An administrator cannot be banned.", HttpStatus.FORBIDDEN);
         }
         // Organizator ne moze da blokira drugog organizatora te zajednice
         if (communityService.checkOrganizer(community.getId(), target.getId())) {

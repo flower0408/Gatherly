@@ -39,9 +39,12 @@ export class LoginComponent {
         this.router.navigate(['events']).then(() => window.location.reload());
       },
       error: (response: HttpErrorResponse) => {
-        // 403 znaci da je nalog nepotvrdjen ili blokiran, 401 da kredencijali ne valjaju
+        // Uz 403 server kaze i zasto: nalog je nepotvrdjen ili je blokiran.
+        // 401 znaci da kredencijali ne valjaju i tu se razlog namerno ne otkriva.
         if (response.status === 403) {
-          this.error = 'This account is not activated yet, or it has been blocked.';
+          this.error = typeof response.error === 'string' && response.error.length > 0
+            ? response.error
+            : 'This account cannot be used to sign in.';
         } else {
           this.error = 'Username or password is incorrect.';
         }
