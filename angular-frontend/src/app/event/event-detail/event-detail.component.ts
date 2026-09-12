@@ -230,4 +230,11 @@ export class EventDetailComponent implements OnInit {
     }
     return new Date(this.event.startsAt) < new Date();
   }
+
+  get hasFinished(): boolean {
+    if (!this.event) {
+      return false;
+    }
+    return new Date(this.event.endsAt) < new Date();
+  }
 }

@@ -72,8 +72,12 @@
             <span class="badge text-bg-warning ms-1" *ngIf="isFull">Full</span>
           </p>
 
-          <div class="alert alert-secondary small" *ngIf="hasStarted">
-            This event has already started.
+          <div class="alert alert-secondary small" *ngIf="hasFinished">
+            This event has finished.
+          </div>
+
+          <div class="alert alert-secondary small" *ngIf="hasStarted && !hasFinished">
+            This event is under way.
           </div>
 
           <div class="alert alert-warning small" *ngIf="!hasStarted && isFull && !registration">

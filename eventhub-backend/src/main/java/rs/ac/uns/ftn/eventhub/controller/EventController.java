@@ -277,6 +277,25 @@ public class EventController {
             logger.error("Event title, description and location cannot be blank");
             return new ResponseEntity<>("Title, description and location cannot be blank.", HttpStatus.BAD_REQUEST);
         }
+        // Dogadjaj koji je poceo je vec istorija: ljudi su dosli po objavljenom terminu
+        // i po njemu je zabelezen dolazak, pa se termin ne prepravlja unazad
+        boolean alreadyStarted = oldEvent.getStartsAt().isBefore(LocalDateTime.now());
+        if (alreadyStarted) {
+            boolean movesStart = editedEvent.getStartsAt() != null
+                    && !LocalDateTime.parse(editedEvent.getStartsAt()).equals(oldEvent.getStartsAt());
+            boolean movesEnd = editedEvent.getEndsAt() != null
+                    && !LocalDateTime.parse(editedEvent.getEndsAt()).equals(oldEvent.getEndsAt());
+            if (movesStart || movesEnd) {
+                logger.error("Event with id: " + id + " has already started, its time cannot be changed");
+                return new ResponseEntity<>("This event has already started, so its time cannot be changed.",
+                        HttpStatus.BAD_REQUEST);
+            }
+        } else if (editedEvent.getStartsAt() != null
+                && LocalDateTime.parse(editedEvent.getStartsAt()).isBefore(LocalDateTime.now())) {
+            logger.error("Event with id: " + id + " cannot be moved into the past");
+            return new ResponseEntity<>("An event cannot be moved into the past.", HttpStatus.BAD_REQUEST);
+        }
+
         logger.info("Applying changes of event");
         if (editedEvent.getTitle() != null)
             oldEvent.setTitle(editedEvent.getTitle());
@@ -296,6 +315,15 @@ public class EventController {
             if (editedEvent.getCapacity() < 1) {
                 logger.error("Event capacity must be at least one");
                 return new ResponseEntity<>("Capacity must be at least one.", HttpStatus.BAD_REQUEST);
+            }
+            // Kapacitet ne sme da padne ispod broja onih koji vec imaju potvrdjeno mesto,
+            // inace bi na dogadjaj dolazilo vise ljudi nego sto ima mesta
+            Integer taken = registrationService.countTakenSpots(oldEvent.getId());
+            if (editedEvent.getCapacity() < taken) {
+                logger.error("Event with id: " + id + " already has " + taken + " taken spots");
+                return new ResponseEntity<>("There are already " + taken
+                        + " people with a place, so the capacity cannot be lower than that.",
+                        HttpStatus.BAD_REQUEST);
             }
             oldEvent.setCapacity(editedEvent.getCapacity());
         }

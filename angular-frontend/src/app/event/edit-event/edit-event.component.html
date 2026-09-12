@@ -21,6 +21,10 @@
         <input class="form-control" type="text" id="location" formControlName="location">
       </div>
 
+      <div class="alert alert-secondary small" *ngIf="alreadyStarted">
+        This event has already started, so its time can no longer be changed.
+      </div>
+
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label" for="startsAt">Starts at</label>

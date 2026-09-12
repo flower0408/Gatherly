@@ -22,6 +22,8 @@ export class EditEventComponent implements OnInit {
   saving = false;
   // Kada je slika sklonjena, uz izmenu se salje prazan spisak pa je backend brise
   imageRemoved = false;
+  // Termin dogadjaja koji je poceo se ne prepravlja unazad
+  alreadyStarted = false;
   loading = true;
 
   constructor(
@@ -57,6 +59,11 @@ export class EditEventComponent implements OnInit {
         });
         if (event.images && event.images.length > 0) {
           this.currentImage = event.images[0].path;
+        }
+        this.alreadyStarted = new Date(event.startsAt) < new Date();
+        if (this.alreadyStarted) {
+          this.form.controls['startsAt'].disable();
+          this.form.controls['endsAt'].disable();
         }
         this.loading = false;
       },
@@ -102,10 +109,14 @@ export class EditEventComponent implements OnInit {
       title: this.form.value.title,
       description: this.form.value.description,
       location: this.form.value.location,
-      startsAt: this.form.value.startsAt,
-      endsAt: this.form.value.endsAt,
       capacity: this.form.value.capacity
     };
+
+    // Za dogadjaj koji je poceo se termin uopste ne salje
+    if (!this.alreadyStarted) {
+      changes.startsAt = this.form.value.startsAt;
+      changes.endsAt = this.form.value.endsAt;
+    }
 
     // Spisak slika se salje samo ako je izabrana nova ili je stara sklonjena,
     // inace slika ostaje kakva jeste
