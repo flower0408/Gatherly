@@ -6,7 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.model.enums.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -19,10 +22,16 @@ public class UserDTO {
     @NotBlank
     private String username;
 
+    // Ista donja granica kao pri promeni lozinke, da pravilo ne bude stroze posle registracije.
+    // Prima se pri registraciji, ali se nikada ne vraca u odgovoru.
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank
+    @Size(min = 8, message = "The password must have at least 8 characters.")
     private String password;
 
+    // Bez ispravne adrese nalog ne bi mogao da primi link za aktivaciju, pa nikad ne bi ni proradio
     @NotBlank
+    @Email(message = "Please enter a valid email address.")
     private String email;
 
     private Role role;

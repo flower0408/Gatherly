@@ -19,6 +19,14 @@ public class ValidationExceptionHandler {
 
     private static final Logger logger = LogManager.getLogger(ValidationExceptionHandler.class);
 
+    // Neispravan id u putanji je greska klijenta, a ne kvar na serveru, pa ne sme da vrati 500
+    @ExceptionHandler(NumberFormatException.class)
+    public ResponseEntity<String> handleBadId(NumberFormatException exception) {
+        logger.error("Request had an id that is not a number: " + exception.getMessage());
+
+        return new ResponseEntity<>("That address is not valid.", HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();

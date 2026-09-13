@@ -47,9 +47,20 @@ export class RegisterComponent {
         if (response.status === 406) {
           this.error = 'That username or email is already taken.';
         } else {
-          this.error = 'Registration failed, please check the form.';
+          this.error = this.textOf(response);
         }
       }
     });
+  }
+
+  // Server salje mapu poruka po polju, pa se prikazuju one a ne opsta recenica
+  private textOf(response: HttpErrorResponse): string {
+    if (response.error && typeof response.error === 'object') {
+      const messages = Object.values(response.error).filter((m) => typeof m === 'string');
+      if (messages.length > 0) {
+        return messages.join(' ');
+      }
+    }
+    return 'Registration failed, please check the form.';
   }
 }
