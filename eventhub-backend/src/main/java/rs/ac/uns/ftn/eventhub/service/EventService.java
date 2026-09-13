@@ -37,4 +37,6 @@ public interface EventService {
     Integer deleteEventFromCommunity(Long eventId);
 
     Integer deleteEvent(Long id);
+
+    void deleteEventWithContent(Long id);
 }

@@ -12,15 +12,18 @@ import rs.ac.uns.ftn.eventhub.model.dto.CommunityDTO;
 import rs.ac.uns.ftn.eventhub.model.dto.ImageDTO;
 import rs.ac.uns.ftn.eventhub.model.dto.UserDTO;
 import rs.ac.uns.ftn.eventhub.model.entity.Community;
+import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
+import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.BannedServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
@@ -42,6 +45,9 @@ public class CommunityController {
     ImageService imageService;
 
 
+    EventService eventService;
+
+
     BannedService bannedService;
 
 
@@ -51,10 +57,12 @@ public class CommunityController {
 
     @Autowired
     public CommunityController(CommunityServiceImpl communityService, UserServiceImpl userService,
-                               ImageServiceImpl imageService, BannedServiceImpl bannedService, TokenUtils tokenUtils) {
+                               ImageServiceImpl imageService, EventServiceImpl eventService,
+                               BannedServiceImpl bannedService, TokenUtils tokenUtils) {
         this.communityService = communityService;
         this.userService = userService;
         this.imageService = imageService;
+        this.eventService = eventService;
         this.bannedService = bannedService;
         this.tokenUtils = tokenUtils;
     }
@@ -278,6 +286,11 @@ public class CommunityController {
         if (!communityService.checkOrganizer(community.getId(), user.getId()) && !user.isAdmin()) {
             logger.error("User with id: " + user.getId() + " is not allowed to delete community with id: " + id);
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        // Sa zajednicom odlaze i njeni dogadjaji, jer bez nje ne bi imali ko da ih vodi
+        logger.info("Deleting events of community with id: " + id);
+        for (Event event : eventService.findEventsForCommunity(community.getId())) {
+            eventService.deleteEventWithContent(event.getId());
         }
         logger.info("Deleting community with id: " + id);
         communityService.deleteCommunityOrganizers(community.getId());

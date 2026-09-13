@@ -9,7 +9,11 @@ import rs.ac.uns.ftn.eventhub.model.entity.Community;
 import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.repository.EventRepository;
+import rs.ac.uns.ftn.eventhub.service.CommentService;
+import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
+import rs.ac.uns.ftn.eventhub.service.ImageService;
+import rs.ac.uns.ftn.eventhub.service.ReactionService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -23,9 +27,40 @@ public class EventServiceImpl implements EventService {
     private EventRepository eventRepository;
 
 
+    private EventRegistrationService registrationService;
+
+
+    private CommentService commentService;
+
+
+    private ReactionService reactionService;
+
+
+    private ImageService imageService;
+
+
     @Autowired
-    public EventServiceImpl(EventRepository eventRepository) {
+    public EventServiceImpl(EventRepository eventRepository, EventRegistrationService registrationService,
+                            CommentService commentService, ReactionService reactionService,
+                            ImageService imageService) {
         this.eventRepository = eventRepository;
+        this.registrationService = registrationService;
+        this.commentService = commentService;
+        this.reactionService = reactionService;
+        this.imageService = imageService;
+    }
+
+    // Brisanje dogadjaja sa svim sto uz njega ide. Stoji na jednom mestu, jer dogadjaj
+    // ne brise samo njegov tvorac nego i brisanje zajednice kojoj pripada.
+    @Override
+    public void deleteEventWithContent(Long id) {
+        logger.info("Deleting event with id: " + id + " and everything that belongs to it");
+        reactionService.deleteReactionsForEvent(id);
+        commentService.deleteCommentsForEvent(id);
+        imageService.deleteImagesForEvent(id);
+        registrationService.deleteRegistrationsForEvent(id);
+        deleteEventFromCommunity(id);
+        deleteEvent(id);
     }
 
     private static final Logger logger = LogManager.getLogger(EventServiceImpl.class);

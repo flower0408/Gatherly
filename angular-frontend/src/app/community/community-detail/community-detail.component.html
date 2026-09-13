@@ -30,6 +30,12 @@
 
         <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
            [routerLink]="['/communities', community.id, 'edit']">Edit</a>
+
+        <button class="btn btn-outline-danger btn-sm" *ngIf="auth.isAdmin() && !community.suspended"
+                (click)="startSuspending()">Suspend</button>
+
+        <button class="btn btn-outline-danger btn-sm" *ngIf="canManage"
+                (click)="remove()">Delete</button>
       </div>
     </div>
 
@@ -40,6 +46,21 @@
     <div class="alert alert-warning" *ngIf="community.suspended">
       <strong>This community is suspended.</strong>
       <span *ngIf="community.suspendedReason"> {{ community.suspendedReason }}</span>
+    </div>
+
+    <div class="card mb-3" *ngIf="suspending">
+      <div class="card-body">
+        <label class="form-label" for="suspendedReason">Why is this community being suspended?</label>
+        <input class="form-control mb-2" type="text" id="suspendedReason" [(ngModel)]="suspendedReason">
+        <div class="form-text mb-2">
+          The reason is shown on the community page, and the community is left without organizers.
+        </div>
+
+        <button class="btn btn-danger btn-sm" (click)="suspend()" [disabled]="!suspendedReason.trim()">
+          Suspend community
+        </button>
+        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancelSuspending()">Cancel</button>
+      </div>
     </div>
 
     <div class="alert alert-success" *ngIf="message">{{ message }}</div>

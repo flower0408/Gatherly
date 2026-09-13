@@ -50,6 +50,15 @@ export class CommunityService {
     return this.http.patch('api/communities/edit/' + id, community) as Observable<Community>;
   }
 
+  delete(id: number): Observable<any> {
+    return this.http.delete('api/communities/delete/' + id) as Observable<any>;
+  }
+
+  // Suspenziju izrice administrator i uz nju obavezno ide razlog
+  suspend(id: number, suspendedReason: string): Observable<Community> {
+    return this.http.patch('api/communities/suspend/' + id, { suspendedReason }) as Observable<Community>;
+  }
+
   // Odgovori na ove rute su obican tekst, pa se trazi takav odgovor
   join(id: number): Observable<string> {
     return this.http.post('api/communities/' + id + '/member', null, { responseType: 'text' });

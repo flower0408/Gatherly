@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommunityService } from '../services/community.service';
 import { EventService } from '../../event/services/event.service';
@@ -28,12 +28,15 @@ export class CommunityDetailComponent implements OnInit {
   isMember = false;
   message: string | null = null;
   error: string | null = null;
+  suspending = false;
+  suspendedReason = '';
 
   // Prijavljeni korisnik, treba nam da znamo da li je vec clan i da li je organizator
   private me: User | null = null;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private communityService: CommunityService,
     private eventService: EventService,
     private userService: UserService,
@@ -180,6 +183,47 @@ export class CommunityDetailComponent implements OnInit {
     this.communityService.removeOrganizer(this.community.id, user.id).subscribe({
       next: (response) => {
         this.message = response;
+        this.loadPeople();
+      },
+      error: (response: HttpErrorResponse) => this.error = this.textOf(response)
+    });
+  }
+
+  // Brisanje zajednice odnosi i njene dogadjaje, pa upozorenje mora to da kaze
+  remove(): void {
+    if (!this.community || !confirm('Delete ' + this.community.name
+        + '? Its events will be removed too, along with their registrations and comments.')) {
+      return;
+    }
+    this.clearNotices();
+    this.communityService.delete(this.community.id).subscribe({
+      next: () => this.router.navigate(['/communities']),
+      error: (response: HttpErrorResponse) => this.error = this.textOf(response)
+    });
+  }
+
+  startSuspending(): void {
+    this.suspending = true;
+    this.suspendedReason = '';
+    this.clearNotices();
+  }
+
+  cancelSuspending(): void {
+    this.suspending = false;
+    this.suspendedReason = '';
+  }
+
+  // Suspendovana zajednica ostaje bez organizatora i u njoj se vise nista ne dogadja
+  suspend(): void {
+    if (!this.community || !this.suspendedReason.trim()) {
+      return;
+    }
+    this.clearNotices();
+    this.communityService.suspend(this.community.id, this.suspendedReason).subscribe({
+      next: (updated) => {
+        this.community = updated;
+        this.suspending = false;
+        this.message = 'This community has been suspended.';
         this.loadPeople();
       },
       error: (response: HttpErrorResponse) => this.error = this.textOf(response)

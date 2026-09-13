@@ -360,12 +360,7 @@ public class EventController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         logger.info("Deleting event with id: " + id);
-        reactionService.deleteReactionsForEvent(event.getId());
-        commentService.deleteCommentsForEvent(event.getId());
-        imageService.deleteImagesForEvent(event.getId());
-        registrationService.deleteRegistrationsForEvent(event.getId());
-        eventService.deleteEventFromCommunity(event.getId());
-        eventService.deleteEvent(event.getId());
+        eventService.deleteEventWithContent(event.getId());
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
