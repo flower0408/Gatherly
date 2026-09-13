@@ -25,7 +25,10 @@
       </p>
 
       <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
-        <h1 class="h2 mb-0">{{ event.title }}</h1>
+        <div>
+          <h1 class="h2 mb-1">{{ event.title }}</h1>
+          <span class="badge text-bg-light">{{ categoryLabel(event.category) }}</span>
+        </div>
 
         <div class="btn-group btn-group-sm" *ngIf="canManage">
           <a class="btn btn-outline-primary" [routerLink]="['/events', event.id, 'registrations']">Registrations</a>

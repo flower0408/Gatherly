@@ -42,7 +42,14 @@
           </div>
         </div>
 
-        <div class="col-md-8 mb-3">
+        <div class="col-md-4 mb-3">
+          <label class="form-label" for="category">Category</label>
+          <select class="form-select" id="category" formControlName="category">
+            <option *ngFor="let option of categories" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
           <label class="form-label" for="community">Community</label>
           <select class="form-select" id="community" formControlName="belongsToCommunityId">
             <option [ngValue]="null">No community — a public event</option>

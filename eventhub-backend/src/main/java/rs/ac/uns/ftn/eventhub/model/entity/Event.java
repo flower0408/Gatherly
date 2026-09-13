@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.eventhub.model.entity;
 
+import rs.ac.uns.ftn.eventhub.model.enums.EventCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,11 @@ public class Event {
 
     @Column(nullable = false)
     private Integer capacity;
+
+    // Kategorija sluzi za pretragu i filtriranje, kao na sajtovima za dogadjaje
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventCategory category;
 
     @Column(nullable = false)
     private LocalDateTime creationDate;

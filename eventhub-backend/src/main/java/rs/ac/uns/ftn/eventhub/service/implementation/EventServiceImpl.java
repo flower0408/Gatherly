@@ -8,6 +8,7 @@ import rs.ac.uns.ftn.eventhub.model.dto.EventDTO;
 import rs.ac.uns.ftn.eventhub.model.entity.Community;
 import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
+import rs.ac.uns.ftn.eventhub.model.enums.EventCategory;
 import rs.ac.uns.ftn.eventhub.repository.EventRepository;
 import rs.ac.uns.ftn.eventhub.service.CommentService;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
@@ -85,6 +86,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public List<Event> searchEvents(String term, String category, String fromDate, String toDate,
+                                    boolean onlyUpcoming) {
+        return this.eventRepository.searchEvents(term, category, fromDate, toDate, onlyUpcoming)
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
     public List<Event> findEventsForCreator(Long userId) {
         return this.eventRepository.findEventsByCreator(userId).orElse(Collections.emptyList());
     }
@@ -129,6 +137,7 @@ public class EventServiceImpl implements EventService {
         newEvent.setStartsAt(LocalDateTime.parse(eventDTO.getStartsAt()));
         newEvent.setEndsAt(LocalDateTime.parse(eventDTO.getEndsAt()));
         newEvent.setCapacity(eventDTO.getCapacity());
+        newEvent.setCategory(EventCategory.valueOf(eventDTO.getCategory().toUpperCase()));
         newEvent.setCreationDate(LocalDateTime.parse(eventDTO.getCreationDate()));
         newEvent.setCreatedBy(createdBy);
         newEvent.setDeleted(false);

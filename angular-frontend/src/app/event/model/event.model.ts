@@ -8,6 +8,7 @@ export class Event {
   startsAt: string = '';
   endsAt: string = '';
   capacity: number = 0;
+  category: string = 'OTHER';
   creationDate: string = '';
   createdByUserId: number | null = null;
   belongsToCommunityId: number | null = null;

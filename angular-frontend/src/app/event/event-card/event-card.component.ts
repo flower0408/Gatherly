@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Event } from '../model/event.model';
+import { categoryLabel } from '../model/event-category.model';
 
 // Kartica dogadjaja, koristi se na listi i kasnije na stranici zajednice
 @Component({
@@ -8,6 +9,8 @@ import { Event } from '../model/event.model';
   styleUrls: ['./event-card.component.css']
 })
 export class EventCardComponent {
+
+  categoryLabel = categoryLabel;
 
   @Input() event!: Event;
 

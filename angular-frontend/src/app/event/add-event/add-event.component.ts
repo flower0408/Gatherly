@@ -8,6 +8,7 @@ import { CommunityService } from '../../community/services/community.service';
 import { Event } from '../model/event.model';
 import { Image } from '../model/image.model';
 import { Community } from '../../community/model/community.model';
+import { EVENT_CATEGORIES } from '../model/event-category.model';
 
 @Component({
   selector: 'app-add-event',
@@ -18,6 +19,7 @@ export class AddEventComponent implements OnInit {
 
   form: FormGroup;
   communities: Community[] = [];
+  categories = EVENT_CATEGORIES;
   error: string | null = null;
   uploadedImage: Image | null = null;
   uploading = false;
@@ -38,6 +40,7 @@ export class AddEventComponent implements OnInit {
       startsAt: [null, Validators.required],
       endsAt: [null, Validators.required],
       capacity: [10, [Validators.required, Validators.min(1)]],
+      category: ['OTHER', Validators.required],
       belongsToCommunityId: [null]
     });
   }
@@ -103,6 +106,7 @@ export class AddEventComponent implements OnInit {
       startsAt: this.form.value.startsAt,
       endsAt: this.form.value.endsAt,
       capacity: this.form.value.capacity,
+      category: this.form.value.category,
       creationDate: new Date().toISOString().slice(0, 19),
       belongsToCommunityId: this.form.value.belongsToCommunityId || null,
       images: this.uploadedImage ? [{ path: this.uploadedImage.path }] : []

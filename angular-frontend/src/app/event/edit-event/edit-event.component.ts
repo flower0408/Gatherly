@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { EventService } from '../services/event.service';
 import { ImageService } from '../services/image.service';
 import { Image } from '../model/image.model';
+import { EVENT_CATEGORIES } from '../model/event-category.model';
 
 @Component({
   selector: 'app-edit-event',
@@ -15,6 +16,7 @@ export class EditEventComponent implements OnInit {
 
   form: FormGroup;
   eventId = 0;
+  categories = EVENT_CATEGORIES;
   error: string | null = null;
   currentImage: string | null = null;
   uploadedImage: Image | null = null;
@@ -39,7 +41,8 @@ export class EditEventComponent implements OnInit {
       location: [null, Validators.required],
       startsAt: [null, Validators.required],
       endsAt: [null, Validators.required],
-      capacity: [null, [Validators.required, Validators.min(1)]]
+      capacity: [null, [Validators.required, Validators.min(1)]],
+      category: [null, Validators.required]
     });
   }
 
@@ -55,7 +58,8 @@ export class EditEventComponent implements OnInit {
           // input type=datetime-local prima najvise do minuta
           startsAt: event.startsAt.slice(0, 16),
           endsAt: event.endsAt.slice(0, 16),
-          capacity: event.capacity
+          capacity: event.capacity,
+          category: event.category
         });
         if (event.images && event.images.length > 0) {
           this.currentImage = event.images[0].path;
@@ -109,7 +113,8 @@ export class EditEventComponent implements OnInit {
       title: this.form.value.title,
       description: this.form.value.description,
       location: this.form.value.location,
-      capacity: this.form.value.capacity
+      capacity: this.form.value.capacity,
+      category: this.form.value.category
     };
 
     // Za dogadjaj koji je poceo se termin uopste ne salje

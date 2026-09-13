@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { EventService } from '../services/event.service';
 import { Event } from '../model/event.model';
+import { EVENT_CATEGORIES } from '../model/event-category.model';
 
 @Component({
   selector: 'app-event-list',
@@ -13,6 +14,13 @@ export class EventListComponent implements OnInit {
   loading = true;
   showPast = false;
 
+  // Filteri pretrage, prazna vrednost znaci da se taj filter ne primenjuje
+  categories = EVENT_CATEGORIES;
+  term = '';
+  category = '';
+  from = '';
+  to = '';
+
   constructor(private eventService: EventService) {}
 
   ngOnInit(): void {
@@ -22,9 +30,7 @@ export class EventListComponent implements OnInit {
   load(): void {
     this.loading = true;
 
-    const request = this.showPast ? this.eventService.getAll() : this.eventService.getUpcoming();
-
-    request.subscribe({
+    this.eventService.search(this.term, this.category, this.from, this.to, !this.showPast).subscribe({
       next: (result) => {
         this.events = result;
         this.loading = false;
@@ -42,5 +48,17 @@ export class EventListComponent implements OnInit {
     }
     this.showPast = value;
     this.load();
+  }
+
+  clearFilters(): void {
+    this.term = '';
+    this.category = '';
+    this.from = '';
+    this.to = '';
+    this.load();
+  }
+
+  get hasFilters(): boolean {
+    return this.term !== '' || this.category !== '' || this.from !== '' || this.to !== '';
   }
 }

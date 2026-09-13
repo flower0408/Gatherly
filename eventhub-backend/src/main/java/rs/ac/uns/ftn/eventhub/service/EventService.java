@@ -14,6 +14,8 @@ public interface EventService {
 
     List<Event> findUpcoming();
 
+    List<Event> searchEvents(String term, String category, String fromDate, String toDate, boolean onlyUpcoming);
+
     List<Event> findEventsForCreator(Long userId);
 
     List<Event> findEventsForCommunity(Long communityId);

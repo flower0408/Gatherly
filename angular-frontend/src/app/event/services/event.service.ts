@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Event } from '../model/event.model';
 
@@ -17,6 +17,23 @@ export class EventService {
 
   getAll(): Observable<Event[]> {
     return this.http.get('api/events/all') as Observable<Event[]>;
+  }
+
+  // Pretraga po pojmu, kategoriji i rasponu datuma. Prazan filter se ne salje.
+  search(term: string, category: string, from: string, to: string, onlyUpcoming: boolean): Observable<Event[]> {
+    let params = new HttpParams();
+    if (term)
+      params = params.set('term', term);
+    if (category)
+      params = params.set('category', category);
+    if (from)
+      params = params.set('from', from);
+    if (to)
+      params = params.set('to', to);
+    if (onlyUpcoming)
+      params = params.set('upcoming', 'true');
+
+    return this.http.get('api/events/search', { params: params }) as Observable<Event[]>;
   }
 
   getOne(id: number): Observable<Event> {

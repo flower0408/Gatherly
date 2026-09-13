@@ -35,6 +35,10 @@ public class EventDTO {
     @NotNull
     private Integer capacity;
 
+    // Kategorija se salje kao tekst, a u kontroleru se prevodi u EventCategory
+    @NotBlank
+    private String category;
+
     @NotNull
     private String creationDate;
 
@@ -56,6 +60,7 @@ public class EventDTO {
         this.startsAt = createdEvent.getStartsAt().toString();
         this.endsAt = createdEvent.getEndsAt().toString();
         this.capacity = createdEvent.getCapacity();
+        this.category = createdEvent.getCategory().toString();
         this.creationDate = createdEvent.getCreationDate().toString();
         this.createdByUserId = createdEvent.getCreatedBy().getId();
     }

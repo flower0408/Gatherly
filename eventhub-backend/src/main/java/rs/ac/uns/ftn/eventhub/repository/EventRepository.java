@@ -23,6 +23,24 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             value = "select * from `event` where is_deleted = false and starts_at >= now() order by starts_at asc;")
     Optional<List<Event>> findUpcomingEvents();
 
+    // Pretraga po pojmu, kategoriji i rasponu datuma. Prazan uslov se prosledjuje kao null
+    // i tada se taj deo upita ne primenjuje, pa jedan upit pokriva sve kombinacije filtera.
+    @Query(nativeQuery = true,
+            value = "select * from `event` where is_deleted = false " +
+                    "and (:term is null or lower(title) like lower(concat('%', :term, '%')) " +
+                    "     or lower(description) like lower(concat('%', :term, '%')) " +
+                    "     or lower(location) like lower(concat('%', :term, '%'))) " +
+                    "and (:category is null or category = :category) " +
+                    "and (:fromDate is null or starts_at >= :fromDate) " +
+                    "and (:toDate is null or starts_at <= :toDate) " +
+                    "and (:onlyUpcoming = false or starts_at >= now()) " +
+                    "order by starts_at asc")
+    Optional<List<Event>> searchEvents(@Param("term") String term,
+                                       @Param("category") String category,
+                                       @Param("fromDate") String fromDate,
+                                       @Param("toDate") String toDate,
+                                       @Param("onlyUpcoming") boolean onlyUpcoming);
+
     @Query(nativeQuery = true,
             value = "select * from `event` where created_by_user_id = :userId and is_deleted = false order by starts_at asc;")
     Optional<List<Event>> findEventsByCreator(@Param("userId") Long userId);

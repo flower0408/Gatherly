@@ -8,6 +8,7 @@ import { AuthenticationService } from '../../user/services/authentication.servic
 import { Event } from '../model/event.model';
 import { Community } from '../../community/model/community.model';
 import { Registration } from '../model/registration.model';
+import { categoryLabel } from '../model/event-category.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -23,6 +24,7 @@ export class EventDetailComponent implements OnInit {
   notFound = false;
   canManage = false;
   myId: number | null = null;
+  categoryLabel = categoryLabel;
   // Dogadjaj van zajednice je otvoren za razgovor, u zajednici pisu njeni clanovi
   canWrite = true;
   registration: Registration | null = null;

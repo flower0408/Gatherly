@@ -14,6 +14,7 @@ import rs.ac.uns.ftn.eventhub.model.entity.Community;
 import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
+import rs.ac.uns.ftn.eventhub.model.enums.EventCategory;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.CommentService;
@@ -103,6 +104,32 @@ public class EventController {
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(toDTOs(eventService.findAll()), HttpStatus.OK);
+    }
+
+    // Pretraga je otvorena i za goste, jer je pregled dogadjaja javan.
+    // Prazan parametar znaci da se taj filter ne primenjuje.
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam(value = "term", required = false) String term,
+                                    @RequestParam(value = "category", required = false) String category,
+                                    @RequestParam(value = "from", required = false) String from,
+                                    @RequestParam(value = "to", required = false) String to,
+                                    @RequestParam(value = "upcoming", required = false) Boolean upcoming) {
+        if (category != null && !category.isBlank() && parseCategory(category) == null) {
+            logger.error("Unknown event category in search: " + category);
+            return new ResponseEntity<>("Unknown event category.", HttpStatus.BAD_REQUEST);
+        }
+        String cleanTerm = (term == null || term.isBlank()) ? null : term.trim();
+        String cleanCategory = (category == null || category.isBlank()) ? null : category.toUpperCase();
+        // Datum stize kao yyyy-MM-dd, a pretrazuje se pocetak odnosno kraj tog dana
+        String fromMoment = (from == null || from.isBlank()) ? null : from + " 00:00:00";
+        String toMoment = (to == null || to.isBlank()) ? null : to + " 23:59:59";
+
+        logger.info("Searching events by term: " + cleanTerm + ", category: " + cleanCategory);
+        List<Event> found = eventService.searchEvents(cleanTerm, cleanCategory, fromMoment, toMoment,
+                Boolean.TRUE.equals(upcoming));
+        logger.info("Created and sent response");
+
+        return new ResponseEntity<>(toDTOs(found), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -211,6 +238,10 @@ public class EventController {
             logger.error("Event cannot end before it starts");
             return new ResponseEntity<>("An event must end after it starts.", HttpStatus.BAD_REQUEST);
         }
+        if (parseCategory(newEvent.getCategory()) == null) {
+            logger.error("Unknown event category: " + newEvent.getCategory());
+            return new ResponseEntity<>("Unknown event category.", HttpStatus.BAD_REQUEST);
+        }
         // Dogadjaj moze da pripada zajednici, ali ne mora
         Community community = null;
         if (newEvent.getBelongsToCommunityId() != null) {
@@ -311,6 +342,14 @@ public class EventController {
             logger.error("Event cannot end before it starts");
             return new ResponseEntity<>("An event must end after it starts.", HttpStatus.BAD_REQUEST);
         }
+        if (editedEvent.getCategory() != null) {
+            EventCategory category = parseCategory(editedEvent.getCategory());
+            if (category == null) {
+                logger.error("Unknown event category: " + editedEvent.getCategory());
+                return new ResponseEntity<>("Unknown event category.", HttpStatus.BAD_REQUEST);
+            }
+            oldEvent.setCategory(category);
+        }
         if (editedEvent.getCapacity() != null) {
             if (editedEvent.getCapacity() < 1) {
                 logger.error("Event capacity must be at least one");
@@ -363,6 +402,16 @@ public class EventController {
         eventService.deleteEventWithContent(event.getId());
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private EventCategory parseCategory(String value) {
+        if (value == null)
+            return null;
+        try {
+            return EventCategory.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     // Zajednica kojoj dogadjaj pripada se cuva u spojnoj tabeli, pa se dopisuje u DTO posebno
