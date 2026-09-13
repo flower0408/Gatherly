@@ -16,33 +16,33 @@ insert into `user`(is_deleted, is_verified, verification_token, email, first_nam
 values (false, true, null, 'djura@mail.com', 'Djura', false, null, 'Djuric', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'djurica', 'USER');
 
 insert into `event` (title, description, location, starts_at, ends_at, capacity, category, creation_date, is_deleted, created_by_user_id)
-values ('Frontend meetup', 'This is first event by me. I am glad if you can see it.', 'Novi Sad, SPENS',
+values ('Frontend meetup', 'Two short talks about what changed in the browser this year, then pizza and questions.', 'Novi Sad, SPENS',
         '2026-09-12 18:00:00', '2026-09-12 20:00:00', 50, 'TECHNOLOGY', '2026-08-12 12:00:00', false, 1);
 insert into `event` (title, description, location, starts_at, ends_at, capacity, category, creation_date, is_deleted, created_by_user_id)
-values ('Cancelled workshop', 'This is new event for today, happy to be here.', 'Beograd, Startit Centar',
+values ('Testing workshop, cancelled', 'The room fell through, so this one will be announced again for a new date.', 'Beograd, Startit Centar',
         '2026-09-08 18:20:30', '2026-09-08 20:20:30', 30, 'TECHNOLOGY', '2026-08-08 18:20:30', true, 2);
 insert into `event` (title, description, location, starts_at, ends_at, capacity, category, creation_date, is_deleted, created_by_user_id)
-values ('Community gathering', 'This is an event in a community. If you see it, you are inside a community', 'Novi Sad, FTN',
+values ('Community gathering', 'An open meeting of the group: what we did this year and what we plan for the next one.', 'Novi Sad, FTN',
         '2026-09-14 15:23:35', '2026-09-14 17:23:35', 20, 'BUSINESS', '2026-05-14 15:23:35', false, 1);
 insert into `event` (title, description, location, starts_at, ends_at, capacity, category, creation_date, is_deleted, created_by_user_id)
-values ('Board games night', 'This is another event for a community. Say hi to everyone in this community', 'Novi Sad, Kvartic',
+values ('Board games night', 'Two tables, light games first and something longer afterwards. Only two seats left.', 'Novi Sad, Kvartic',
         '2026-09-15 14:56:55', '2026-09-15 16:56:55', 2, 'GAMES', '2026-05-15 14:56:55', false, 2);
 insert into `event` (title, description, location, starts_at, ends_at, capacity, category, creation_date, is_deleted, created_by_user_id)
-values ('Photography walk', 'This is test event for second community. Say hi to everyone in this community', 'Novi Sad, Petrovaradin',
+values ('Photography walk', 'We walk from the bridge to the fortress and stop wherever the light is good.', 'Novi Sad, Petrovaradin',
         '2026-09-13 12:12:12', '2026-09-13 14:12:12', 15, 'ART_AND_CULTURE', '2026-06-13 12:12:12', false, 3);
 insert into `event` (title, description, location, starts_at, ends_at, capacity, category, creation_date, is_deleted, created_by_user_id)
-values ('Open air concert', 'This is Anas public event. Everyone can see it. Sending good vibes to everyone.', 'Novi Sad, Strand',
+values ('Open air concert', 'Three bands by the river, from the afternoon until the lights go out.', 'Novi Sad, Strand',
         '2026-09-20 05:22:12', '2026-09-20 07:22:12', 200, 'MUSIC', '2026-07-20 05:22:12', false, 3);
 insert into `event` (title, description, location, starts_at, ends_at, capacity, category, creation_date, is_deleted, created_by_user_id)
-values ('Running club', 'This is Mikas public event. Everyone can see it. Sending good vibes to everyone.', 'Novi Sad, Kej',
+values ('Running club', 'Our usual ten kilometres along the river, at a pace where nobody is left behind.', 'Novi Sad, Kej',
         '2026-08-10 01:12:39', '2026-08-10 03:12:39', 40, 'SPORT', '2026-07-27 01:12:39', false, 2);
 
 insert into comment (is_deleted, text, timestamp, belongs_to_event_id, belongs_to_user_id, replies_to_comment_id)
-values (false, 'Good thoughts', '2026-08-11 19:40:00', 1, 2, null);
+values (false, 'Will the talks be recorded for those who cannot come?', '2026-08-11 19:40:00', 1, 2, null);
 insert into comment (is_deleted, text, timestamp, belongs_to_event_id, belongs_to_user_id, replies_to_comment_id)
-values (false, 'Fine answer to message', '2026-08-04 09:15:00', 1, 1, 1);
+values (false, 'Yes, we will put the recordings up a few days later.', '2026-08-04 09:15:00', 1, 1, 1);
 insert into comment (is_deleted, text, timestamp, belongs_to_event_id, belongs_to_user_id, replies_to_comment_id)
-values (false, 'Another comment', '2026-06-22 21:05:00', 1, 3, null);
+values (false, 'Is there somewhere to leave a bike near the entrance?', '2026-06-22 21:05:00', 1, 3, null);
 
 insert into report (accepted, is_deleted, reason, timestamp, by_user_id, on_comment_id, on_event_id, on_user_id)
 values (true, false, 'HARASSMENT', '2026-05-12', 3, null, null, 4);
@@ -59,11 +59,11 @@ insert into reaction (is_deleted, timestamp, type, made_by_user_id, on_comment_i
 values (false, '2026-05-13', 'DISLIKE', 3, 1, null);
 
 insert into community (creation_date, is_deleted, description, is_suspended, name, suspended_reason)
-values ('2026-05-11', false, 'Test community for testing purposes', false, 'Test Community 1', null);
+values ('2026-05-11', false, 'People who build things for the web, meeting once a month to show what they made.', false, 'Novi Sad Web Circle', null);
 insert into community (creation_date, is_deleted, description, is_suspended, name, suspended_reason)
-values ('2026-05-11', false, 'Another test community for testing', false, 'Test Community 2', null);
+values ('2026-05-11', false, 'A group for anyone who likes taking pictures around the city, no equipment required.', false, 'City Photographers', null);
 insert into community (creation_date, is_deleted, description, is_suspended, name, suspended_reason)
-values ('2026-05-12', true, 'Deleted test community for testing', true, 'Test Community 3', 'Un-moderated');
+values ('2026-05-12', true, 'A group that was closed because nobody was moderating what was posted in it.', true, 'Old Notice Board', 'Nobody was moderating the content');
 
 insert into community_organizers (community_id, organizer_id)
 values (1, 1);
@@ -262,3 +262,37 @@ insert into event_registration (status, at, created_at, is_deleted, created_by_u
 values ('NO_SHOW', '2026-07-18', '2026-07-02', false, 7, 17);
 insert into event_registration (status, at, created_at, is_deleted, created_by_user_id, for_event_id)
 values ('ATTENDED', '2026-07-18', '2026-07-02', false, 2, 17);
+
+-- Naslovne slike dogadjaja. Stoje medju resursima aplikacije, pa rade i posle novog preuzimanja projekta.
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/technology.svg', 1, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/business.svg', 3, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/games.svg', 4, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/art-and-culture.svg', 5, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/music.svg', 6, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/sport.svg', 7, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/sport.svg', 8, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/games.svg', 9, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/food-and-drink.svg', 10, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/art-and-culture.svg', 11, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/technology.svg', 12, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/outdoors.svg', 13, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/business.svg', 14, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/education.svg', 15, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/sport.svg', 16, null);
+insert into image (is_deleted, path, belongs_to_event_id, belongs_to_user_id)
+values (false, '/assets/images/covers/outdoors.svg', 17, null);
