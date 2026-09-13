@@ -8,6 +8,7 @@ import { AuthenticationService } from '../../user/services/authentication.servic
 import { Event } from '../model/event.model';
 import { Community } from '../../community/model/community.model';
 import { Registration } from '../model/registration.model';
+import { User } from '../../user/model/user.model';
 import { categoryLabel } from '../model/event-category.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -25,6 +26,7 @@ export class EventDetailComponent implements OnInit {
   canManage = false;
   myId: number | null = null;
   categoryLabel = categoryLabel;
+  participants: User[] = [];
   // Dogadjaj van zajednice je otvoren za razgovor, u zajednici pisu njeni clanovi
   canWrite = true;
   registration: Registration | null = null;
@@ -56,6 +58,7 @@ export class EventDetailComponent implements OnInit {
         }
         this.checkOwnership(result);
         this.loadMyRegistration(result.id);
+        this.loadParticipants(result.id);
       },
       error: () => {
         this.notFound = true;
@@ -91,6 +94,17 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
+  // Spisak onih koji dolaze vidi samo prijavljen korisnik
+  private loadParticipants(eventId: number): void {
+    if (!this.auth.isLoggedIn()) {
+      return;
+    }
+    this.registrationService.getParticipants(eventId).subscribe({
+      next: (result) => this.participants = result,
+      error: () => this.participants = []
+    });
+  }
+
   register(): void {
     if (!this.event) {
       return;
@@ -105,6 +119,9 @@ export class EventDetailComponent implements OnInit {
           ? 'The event is full, so you are on the waiting list. You will be notified if a spot opens up.'
           : 'Your request has been sent, the organizer will confirm it.';
         this.reload();
+        if (this.event) {
+          this.loadParticipants(this.event.id);
+        }
         if (this.event && this.event.belongsToCommunityId) {
           this.checkMembership(this.event.belongsToCommunityId);
         }
@@ -125,6 +142,9 @@ export class EventDetailComponent implements OnInit {
         this.registration = null;
         this.message = 'Your registration has been cancelled.';
         this.reload();
+        if (this.event) {
+          this.loadParticipants(this.event.id);
+        }
       },
       error: (response: HttpErrorResponse) => this.error = this.textOf(response)
     });

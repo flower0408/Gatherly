@@ -8,7 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.eventhub.model.dto.EventRegistrationDTO;
+import rs.ac.uns.ftn.eventhub.model.dto.ImageDTO;
+import rs.ac.uns.ftn.eventhub.model.dto.UserDTO;
 import rs.ac.uns.ftn.eventhub.model.entity.Event;
+import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.EventRegistration;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.model.enums.RegistrationStatus;
@@ -17,12 +20,14 @@ import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
+import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.MailService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 import rs.ac.uns.ftn.eventhub.service.implementation.BannedServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
 import java.time.LocalDateTime;
@@ -47,6 +52,9 @@ public class EventRegistrationController {
     BannedService bannedService;
 
 
+    ImageService imageService;
+
+
     UserService userService;
 
 
@@ -60,11 +68,13 @@ public class EventRegistrationController {
     @Autowired
     public EventRegistrationController(EventRegistrationServiceImpl registrationService, EventServiceImpl eventService,
                                        CommunityServiceImpl communityService, BannedServiceImpl bannedService,
-                                       UserServiceImpl userService, MailService mailService, TokenUtils tokenUtils) {
+                                       ImageServiceImpl imageService, UserServiceImpl userService,
+                                       MailService mailService, TokenUtils tokenUtils) {
         this.registrationService = registrationService;
         this.eventService = eventService;
         this.communityService = communityService;
         this.bannedService = bannedService;
+        this.imageService = imageService;
         this.userService = userService;
         this.mailService = mailService;
         this.tokenUtils = tokenUtils;
@@ -166,6 +176,35 @@ public class EventRegistrationController {
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(toDTOs(registrationService.findRegistrationsForEvent(event.getId())), HttpStatus.OK);
+    }
+
+    // Ko dolazi na dogadjaj vidi svaki prijavljen korisnik, jer je to pola razloga
+    // zbog kojeg se ljudi i prijavljuju. Gost spisak ne vidi.
+    @GetMapping("/event/{eventId}/going")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<List<UserDTO>> getParticipants(@PathVariable String eventId,
+                                                         @RequestHeader("authorization") String token) {
+        logger.info("Authentication check");
+        User user = findUserByToken(token);
+        if (user == null) {
+            logger.error("User not found with token: " + token);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Event event = eventService.findById(Long.parseLong(eventId));
+        if (event == null) {
+            logger.error("Event not found with id: " + eventId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        logger.info("Finding participants of event with id: " + eventId);
+        List<UserDTO> participants = new ArrayList<>();
+        for (EventRegistration registration : registrationService.findAcceptedForEvent(event.getId())) {
+            User participant = userService.findById(registration.getCreatedBy().getId());
+            if (participant != null)
+                participants.add(toDTO(participant));
+        }
+        logger.info("Created and sent response");
+
+        return new ResponseEntity<>(participants, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/accept")
@@ -340,6 +379,15 @@ public class EventRegistrationController {
             dtos.add(toDTO(temp));
         }
         return dtos;
+    }
+
+    // Uz korisnika se salje i profilna slika, da front ne bi za svakog ucesnika slao poseban zahtev
+    private UserDTO toDTO(User user) {
+        UserDTO userDTO = new UserDTO(user);
+        Image profileImage = imageService.findProfileImageForUser(user.getId());
+        if (profileImage != null)
+            userDTO.setProfileImage(new ImageDTO(profileImage));
+        return userDTO;
     }
 
     private User findUserByToken(String token) {

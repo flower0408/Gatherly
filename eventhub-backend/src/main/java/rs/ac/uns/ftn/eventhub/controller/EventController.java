@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.eventhub.controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +35,7 @@ import rs.ac.uns.ftn.eventhub.service.implementation.ReactionServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,6 +181,25 @@ public class EventController {
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(toDTOs(upcoming), HttpStatus.OK);
+    }
+
+    // Preuzimanje dogadjaja u obliku koji razumeju kalendari, po standardu iCalendar.
+    // Sadrzaj je obican tekst sa tacno propisanim redovima, pa se sastavlja rucno.
+    @GetMapping("/{id}/calendar")
+    public ResponseEntity<?> downloadCalendarFile(@PathVariable String id) {
+        logger.info("Building calendar file for event with id: " + id);
+        Event event = eventService.findById(Long.parseLong(id));
+        if (event == null) {
+            logger.error("Event not found with id: " + id);
+            return new ResponseEntity<>("Event not found.", HttpStatus.NOT_FOUND);
+        }
+        String file = buildCalendarFile(event);
+        logger.info("Created and sent response");
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "text/calendar; charset=utf-8")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"event-" + event.getId() + ".ics\"")
+                .body(file);
     }
 
     // Od ove tacke rute traze prijavljenog korisnika
@@ -402,6 +423,40 @@ public class EventController {
         eventService.deleteEventWithContent(event.getId());
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // Vreme u iCalendar zapisu ide bez razmaka i crtica, u obliku 20260912T180000
+    private String toCalendarTime(LocalDateTime moment) {
+        return moment.format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"));
+    }
+
+    private String buildCalendarFile(Event event) {
+        String separator = "\r\n";
+
+        return "BEGIN:VCALENDAR" + separator
+                + "VERSION:2.0" + separator
+                + "PRODID:-//Gatherly//EN" + separator
+                + "BEGIN:VEVENT" + separator
+                + "UID:event-" + event.getId() + "@gatherly" + separator
+                + "DTSTAMP:" + toCalendarTime(LocalDateTime.now()) + separator
+                + "DTSTART:" + toCalendarTime(event.getStartsAt()) + separator
+                + "DTEND:" + toCalendarTime(event.getEndsAt()) + separator
+                + "SUMMARY:" + escapeForCalendar(event.getTitle()) + separator
+                + "DESCRIPTION:" + escapeForCalendar(event.getDescription()) + separator
+                + "LOCATION:" + escapeForCalendar(event.getLocation()) + separator
+                + "END:VEVENT" + separator
+                + "END:VCALENDAR" + separator;
+    }
+
+    // Zarez, tacka-zarez i obrnuta kosa crta imaju posebno znacenje u ovom zapisu,
+    // pa se moraju oznaciti obrnutom kosom crtom
+    private String escapeForCalendar(String text) {
+        if (text == null)
+            return "";
+        return text.replace("\\", "\\\\")
+                .replace(";", "\\;")
+                .replace(",", "\\,")
+                .replace("\n", " ");
     }
 
     private EventCategory parseCategory(String value) {

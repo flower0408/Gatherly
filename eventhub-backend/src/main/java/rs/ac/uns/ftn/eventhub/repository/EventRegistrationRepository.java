@@ -19,6 +19,13 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
                     "order by created_at asc;")
     Optional<List<EventRegistration>> findRegistrationsByEventId(@Param("eventId") Long eventId);
 
+    // Ucesnici sa potvrdjenim mestom, za spisak koji vide svi prijavljeni korisnici
+    @Query(nativeQuery = true,
+            value = "select * from event_registration where for_event_id = :eventId " +
+                    "and is_deleted = false and status in ('ACCEPTED', 'ATTENDED') " +
+                    "order by created_at asc;")
+    Optional<List<EventRegistration>> findAcceptedByEventId(@Param("eventId") Long eventId);
+
     @Query(nativeQuery = true,
             value = "select * from event_registration where created_by_user_id = :userId and is_deleted = false " +
                     "order by created_at desc;")

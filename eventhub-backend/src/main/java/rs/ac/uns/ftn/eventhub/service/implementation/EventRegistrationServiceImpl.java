@@ -76,6 +76,11 @@ public class EventRegistrationServiceImpl implements EventRegistrationService {
     }
 
     @Override
+    public List<EventRegistration> findAcceptedForEvent(Long eventId) {
+        return eventRegistrationRepository.findAcceptedByEventId(eventId).orElse(Collections.emptyList());
+    }
+
+    @Override
     public List<EventRegistration> findRegistrationsForUser(Long userId) {
         return eventRegistrationRepository.findRegistrationsByUserId(userId).orElse(Collections.emptyList());
     }

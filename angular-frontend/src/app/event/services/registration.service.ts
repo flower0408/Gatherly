@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Registration } from '../model/registration.model';
+import { User } from '../../user/model/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,11 @@ export class RegistrationService {
 
   getForEvent(eventId: number): Observable<Registration[]> {
     return this.http.get('api/registrations/event/' + eventId) as Observable<Registration[]>;
+  }
+
+  // Ucesnici sa potvrdjenim mestom, spisak vidi svaki prijavljen korisnik
+  getParticipants(eventId: number): Observable<User[]> {
+    return this.http.get('api/registrations/event/' + eventId + '/going') as Observable<User[]>;
   }
 
   accept(id: number): Observable<Registration> {

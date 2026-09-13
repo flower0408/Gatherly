@@ -8,3 +8,12 @@
   height: 220px;
   background: linear-gradient(135deg, var(--bs-primary), var(--bs-purple, #6f42c1));
 }
+
+/* Slicice ucesnika u spisku onih koji dolaze */
+.going-avatar {
+  width: 2rem;
+  height: 2rem;
+  object-fit: cover;
+  line-height: 2rem;
+  font-size: .9rem;
+}

@@ -13,6 +13,8 @@ public interface EventRegistrationService {
 
     List<EventRegistration> findRegistrationsForEvent(Long eventId);
 
+    List<EventRegistration> findAcceptedForEvent(Long eventId);
+
     List<EventRegistration> findRegistrationsForUser(Long userId);
 
     EventRegistration findActiveRegistration(Long userId, Long eventId);
