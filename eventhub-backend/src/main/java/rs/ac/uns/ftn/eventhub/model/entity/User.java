@@ -43,6 +43,14 @@ public class User {
     @Column
     private LocalDateTime lastLogin;
 
+    // Broj uzastopnih neuspelih prijava i trenutak do kog je nalog privremeno zakljucan.
+    // NIST SP 800-63B trazi da se uzastopni pokusaji ogranice.
+    @Column
+    private Integer failedLoginAttempts;
+
+    @Column
+    private LocalDateTime lockedUntil;
+
     @Column(nullable = false)
     private String firstName;
 

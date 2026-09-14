@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.eventhub.model.dto.*;
 import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
+import rs.ac.uns.ftn.eventhub.security.PasswordPolicy;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
@@ -65,13 +67,21 @@ public class UserController {
 
     TokenUtils tokenUtils;
 
+
+    PasswordPolicy passwordPolicy;
+
     private static final Logger logger = LogManager.getLogger(UserController.class);
+
+    private static final int NAJVISE_PROMASAJA = 5;
+
+    private static final int MINUTA_ZAKLJUCAVANJA = 15;
 
     @Autowired
     public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
                           UserDetailsService userDetailsService, MailService mailService,
                           ImageServiceImpl imageService, BannedServiceImpl bannedService,
-                          EventRegistrationServiceImpl registrationService, TokenUtils tokenUtils) {
+                          EventRegistrationServiceImpl registrationService, TokenUtils tokenUtils,
+                          PasswordPolicy passwordPolicy) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
@@ -80,6 +90,7 @@ public class UserController {
         this.bannedService = bannedService;
         this.registrationService = registrationService;
         this.tokenUtils = tokenUtils;
+        this.passwordPolicy = passwordPolicy;
     }
 
     // Uz korisnika se salje i njegova profilna slika, da front ne bi za svakog slao poseban zahtev
@@ -94,7 +105,12 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDTO> create(@RequestBody @Validated UserDTO newUser) {
+    public ResponseEntity<?> create(@RequestBody @Validated UserDTO newUser) {
+        String passwordProblem = passwordPolicy.check(newUser.getPassword(), newUser.getUsername(), newUser.getEmail());
+        if (passwordProblem != null) {
+            logger.error("Password rejected for new user: " + newUser.getUsername());
+            return new ResponseEntity<>(passwordProblem, HttpStatus.BAD_REQUEST);
+        }
         logger.info("Creating user from DTO");
         User createdUser = userService.createUser(newUser);
         if (createdUser == null) {
@@ -125,12 +141,30 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) {
+        User requestingUser = userService.findByUsername(authenticationRequest.getUsername());
+        // Nalog koji je privremeno zakljucan zbog uzastopnih promasaja se ne proverava dalje
+        if (requestingUser != null && isLocked(requestingUser)) {
+            logger.error("Account of user with id: " + requestingUser.getId() + " is temporarily locked");
+            return new ResponseEntity<>("Too many failed attempts. This account is locked for "
+                    + MINUTA_ZAKLJUCAVANJA + " minutes.", HttpStatus.FORBIDDEN);
+        }
+
+        // Ukoliko kredencijali nisu ispravni, desice se AuthenticationException,
+        // pa se promasaj broji i nalog se posle nekoliko pokusaja privremeno zakljucava
         logger.info("Checking user's username and password");
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+        } catch (AuthenticationException exception) {
+            if (requestingUser != null)
+                countFailedAttempt(requestingUser);
+            logger.error("Failed sign in for username: " + authenticationRequest.getUsername());
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         // Nalog koji nije potvrdjen preko linka iz mejla ne moze da se prijavi
         logger.info("Checking if user's account is verified");
-        User requestingUser = userService.findByUsername(authenticationRequest.getUsername());
         if (!requestingUser.isVerified()) {
             logger.error("Account of user with id: " + requestingUser.getId() + " is not verified");
             return new ResponseEntity<>("This account has not been activated yet. "
@@ -153,6 +187,9 @@ public class UserController {
         logger.info("Setting last login time for user");
         User loggedInUser = userService.findByUsername(authenticationRequest.getUsername());
         loggedInUser.setLastLogin(LocalDateTime.now());
+        // Uspesna prijava brise racun promasaja
+        loggedInUser.setFailedLoginAttempts(0);
+        loggedInUser.setLockedUntil(null);
         userService.saveUser(loggedInUser);
 
         logger.info("Created and sent response");
@@ -279,6 +316,12 @@ public class UserController {
             logger.error("Hashes do not match");
             return new ResponseEntity<>("Your current password is not correct.", HttpStatus.BAD_REQUEST);
         }
+        String passwordProblem = passwordPolicy.check(changePasswordRequest.getNewPassword(),
+                user.getUsername(), user.getEmail());
+        if (passwordProblem != null) {
+            logger.error("New password rejected for user with id: " + user.getId());
+            return new ResponseEntity<>(passwordProblem, HttpStatus.BAD_REQUEST);
+        }
         // Ista lozinka nije promena, a korisniku bi izgledalo kao da jeste
         if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword())) {
             logger.error("New password is the same as the old one");
@@ -375,5 +418,31 @@ public class UserController {
         logger.info("Created and sent response");
 
         return new ResponseEntity<>(toDTO(user), HttpStatus.OK);
+    }
+
+    // Uzastopni promasaji se broje, a posle zadatog broja nalog se zakljucava na kratko.
+    // NIST SP 800-63B trazi ogranicavanje uzastopnih neuspelih pokusaja prijave.
+    private boolean isLocked(User user) {
+        if (user.getLockedUntil() == null)
+            return false;
+        if (user.getLockedUntil().isAfter(LocalDateTime.now()))
+            return true;
+        // Vreme zakljucavanja je isteklo, pa racun promasaja krece ispocetka
+        user.setLockedUntil(null);
+        user.setFailedLoginAttempts(0);
+        userService.saveUser(user);
+        return false;
+    }
+
+    private void countFailedAttempt(User user) {
+        int attempts = user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts();
+        attempts = attempts + 1;
+        user.setFailedLoginAttempts(attempts);
+        if (attempts >= NAJVISE_PROMASAJA) {
+            logger.error("Locking account of user with id: " + user.getId()
+                    + " after " + attempts + " failed attempts");
+            user.setLockedUntil(LocalDateTime.now().plusMinutes(MINUTA_ZAKLJUCAVANJA));
+        }
+        userService.saveUser(user);
     }
 }

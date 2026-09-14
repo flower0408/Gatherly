@@ -45,9 +45,13 @@
         <div class="mb-3">
           <label class="form-label" for="password">Password</label>
           <input class="form-control" type="password" id="password" formControlName="password">
+          <div class="form-text">
+            At least 12 characters. A phrase you can remember is stronger than a short password
+            with symbols, so spaces are welcome.
+          </div>
           <div class="form-text text-danger"
                *ngIf="form.controls['password'].touched && form.controls['password'].errors?.['minlength']">
-            The password must have at least 8 characters.
+            The password must have at least 12 characters.
           </div>
         </div>
 

@@ -1,19 +1,20 @@
 -- Pocetni podaci za prikaz aplikacije.
--- Svi nalozi imaju istu lozinku: Test1234!
+-- Svi nalozi imaju istu lozinku: gatherly demo 2026
+-- Lozinka je duza od dvanaest znakova, koliko pravila aplikacije i traze.
 -- Administrator je 'pera', obicni korisnici su ostali.
 
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, display_name, description, role)
-values (false, true, null, 'pera@mail.com', 'Pera', true, null, 'Peric', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'pera',
+values (false, true, null, 'pera@mail.com', 'Pera', true, null, 'Peric', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'pera',
         "pera", "I am admin of this app", 'ADMIN');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, display_name, role)
-values (false, true, null, 'mika@mail.com', 'Mika', false, null, 'Mikic', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'mika',
+values (false, true, null, 'mika@mail.com', 'Mika', false, null, 'Mikic', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'mika',
         'mika', 'USER');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, role)
-values (false, true, null, 'ana@mail.com', 'Ana', false, null, 'Anic', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'ana', 'USER');
+values (false, true, null, 'ana@mail.com', 'Ana', false, null, 'Anic', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'ana', 'USER');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, role)
-values (false, true, null, 'zika@mail.com', 'Zika', false, null, 'Zikic', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'zika', 'USER');
+values (false, true, null, 'zika@mail.com', 'Zika', false, null, 'Zikic', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'zika', 'USER');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, role)
-values (false, true, null, 'djura@mail.com', 'Djura', false, null, 'Djuric', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'djurica', 'USER');
+values (false, true, null, 'djura@mail.com', 'Djura', false, null, 'Djuric', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'djurica', 'USER');
 
 insert into `event` (title, description, location, starts_at, ends_at, capacity, category, creation_date, is_deleted, created_by_user_id)
 values ('Frontend meetup', 'Two short talks about what changed in the browser this year, then pizza and questions.', 'Novi Sad, SPENS',
@@ -104,16 +105,16 @@ values (false, '2026-05-13', null, 5, null);
 -- dogadjaja po raznim kategorijama i datumima, prijava u svim stanjima i razgovora.
 
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, display_name, description, role)
-values (false, true, null, 'jovana@mail.com', 'Jovana', false, null, 'Jovanovic', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'jovana',
+values (false, true, null, 'jovana@mail.com', 'Jovana', false, null, 'Jovanovic', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'jovana',
         'Jovana J.', 'I run every morning and I am always looking for company.', 'USER');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, display_name, description, role)
-values (false, true, null, 'marko@mail.com', 'Marko', false, null, 'Markovic', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'marko',
+values (false, true, null, 'marko@mail.com', 'Marko', false, null, 'Markovic', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'marko',
         'Marko M.', 'Board games, strategy games, any games.', 'USER');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, display_name, description, role)
-values (false, true, null, 'tijana@mail.com', 'Tijana', false, null, 'Tijanic', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'tijana',
+values (false, true, null, 'tijana@mail.com', 'Tijana', false, null, 'Tijanic', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'tijana',
         'Tijana T.', 'Food, languages and long walks.', 'USER');
 insert into `user`(is_deleted, is_verified, verification_token, email, first_name, is_admin, last_login, last_name, password, username, role)
-values (false, true, null, 'nikola@mail.com', 'Nikola', false, null, 'Nikolic', '$2a$10$lum2uaCiL0Q2dKMoR9ZV4.s9nri.gRxmMSZ0psN9xucj0nUJCmcve', 'nikola', 'USER');
+values (false, true, null, 'nikola@mail.com', 'Nikola', false, null, 'Nikolic', '$2a$10$zCsaljiIPMxn3HYbBt.mVuipuvrJZbJbduWfxwBJTpVm8C5NQ0qe.', 'nikola', 'USER');
 
 insert into community (creation_date, is_deleted, description, is_suspended, name, suspended_reason)
 values ('2026-03-04', false, 'We run together along the Danube, every Saturday morning. Beginners are welcome, nobody is left behind.', false, 'Novi Sad Runners', null);

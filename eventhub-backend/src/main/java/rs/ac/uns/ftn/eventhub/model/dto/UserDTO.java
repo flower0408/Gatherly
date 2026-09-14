@@ -22,11 +22,10 @@ public class UserDTO {
     @NotBlank
     private String username;
 
-    // Ista donja granica kao pri promeni lozinke, da pravilo ne bude stroze posle registracije.
     // Prima se pri registraciji, ali se nikada ne vraca u odgovoru.
+    // Pravila o samoj lozinki proverava PasswordPolicy, da bi bila na jednom mestu.
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank
-    @Size(min = 8, message = "The password must have at least 8 characters.")
     private String password;
 
     // Bez ispravne adrese nalog ne bi mogao da primi link za aktivaciju, pa nikad ne bi ni proradio
