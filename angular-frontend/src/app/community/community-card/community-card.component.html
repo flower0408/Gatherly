@@ -6,7 +6,9 @@
       Since {{ community.creationDate | date: 'MMMM y' }}
     </p>
 
-    <span class="badge text-bg-warning mb-2" *ngIf="community.suspended">Suspended</span>
+    @if (community.suspended) {
+      <span class="badge text-bg-warning mb-2">Suspended</span>
+    }
 
     <p class="card-text description">{{ community.description }}</p>
   </div>

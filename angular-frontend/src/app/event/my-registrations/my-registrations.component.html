@@ -2,47 +2,59 @@
   <h1 class="h3 mb-1">My registrations</h1>
   <p class="text-body-secondary mb-4">Everything you signed up for, and where each request stands.</p>
 
-  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
 
-  <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+  @if (loading) {
+    <p class="text-body-secondary">Loading…</p>
+  }
 
-  <p *ngIf="!loading && registrations.length === 0" class="text-body-secondary">
-    You have not signed up for any event yet.
-    <a [routerLink]="['/events']">Browse events</a>.
-  </p>
+  @if (!loading && registrations.length === 0) {
+    <p class="text-body-secondary">
+      You have not signed up for any event yet.
+      <a [routerLink]="['/events']">Browse events</a>.
+    </p>
+  }
 
-  <div class="table-responsive" *ngIf="registrations.length > 0">
-    <table class="table align-middle">
-      <thead>
-        <tr>
-          <th>Event</th>
-          <th>When</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let registration of registrations">
-          <td>
-            <a [routerLink]="['/events', registration.forEventId]">
-              {{ eventOf(registration)?.title || 'Event' }}
-            </a>
-            <div class="small text-body-secondary">
-              {{ eventOf(registration)?.location }}
-            </div>
-          </td>
-          <td class="small">
-            {{ eventOf(registration)?.startsAt | date: 'd MMM y, HH:mm' }}
-          </td>
-          <td>
-            <span class="badge" [ngClass]="badge(registration.status)">{{ label(registration.status) }}</span>
-          </td>
-          <td class="text-end">
-            <button class="btn btn-outline-secondary btn-sm" *ngIf="canCancel(registration)"
-                    (click)="cancel(registration)">Cancel</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  @if (registrations.length > 0) {
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>When</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (registration of registrations; track registration) {
+            <tr>
+              <td>
+                <a [routerLink]="['/events', registration.forEventId]">
+                  {{ eventOf(registration)?.title || 'Event' }}
+                </a>
+                <div class="small text-body-secondary">
+                  {{ eventOf(registration)?.location }}
+                </div>
+              </td>
+              <td class="small">
+                {{ $safeNavigationMigration(eventOf(registration)?.startsAt) | date: 'd MMM y, HH:mm' }}
+              </td>
+              <td>
+                <span class="badge" [ngClass]="badge(registration.status)">{{ label(registration.status) }}</span>
+              </td>
+              <td class="text-end">
+                @if (canCancel(registration)) {
+                  <button class="btn btn-outline-secondary btn-sm"
+                  (click)="cancel(registration)">Cancel</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>

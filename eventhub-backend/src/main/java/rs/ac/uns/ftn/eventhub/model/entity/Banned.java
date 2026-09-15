@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import javax.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Table(name = "banned")
 @SQLDelete(sql = "update banned set is_deleted = true where id=?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 public class Banned {
 
     @Id

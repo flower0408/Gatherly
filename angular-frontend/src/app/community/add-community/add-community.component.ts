@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -7,7 +7,9 @@ import { CommunityService } from '../services/community.service';
 @Component({
   selector: 'app-add-community',
   templateUrl: './add-community.component.html',
-  styleUrls: ['./add-community.component.css']
+  styleUrls: ['./add-community.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class AddCommunityComponent {
 

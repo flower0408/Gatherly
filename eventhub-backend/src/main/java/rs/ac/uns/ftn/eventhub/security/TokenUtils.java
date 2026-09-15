@@ -2,11 +2,13 @@ package rs.ac.uns.ftn.eventhub.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +21,13 @@ public class TokenUtils {
 
     @Value("${jwt.expiration}")
     private Long expiration;
+
+    // Kljuc kojim se token potpisuje i kojim se potpis proverava.
+    // RFC 7518 trazi da za HS512 kljuc bude bar onoliko dug koliko i sam potpis,
+    // dakle 512 bita odnosno 64 bajta; biblioteka odbija kraci kljuc.
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(this.secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String getUsernameFromToken(String token) {
         String username;
@@ -34,8 +43,8 @@ public class TokenUtils {
     private Claims getClaimsFromToken(String token) {
         Claims claims;
         try {
-            claims = Jwts.parser().setSigningKey(this.secret) // izvlacenje celog payloada
-                    .parseClaimsJws(token).getBody();
+            claims = Jwts.parser().verifyWith(this.getSigningKey()).build() // izvlacenje celog payloada
+                    .parseSignedClaims(token).getPayload();
         } catch (Exception e) {
             claims = null;
         }
@@ -69,12 +78,13 @@ public class TokenUtils {
     // Uloga se upisuje u sam token, da server ne bi morao da je trazi u bazi uz svaki zahtev
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<String, Object>();
-        claims.put("sub", userDetails.getUsername());
         claims.put("role", userDetails.getAuthorities().toArray()[0]);
         claims.put("created", new Date(System.currentTimeMillis()));
-        return Jwts.builder().setClaims(claims)
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+        // claims() zamenjuje ceo sadrzaj tokena, pa se subject postavlja posle njega
+        return Jwts.builder().claims(claims)
+                .subject(userDetails.getUsername())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(this.getSigningKey(), Jwts.SIG.HS512).compact();
     }
 
     public int getExpiredIn() {

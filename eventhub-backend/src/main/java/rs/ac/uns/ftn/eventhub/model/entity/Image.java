@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import javax.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
+import jakarta.persistence.*;
 
 @Entity
 @Getter
@@ -15,7 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "image")
 @SQLDelete(sql = "update image set is_deleted = true where id=?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 public class Image {
 
     @Id

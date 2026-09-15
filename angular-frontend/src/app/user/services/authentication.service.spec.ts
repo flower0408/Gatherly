@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { AuthenticationService } from './authentication.service';
 import { Login } from '../model/login.model';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 // Uloga i korisnicko ime se citaju iz samog tokena, pa se u testu upisuje token
 // sa poznatim sadrzajem i proverava sta servis iz njega izvuce.
@@ -20,8 +21,11 @@ describe('AuthenticationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AuthenticationService]
+      providers: [
+        AuthenticationService,
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
+        provideHttpClientTesting()
+      ]
     });
 
     service = TestBed.inject(AuthenticationService);

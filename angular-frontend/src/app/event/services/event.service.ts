@@ -53,14 +53,6 @@ export class EventService {
     return this.http.get('api/events/user/' + userId) as Observable<Event[]>;
   }
 
-  getMine(): Observable<Event[]> {
-    return this.http.get('api/events/my') as Observable<Event[]>;
-  }
-
-  getHomepage(): Observable<Event[]> {
-    return this.http.get('api/events/homepage') as Observable<Event[]>;
-  }
-
   create(event: Event): Observable<Event> {
     return this.http.post('api/events/add', event) as Observable<Event>;
   }

@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 import rs.ac.uns.ftn.eventhub.model.enums.RegistrationStatus;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "event_registration")
 @SQLDelete(sql = "update event_registration set is_deleted = true where id=?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 public class EventRegistration {
 
     @Id

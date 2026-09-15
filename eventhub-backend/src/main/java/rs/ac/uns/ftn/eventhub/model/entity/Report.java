@@ -8,8 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import javax.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Table(name = "report")
 @SQLDelete(sql = "update report set is_deleted = true where id=?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 public class Report {
 
     @Id

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RegistrationService } from '../services/registration.service';
 import { EventService } from '../services/event.service';
@@ -8,7 +8,9 @@ import { Event } from '../model/event.model';
 @Component({
   selector: 'app-my-registrations',
   templateUrl: './my-registrations.component.html',
-  styleUrls: ['./my-registrations.component.css']
+  styleUrls: ['./my-registrations.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class MyRegistrationsComponent implements OnInit {
 

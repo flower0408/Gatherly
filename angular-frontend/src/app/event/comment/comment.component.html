@@ -2,53 +2,73 @@
   <div class="d-flex justify-content-between align-items-baseline gap-2">
     <div>
       <a class="fw-semibold text-decoration-none"
-         [routerLink]="['/users', comment.belongsToUserId]">{{ comment.authorUsername }}</a>
+      [routerLink]="['/users', comment.belongsToUserId]">{{ comment.authorUsername }}</a>
       <span class="small text-body-secondary ms-2">{{ comment.timestamp | date: 'd MMM y, HH:mm' }}</span>
     </div>
 
     <div class="btn-group btn-group-sm">
-      <button class="btn btn-link btn-sm text-decoration-none p-0 me-3"
-              *ngIf="myId !== null && canWrite" (click)="startReply()">Reply</button>
-      <button class="btn btn-link btn-sm text-decoration-none p-0 me-3"
-              *ngIf="isMine" (click)="startEdit()">Edit</button>
-      <button class="btn btn-link btn-sm text-decoration-none p-0 text-danger"
-              *ngIf="isMine || canModerate" (click)="remove()">Delete</button>
+      @if (myId !== null && canWrite) {
+        <button class="btn btn-link btn-sm text-decoration-none p-0 me-3"
+        (click)="startReply()">Reply</button>
+      }
+      @if (isMine) {
+        <button class="btn btn-link btn-sm text-decoration-none p-0 me-3"
+        (click)="startEdit()">Edit</button>
+      }
+      @if (isMine || canModerate) {
+        <button class="btn btn-link btn-sm text-decoration-none p-0 text-danger"
+        (click)="remove()">Delete</button>
+      }
     </div>
   </div>
 
-  <p class="mb-2" *ngIf="!editing">{{ comment.text }}</p>
+  @if (!editing) {
+    <p class="mb-2">{{ comment.text }}</p>
+  }
 
-  <div class="alert alert-danger py-2 small" *ngIf="error">{{ error }}</div>
+  @if (error) {
+    <div class="alert alert-danger py-2 small">{{ error }}</div>
+  }
 
-  <div class="mb-2" *ngIf="editing">
-    <textarea class="form-control form-control-sm mb-2" rows="2" [(ngModel)]="draft"></textarea>
-    <button class="btn btn-primary btn-sm" (click)="submitEdit()" [disabled]="!draft.trim()">Save</button>
-    <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
-  </div>
+  @if (editing) {
+    <div class="mb-2">
+      <textarea class="form-control form-control-sm mb-2" rows="2" [(ngModel)]="draft"></textarea>
+      <button class="btn btn-primary btn-sm" (click)="submitEdit()" [disabled]="!draft.trim()">Save</button>
+      <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
+    </div>
+  }
 
-  <div class="mb-2" *ngIf="replying">
-    <textarea class="form-control form-control-sm mb-2" rows="2" [(ngModel)]="draft"
-              placeholder="Write a reply…"></textarea>
-    <button class="btn btn-primary btn-sm" (click)="submitReply()" [disabled]="!draft.trim()">Reply</button>
-    <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
-  </div>
+  @if (replying) {
+    <div class="mb-2">
+      <textarea class="form-control form-control-sm mb-2" rows="2" [(ngModel)]="draft"
+      placeholder="Write a reply…"></textarea>
+      <button class="btn btn-primary btn-sm" (click)="submitReply()" [disabled]="!draft.trim()">Reply</button>
+      <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
+    </div>
+  }
 
   <div class="d-flex align-items-center gap-3 flex-wrap mb-2">
     <app-reactions [commentId]="comment.id" [canReact]="myId !== null && canWrite"></app-reactions>
     <app-report-button [commentId]="comment.id" [canReport]="myId !== null && !isMine"></app-report-button>
   </div>
 
-  <button class="btn btn-link btn-sm text-decoration-none p-0 d-block" *ngIf="replies.length > 0"
-          (click)="showReplies = !showReplies">
-    {{ showReplies ? 'Hide' : 'Show' }} {{ replies.length }}
-    {{ replies.length === 1 ? 'reply' : 'replies' }}
-  </button>
+  @if (replies.length > 0) {
+    <button class="btn btn-link btn-sm text-decoration-none p-0 d-block"
+      (click)="showReplies = !showReplies">
+      {{ showReplies ? 'Hide' : 'Show' }} {{ replies.length }}
+      {{ replies.length === 1 ? 'reply' : 'replies' }}
+    </button>
+  }
 
   <!-- Odgovor je opet komentar, pa se komponenta poziva sama -->
-  <div class="replies" *ngIf="showReplies">
-    <app-comment *ngFor="let reply of replies"
-                 [comment]="reply" [eventId]="eventId" [myId]="myId"
-                 [canModerate]="canModerate" [canWrite]="canWrite"
-                 (removed)="loadReplies()"></app-comment>
-  </div>
+  @if (showReplies) {
+    <div class="replies">
+      @for (reply of replies; track reply) {
+        <app-comment
+          [comment]="reply" [eventId]="eventId" [myId]="myId"
+          [canModerate]="canModerate" [canWrite]="canWrite"
+        (removed)="loadReplies()"></app-comment>
+      }
+    </div>
+  }
 </div>

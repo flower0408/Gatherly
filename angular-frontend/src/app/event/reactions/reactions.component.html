@@ -1,7 +1,9 @@
 <div class="d-flex gap-1 flex-wrap">
-  <button class="btn btn-sm reaction" *ngFor="let type of types"
-          [ngClass]="mine === type ? 'btn-primary' : 'btn-outline-secondary'"
-          [disabled]="!canReact" [title]="title(type)" (click)="react(type)">
-    {{ icon(type) }} {{ countOf(type) }}
-  </button>
+  @for (type of types; track type) {
+    <button class="btn btn-sm reaction"
+      [ngClass]="mine === type ? 'btn-primary' : 'btn-outline-secondary'"
+      [disabled]="!canReact" [title]="title(type)" (click)="react(type)">
+      {{ icon(type) }} {{ countOf(type) }}
+    </button>
+  }
 </div>

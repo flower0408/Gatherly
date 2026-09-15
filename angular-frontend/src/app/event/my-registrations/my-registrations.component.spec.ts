@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MyRegistrationsComponent } from './my-registrations.component';
 import { Registration } from '../model/registration.model';
 import { Event } from '../model/event.model';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 // Komponenta prevodi stanja prijave u recenice koje korisnik razume i odlucuje
 // kada se nudi otkazivanje. Oba pravila se proveravaju bez pravog servera.
@@ -23,7 +24,11 @@ describe('MyRegistrationsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [MyRegistrationsComponent],
-      imports: [HttpClientTestingModule, RouterTestingModule]
+      imports: [RouterTestingModule],
+      providers: [
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
+        provideHttpClientTesting()
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MyRegistrationsComponent);

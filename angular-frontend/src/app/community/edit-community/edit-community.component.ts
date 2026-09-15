@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -7,7 +7,9 @@ import { CommunityService } from '../services/community.service';
 @Component({
   selector: 'app-edit-community',
   templateUrl: './edit-community.component.html',
-  styleUrls: ['./edit-community.component.css']
+  styleUrls: ['./edit-community.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class EditCommunityComponent implements OnInit {
 

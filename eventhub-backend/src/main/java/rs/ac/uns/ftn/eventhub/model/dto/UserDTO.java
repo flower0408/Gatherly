@@ -7,9 +7,9 @@ import lombok.Setter;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.model.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Getter
 @Setter

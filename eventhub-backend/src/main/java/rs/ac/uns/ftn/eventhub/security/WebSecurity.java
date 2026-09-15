@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.service.UserService;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 // Provera koja se poziva iz @PreAuthorize izraza i vidi @PathVariable vrednosti iz putanje,
 // pa moze da uporedi korisnika sa zapisom nad kojim radi

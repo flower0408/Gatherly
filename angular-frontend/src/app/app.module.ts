@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing/app-routing.module';
@@ -31,44 +31,38 @@ import { CommunityDetailComponent } from './community/community-detail/community
 import { AddCommunityComponent } from './community/add-community/add-community.component';
 import { EditCommunityComponent } from './community/edit-community/edit-community.component';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    NavbarComponent,
-    FooterComponent,
-    LoginComponent,
-    RegisterComponent,
-    VerifyComponent,
-    EventListComponent,
-    EventCardComponent,
-    EventDetailComponent,
-    AddEventComponent,
-    EditEventComponent,
-    MyRegistrationsComponent,
-    EventRegistrationsComponent,
-    ReactionsComponent,
-    CommentComponent,
-    CommentListComponent,
-    ReportButtonComponent,
-    ReportListComponent,
-    BanListComponent,
-    ProfileComponent,
-    CommunityCardComponent,
-    CommunityListComponent,
-    CommunityDetailComponent,
-    AddCommunityComponent,
-    EditCommunityComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    HttpClientModule
-  ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        NavbarComponent,
+        FooterComponent,
+        LoginComponent,
+        RegisterComponent,
+        VerifyComponent,
+        EventListComponent,
+        EventCardComponent,
+        EventDetailComponent,
+        AddEventComponent,
+        EditEventComponent,
+        MyRegistrationsComponent,
+        EventRegistrationsComponent,
+        ReactionsComponent,
+        CommentComponent,
+        CommentListComponent,
+        ReportButtonComponent,
+        ReportListComponent,
+        BanListComponent,
+        ProfileComponent,
+        CommunityCardComponent,
+        CommunityListComponent,
+        CommunityDetailComponent,
+        AddCommunityComponent,
+        EditCommunityComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        ReactiveFormsModule], providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+        provideHttpClient(withXhr(), withInterceptorsFromDi())
+    ] })
 export class AppModule { }

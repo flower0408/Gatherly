@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventService } from '../services/event.service';
 import { CommunityService } from '../../community/services/community.service';
@@ -15,7 +15,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 @Component({
   selector: 'app-event-detail',
   templateUrl: './event-detail.component.html',
-  styleUrls: ['./event-detail.component.css']
+  styleUrls: ['./event-detail.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class EventDetailComponent implements OnInit {
 

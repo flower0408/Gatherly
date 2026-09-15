@@ -3,25 +3,31 @@
     <h1 class="h3 mb-1">Start a community</h1>
     <p class="text-body-secondary mb-4">You become its first organizer, so you can host events in it.</p>
 
-    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    @if (error) {
+      <div class="alert alert-danger">{{ error }}</div>
+    }
 
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="mb-3">
         <label class="form-label" for="name">Name</label>
         <input class="form-control" type="text" id="name" formControlName="name">
-        <div class="form-text text-danger"
-             *ngIf="form.controls['name'].touched && form.controls['name'].errors?.['required']">
-          A name is required.
-        </div>
+        @if (form.controls['name'].touched && form.controls['name'].errors?.['required']) {
+          <div class="form-text text-danger"
+            >
+            A name is required.
+          </div>
+        }
       </div>
 
       <div class="mb-4">
         <label class="form-label" for="description">Description</label>
         <textarea class="form-control" id="description" rows="4" formControlName="description"></textarea>
-        <div class="form-text text-danger"
-             *ngIf="form.controls['description'].touched && form.controls['description'].errors?.['required']">
-          Tell people what this community is about.
-        </div>
+        @if (form.controls['description'].touched && form.controls['description'].errors?.['required']) {
+          <div class="form-text text-danger"
+            >
+            Tell people what this community is about.
+          </div>
+        }
       </div>
 
       <button class="btn btn-primary" type="submit" [disabled]="!form.valid || saving">

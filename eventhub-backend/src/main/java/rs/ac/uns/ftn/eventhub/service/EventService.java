@@ -24,8 +24,6 @@ public interface EventService {
 
     List<Event> findEventsForCommunityDesc(Long communityId);
 
-    List<Event> findHomepageEvents(Long userId);
-
     Long findCommunityIdForEvent(Long eventId);
 
     String findConflictingEventTitle(Long userId, Event event);

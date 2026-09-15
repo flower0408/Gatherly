@@ -204,36 +204,6 @@ public class EventController {
 
     // Od ove tacke rute traze prijavljenog korisnika
 
-    @GetMapping("/homepage")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<List<EventDTO>> getHomepageEvents(@RequestHeader("authorization") String token) {
-        logger.info("Authentication check");
-        User user = findUserByToken(token);
-        if (user == null) {
-            logger.error("User not found with token: " + token);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        logger.info("Finding homepage events for user with id: " + user.getId());
-        logger.info("Created and sent response");
-
-        return new ResponseEntity<>(toDTOs(eventService.findHomepageEvents(user.getId())), HttpStatus.OK);
-    }
-
-    @GetMapping("/my")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<List<EventDTO>> getMyEvents(@RequestHeader("authorization") String token) {
-        logger.info("Authentication check");
-        User user = findUserByToken(token);
-        if (user == null) {
-            logger.error("User not found with token: " + token);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        logger.info("Finding events created by user with id: " + user.getId());
-        logger.info("Created and sent response");
-
-        return new ResponseEntity<>(toDTOs(eventService.findEventsForCreator(user.getId())), HttpStatus.OK);
-    }
-
     @PostMapping("/add")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> addEvent(@RequestBody @Validated EventDTO newEvent, @RequestHeader("authorization") String token) {

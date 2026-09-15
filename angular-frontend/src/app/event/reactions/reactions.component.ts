@@ -1,10 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReactionService } from '../services/reaction.service';
 
 @Component({
   selector: 'app-reactions',
   templateUrl: './reactions.component.html',
-  styleUrls: ['./reactions.component.css']
+  styleUrls: ['./reactions.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class ReactionsComponent implements OnInit {
 

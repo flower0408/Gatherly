@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { EventService } from './event.service';
 import { Event } from '../model/event.model';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
-// Servis se proverava bez pravog servera: HttpClientTestingModule presrece zahtev,
+// Servis se proverava bez pravog servera: provideHttpClientTesting presrece zahtev,
 // pa se moze videti tacno koja je adresa pozvana i sa kojim parametrima.
 describe('EventService', () => {
 
@@ -12,8 +13,11 @@ describe('EventService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [EventService]
+      providers: [
+        EventService,
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
+        provideHttpClientTesting()
+      ]
     });
 
     service = TestBed.inject(EventService);

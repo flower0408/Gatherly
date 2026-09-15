@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -10,7 +10,9 @@ import { Community } from '../../community/model/community.model';
 @Component({
   selector: 'app-report-list',
   templateUrl: './report-list.component.html',
-  styleUrls: ['./report-list.component.css']
+  styleUrls: ['./report-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class ReportListComponent implements OnInit {
 

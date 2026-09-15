@@ -1,11 +1,13 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ReportService } from '../services/report.service';
 
 @Component({
   selector: 'app-report-button',
   templateUrl: './report-button.component.html',
-  styleUrls: ['./report-button.component.css']
+  styleUrls: ['./report-button.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class ReportButtonComponent {
 

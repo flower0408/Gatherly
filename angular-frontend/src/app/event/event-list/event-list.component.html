@@ -12,14 +12,16 @@
     <div class="col-12 col-lg-4">
       <label class="form-label small" for="term">Search</label>
       <input class="form-control" type="text" id="term" [(ngModel)]="term" name="term"
-             placeholder="Title, description or place">
+        placeholder="Title, description or place">
     </div>
 
     <div class="col-6 col-lg-3">
       <label class="form-label small" for="category">Category</label>
       <select class="form-select" id="category" [(ngModel)]="category" name="category">
         <option value="">Any category</option>
-        <option *ngFor="let option of categories" [value]="option.value">{{ option.label }}</option>
+        @for (option of categories; track option) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
       </select>
     </div>
 
@@ -42,31 +44,41 @@
     <h2 class="h4 mb-0">{{ showPast ? 'All events' : 'Upcoming events' }}</h2>
 
     <div class="d-flex align-items-center gap-2">
-      <button class="btn btn-link btn-sm text-decoration-none" *ngIf="hasFilters"
-              (click)="clearFilters()">Clear filters</button>
+      @if (hasFilters) {
+        <button class="btn btn-link btn-sm text-decoration-none"
+        (click)="clearFilters()">Clear filters</button>
+      }
 
       <div class="btn-group btn-group-sm">
         <button class="btn" [ngClass]="!showPast ? 'btn-primary' : 'btn-outline-primary'"
-                (click)="togglePast(false)">Upcoming</button>
+        (click)="togglePast(false)">Upcoming</button>
         <button class="btn" [ngClass]="showPast ? 'btn-primary' : 'btn-outline-primary'"
-                (click)="togglePast(true)">All</button>
+        (click)="togglePast(true)">All</button>
       </div>
     </div>
   </div>
 
-  <p *ngIf="loading" class="text-body-secondary">Loading events…</p>
+  @if (loading) {
+    <p class="text-body-secondary">Loading events…</p>
+  }
 
-  <p *ngIf="!loading && events.length === 0 && !hasFilters" class="text-body-secondary">
-    There are no events to show yet.
-  </p>
+  @if (!loading && events.length === 0 && !hasFilters) {
+    <p class="text-body-secondary">
+      There are no events to show yet.
+    </p>
+  }
 
-  <p *ngIf="!loading && events.length === 0 && hasFilters" class="text-body-secondary">
-    Nothing matches that search. Try a different word or a wider date range.
-  </p>
+  @if (!loading && events.length === 0 && hasFilters) {
+    <p class="text-body-secondary">
+      Nothing matches that search. Try a different word or a wider date range.
+    </p>
+  }
 
   <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-    <div class="col" *ngFor="let event of events">
-      <app-event-card [event]="event"></app-event-card>
-    </div>
+    @for (event of events; track event) {
+      <div class="col">
+        <app-event-card [event]="event"></app-event-card>
+      </div>
+    }
   </div>
 </div>

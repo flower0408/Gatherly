@@ -1,137 +1,160 @@
 <div class="container page">
 
-  <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+  @if (loading) {
+    <p class="text-body-secondary">Loading…</p>
+  }
 
-  <div *ngIf="notFound" class="text-center py-5">
-    <h1 class="h4 mb-3">Event not found</h1>
-    <p class="text-body-secondary">It may have been removed by its organizer.</p>
-    <a class="btn btn-primary" [routerLink]="['/events']">Back to events</a>
-  </div>
-
-  <div *ngIf="event" class="row g-4">
-    <div class="col-lg-8">
-      <img *ngIf="coverImage" class="img-fluid rounded mb-4 w-100 cover" [src]="coverImage" [alt]="event.title">
-
-      <!-- Bez slike bi stranica pocinjala praznim tekstom, pa naslovno mesto popunjava traka sa datumom -->
-      <div *ngIf="!coverImage" class="rounded mb-4 w-100 cover placeholder-cover d-flex align-items-end">
-        <div class="p-4 text-white">
-          <div class="display-6 fw-bold mb-0">{{ event.startsAt | date: 'd MMM' }}</div>
-          <div class="lead mb-0">{{ event.startsAt | date: 'y · HH:mm' }}</div>
-        </div>
-      </div>
-
-      <p class="event-date text-primary mb-1">
-        {{ event.startsAt | date: 'EEEE, d MMMM y' }}
-      </p>
-
-      <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
-        <div>
-          <h1 class="h2 mb-1">{{ event.title }}</h1>
-          <span class="badge text-bg-light">{{ categoryLabel(event.category) }}</span>
-        </div>
-
-        <div class="btn-group btn-group-sm" *ngIf="canManage">
-          <a class="btn btn-outline-primary" [routerLink]="['/events', event.id, 'registrations']">Registrations</a>
-          <a class="btn btn-outline-primary" [routerLink]="['/events', event.id, 'edit']">Edit</a>
-          <button class="btn btn-outline-danger" (click)="remove()">Delete</button>
-        </div>
-      </div>
-
-      <p class="text-body-secondary mb-4" *ngIf="community">
-        Hosted by
-        <a [routerLink]="['/communities', community.id]">{{ community.name }}</a>
-      </p>
-
-      <h2 class="h6 text-uppercase text-body-secondary">About</h2>
-      <p class="mb-4">{{ event.description }}</p>
-
-      <!-- Ko dolazi, kao na Meetup-u. Gost ovaj spisak ne vidi. -->
-      <div class="mb-4" *ngIf="myId !== null && participants.length > 0">
-        <h2 class="h6 text-uppercase text-body-secondary mb-2">
-          Who is going <span class="text-body-secondary">({{ participants.length }})</span>
-        </h2>
-
-        <div class="d-flex flex-wrap gap-3">
-          <a class="d-flex align-items-center gap-2 text-decoration-none" *ngFor="let person of participants"
-             [routerLink]="['/users', person.id]">
-            <img class="going-avatar rounded-circle" *ngIf="person.profileImage"
-                 [src]="person.profileImage.path" [alt]="person.username">
-            <span class="going-avatar rounded-circle bg-primary text-white text-center"
-                  *ngIf="!person.profileImage">{{ person.username.charAt(0) | uppercase }}</span>
-            <span class="small">{{ person.displayName || person.username }}</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="d-flex align-items-center gap-3 flex-wrap">
-        <app-reactions [eventId]="event.id" [canReact]="myId !== null && canWrite"></app-reactions>
-        <app-report-button [eventId]="event.id" [canReport]="myId !== null && !canManage"></app-report-button>
-      </div>
-
-      <app-comment-list [eventId]="event.id" [myId]="myId" [canModerate]="canManage"
-                        [canWrite]="canWrite" [communityId]="event.belongsToCommunityId"></app-comment-list>
+  @if (notFound) {
+    <div class="text-center py-5">
+      <h1 class="h4 mb-3">Event not found</h1>
+      <p class="text-body-secondary">It may have been removed by its organizer.</p>
+      <a class="btn btn-primary" [routerLink]="['/events']">Back to events</a>
     </div>
+  }
 
-    <div class="col-lg-4">
-      <div class="card">
-        <div class="card-body">
-          <h2 class="h6 text-uppercase text-body-secondary mb-3">Details</h2>
-
-          <p class="mb-2">
-            <strong>When</strong><br>
-            {{ event.startsAt | date: 'd MMM y, HH:mm' }} – {{ event.endsAt | date: 'HH:mm' }}
-          </p>
-
-          <p class="mb-3">
-            <strong>Where</strong><br>
-            {{ event.location }}
-          </p>
-
-          <p class="mb-3">
-            <strong>Spots</strong><br>
-            {{ event.takenSpots }} of {{ event.capacity }} taken
-            <span class="badge text-bg-warning ms-1" *ngIf="isFull">Full</span>
-          </p>
-
-          <div class="alert alert-secondary small" *ngIf="hasFinished">
-            This event has finished.
+  @if (event) {
+    <div class="row g-4">
+      <div class="col-lg-8">
+        @if (coverImage) {
+          <img class="img-fluid rounded mb-4 w-100 cover" [src]="coverImage" [alt]="event.title">
+        }
+        <!-- Bez slike bi stranica pocinjala praznim tekstom, pa naslovno mesto popunjava traka sa datumom -->
+        @if (!coverImage) {
+          <div class="rounded mb-4 w-100 cover placeholder-cover d-flex align-items-end">
+            <div class="p-4 text-white">
+              <div class="display-6 fw-bold mb-0">{{ event.startsAt | date: 'd MMM' }}</div>
+              <div class="lead mb-0">{{ event.startsAt | date: 'y · HH:mm' }}</div>
+            </div>
           </div>
-
-          <div class="alert alert-secondary small" *ngIf="hasStarted && !hasFinished">
-            This event is under way.
+        }
+        <p class="event-date text-primary mb-1">
+          {{ event.startsAt | date: 'EEEE, d MMMM y' }}
+        </p>
+        <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
+          <div>
+            <h1 class="h2 mb-1">{{ event.title }}</h1>
+            <span class="badge text-bg-light">{{ categoryLabel(event.category) }}</span>
           </div>
-
-          <div class="alert alert-warning small" *ngIf="!hasStarted && isFull && !registration">
-            All spots are taken. New sign-ups join the waiting list.
+          @if (canManage) {
+            <div class="btn-group btn-group-sm">
+              <a class="btn btn-outline-primary" [routerLink]="['/events', event.id, 'registrations']">Registrations</a>
+              <a class="btn btn-outline-primary" [routerLink]="['/events', event.id, 'edit']">Edit</a>
+              <button class="btn btn-outline-danger" (click)="remove()">Delete</button>
+            </div>
+          }
+        </div>
+        @if (community) {
+          <p class="text-body-secondary mb-4">
+            Hosted by
+            <a [routerLink]="['/communities', community.id]">{{ community.name }}</a>
+          </p>
+        }
+        <h2 class="h6 text-uppercase text-body-secondary">About</h2>
+        <p class="mb-4">{{ event.description }}</p>
+        <!-- Ko dolazi, kao na Meetup-u. Gost ovaj spisak ne vidi. -->
+        @if (myId !== null && participants.length > 0) {
+          <div class="mb-4">
+            <h2 class="h6 text-uppercase text-body-secondary mb-2">
+              Who is going <span class="text-body-secondary">({{ participants.length }})</span>
+            </h2>
+            <div class="d-flex flex-wrap gap-3">
+              @for (person of participants; track person) {
+                <a class="d-flex align-items-center gap-2 text-decoration-none"
+                  [routerLink]="['/users', person.id]">
+                  @if (person.profileImage) {
+                    <img class="going-avatar rounded-circle"
+                      [src]="person.profileImage.path" [alt]="person.username">
+                  }
+                  @if (!person.profileImage) {
+                    <span class="going-avatar rounded-circle bg-primary text-white text-center"
+                    >{{ person.username.charAt(0) | uppercase }}</span>
+                  }
+                  <span class="small">{{ person.displayName || person.username }}</span>
+                </a>
+              }
+            </div>
           </div>
-
-          <div class="alert alert-success small" *ngIf="message">{{ message }}</div>
-          <div class="alert alert-danger small" *ngIf="error">{{ error }}</div>
-
-          <div *ngIf="registration" class="mb-3">
-            <span class="badge" [ngClass]="statusClass">{{ statusLabel }}</span>
-            <p class="small text-body-secondary mt-2 mb-0" *ngIf="registration.conflictsWith">
-              This overlaps with &ldquo;{{ registration.conflictsWith }}&rdquo;, which you are already signed up for.
+        }
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <app-reactions [eventId]="event.id" [canReact]="myId !== null && canWrite"></app-reactions>
+          <app-report-button [eventId]="event.id" [canReport]="myId !== null && !canManage"></app-report-button>
+        </div>
+        <app-comment-list [eventId]="event.id" [myId]="myId" [canModerate]="canManage"
+        [canWrite]="canWrite" [communityId]="event.belongsToCommunityId"></app-comment-list>
+      </div>
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h6 text-uppercase text-body-secondary mb-3">Details</h2>
+            <p class="mb-2">
+              <strong>When</strong><br>
+              {{ event.startsAt | date: 'd MMM y, HH:mm' }} – {{ event.endsAt | date: 'HH:mm' }}
             </p>
+            <p class="mb-3">
+              <strong>Where</strong><br>
+              {{ event.location }}
+            </p>
+            <p class="mb-3">
+              <strong>Spots</strong><br>
+              {{ event.takenSpots }} of {{ event.capacity }} taken
+              @if (isFull) {
+                <span class="badge text-bg-warning ms-1">Full</span>
+              }
+            </p>
+            @if (hasFinished) {
+              <div class="alert alert-secondary small">
+                This event has finished.
+              </div>
+            }
+            @if (hasStarted && !hasFinished) {
+              <div class="alert alert-secondary small">
+                This event is under way.
+              </div>
+            }
+            @if (!hasStarted && isFull && !registration) {
+              <div class="alert alert-warning small">
+                All spots are taken. New sign-ups join the waiting list.
+              </div>
+            }
+            @if (message) {
+              <div class="alert alert-success small">{{ message }}</div>
+            }
+            @if (error) {
+              <div class="alert alert-danger small">{{ error }}</div>
+            }
+            @if (registration) {
+              <div class="mb-3">
+                <span class="badge" [ngClass]="statusClass">{{ statusLabel }}</span>
+                @if (registration.conflictsWith) {
+                  <p class="small text-body-secondary mt-2 mb-0">
+                    This overlaps with &ldquo;{{ registration.conflictsWith }}&rdquo;, which you are already signed up for.
+                  </p>
+                }
+              </div>
+            }
+            @if (auth.isLoggedIn() && !registration && !hasStarted) {
+              <button class="btn btn-primary w-100"
+                (click)="register()">
+                {{ isFull ? 'Join the waiting list' : 'Sign up' }}
+              </button>
+            }
+            @if (registration && !hasStarted) {
+              <button class="btn btn-outline-secondary w-100"
+              (click)="cancelRegistration()">Cancel registration</button>
+            }
+            @if (!auth.isLoggedIn() && !hasStarted) {
+              <a class="btn btn-primary w-100"
+              [routerLink]="['/users/login']">Sign in to attend</a>
+            }
+            <!-- Preuzimanje u kalendar, kao na sajtovima za dogadjaje -->
+            @if (!hasFinished) {
+              <a class="btn btn-outline-secondary w-100 mt-2"
+              [href]="'api/events/' + event.id + '/calendar'">Add to calendar</a>
+            }
           </div>
-
-          <button class="btn btn-primary w-100" *ngIf="auth.isLoggedIn() && !registration && !hasStarted"
-                  (click)="register()">
-            {{ isFull ? 'Join the waiting list' : 'Sign up' }}
-          </button>
-
-          <button class="btn btn-outline-secondary w-100" *ngIf="registration && !hasStarted"
-                  (click)="cancelRegistration()">Cancel registration</button>
-
-          <a class="btn btn-primary w-100" *ngIf="!auth.isLoggedIn() && !hasStarted"
-             [routerLink]="['/users/login']">Sign in to attend</a>
-
-          <!-- Preuzimanje u kalendar, kao na sajtovima za dogadjaje -->
-          <a class="btn btn-outline-secondary w-100 mt-2" *ngIf="!hasFinished"
-             [href]="'api/events/' + event.id + '/calendar'">Add to calendar</a>
         </div>
       </div>
     </div>
-  </div>
+  }
 
 </div>

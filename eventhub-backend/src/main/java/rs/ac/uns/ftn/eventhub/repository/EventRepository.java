@@ -68,18 +68,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                     "order by e.starts_at desc;")
     Optional<List<Event>> findEventsByCommunityIdDesc(@Param("communityId") Long communityId);
 
-    // Pocetna strana prijavljenog korisnika: predstojeci dogadjaji iz njegovih zajednica,
-    // plus javni dogadjaji koji ne pripadaju nijednoj zajednici
-    @Query(nativeQuery = true,
-            value = "select e.* from `event` e " +
-                    "join `user` u on e.created_by_user_id = u.id " +
-                    "where e.is_deleted = false and u.is_deleted = false and e.starts_at >= now() " +
-                    "and (e.id in (select event_id from community_events where community_id in " +
-                    "        (select community_id from community_members where member_id = :userId)) " +
-                    "     or e.id not in (select event_id from community_events)) " +
-                    "order by e.starts_at asc;")
-    Optional<List<Event>> findHomepageEvents(@Param("userId") Long userId);
-
     // Trazi dogadjaj koji se vremenski preklapa sa zadatim, a na koji je korisnik vec prijavljen.
     // Dva intervala se preklapaju ako svaki pocinje pre nego sto se onaj drugi zavrsi.
     @Query(nativeQuery = true,

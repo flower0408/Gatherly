@@ -32,11 +32,6 @@ export class CommunityService {
     return this.http.get('api/communities/user/' + userId) as Observable<Community[]>;
   }
 
-  // Zajednice ciji je prijavljeni korisnik clan
-  getMine(): Observable<Community[]> {
-    return this.http.get('api/communities/my') as Observable<Community[]>;
-  }
-
   // Zajednice u kojima je prijavljeni korisnik organizator, dakle sme da otvara dogadjaje
   getMineOrganizing(): Observable<Community[]> {
     return this.http.get('api/communities/my/organizing') as Observable<Community[]>;

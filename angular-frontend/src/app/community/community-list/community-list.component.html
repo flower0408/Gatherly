@@ -5,20 +5,28 @@
       <p class="text-body-secondary mb-0">Groups of people who meet around a shared interest.</p>
     </div>
 
-    <a class="btn btn-primary" *ngIf="auth.isLoggedIn()" [routerLink]="['/communities/new']">
-      Start a community
-    </a>
+    @if (auth.isLoggedIn()) {
+      <a class="btn btn-primary" [routerLink]="['/communities/new']">
+        Start a community
+      </a>
+    }
   </div>
 
-  <p *ngIf="loading" class="text-body-secondary">Loading communities…</p>
+  @if (loading) {
+    <p class="text-body-secondary">Loading communities…</p>
+  }
 
-  <p *ngIf="!loading && communities.length === 0" class="text-body-secondary">
-    There are no communities yet.
-  </p>
+  @if (!loading && communities.length === 0) {
+    <p class="text-body-secondary">
+      There are no communities yet.
+    </p>
+  }
 
   <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-    <div class="col" *ngFor="let community of communities">
-      <app-community-card [community]="community"></app-community-card>
-    </div>
+    @for (community of communities; track community) {
+      <div class="col">
+        <app-community-card [community]="community"></app-community-card>
+      </div>
+    }
   </div>
 </div>

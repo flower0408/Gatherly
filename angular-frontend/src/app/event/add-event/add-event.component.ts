@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -13,7 +13,9 @@ import { EVENT_CATEGORIES } from '../model/event-category.model';
 @Component({
   selector: 'app-add-event',
   templateUrl: './add-event.component.html',
-  styleUrls: ['./add-event.component.css']
+  styleUrls: ['./add-event.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class AddEventComponent implements OnInit {
 

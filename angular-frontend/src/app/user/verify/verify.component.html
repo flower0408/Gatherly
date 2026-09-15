@@ -1,12 +1,20 @@
 <div class="container page">
   <div class="form-narrow text-center">
-    <p *ngIf="!done" class="text-body-secondary">Activating your account…</p>
+    @if (!done) {
+      <p class="text-body-secondary">Activating your account…</p>
+    }
 
-    <div *ngIf="done">
-      <h1 class="h3 mb-3">{{ success ? 'Account activated' : 'Activation failed' }}</h1>
-      <div class="alert" [ngClass]="success ? 'alert-success' : 'alert-danger'">{{ message }}</div>
-      <a class="btn btn-primary" [routerLink]="['/users/login']" *ngIf="success">Sign in</a>
-      <a class="btn btn-outline-secondary" [routerLink]="['/events']" *ngIf="!success">Back to events</a>
-    </div>
+    @if (done) {
+      <div>
+        <h1 class="h3 mb-3">{{ success ? 'Account activated' : 'Activation failed' }}</h1>
+        <div class="alert" [ngClass]="success ? 'alert-success' : 'alert-danger'">{{ message }}</div>
+        @if (success) {
+          <a class="btn btn-primary" [routerLink]="['/users/login']">Sign in</a>
+        }
+        @if (!success) {
+          <a class="btn btn-outline-secondary" [routerLink]="['/events']">Back to events</a>
+        }
+      </div>
+    }
   </div>
 </div>

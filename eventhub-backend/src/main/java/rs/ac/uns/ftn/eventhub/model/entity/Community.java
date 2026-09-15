@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import javax.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "community")
 @SQLDelete(sql = "update community set is_deleted = true where id=?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 public class Community {
 
     @Id

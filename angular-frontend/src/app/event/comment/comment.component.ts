@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommentService } from '../services/comment.service';
 import { Comment } from '../model/comment.model';
@@ -6,7 +6,9 @@ import { Comment } from '../model/comment.model';
 @Component({
   selector: 'app-comment',
   templateUrl: './comment.component.html',
-  styleUrls: ['./comment.component.css']
+  styleUrls: ['./comment.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class CommentComponent implements OnInit {
 

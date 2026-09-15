@@ -113,11 +113,6 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<Event> findHomepageEvents(Long userId) {
-        return this.eventRepository.findHomepageEvents(userId).orElse(Collections.emptyList());
-    }
-
-    @Override
     public Long findCommunityIdForEvent(Long eventId) {
         return eventRepository.findCommunityIdByEventId(eventId).orElse(null);
     }

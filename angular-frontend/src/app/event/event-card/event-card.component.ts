@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Event } from '../model/event.model';
 import { categoryLabel } from '../model/event-category.model';
 
@@ -6,7 +6,9 @@ import { categoryLabel } from '../model/event-category.model';
 @Component({
   selector: 'app-event-card',
   templateUrl: './event-card.component.html',
-  styleUrls: ['./event-card.component.css']
+  styleUrls: ['./event-card.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class EventCardComponent {
 

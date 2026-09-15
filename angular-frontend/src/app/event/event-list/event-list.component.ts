@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { EventService } from '../services/event.service';
 import { Event } from '../model/event.model';
 import { EVENT_CATEGORIES } from '../model/event-category.model';
@@ -6,7 +6,9 @@ import { EVENT_CATEGORIES } from '../model/event-category.model';
 @Component({
   selector: 'app-event-list',
   templateUrl: './event-list.component.html',
-  styleUrls: ['./event-list.component.css']
+  styleUrls: ['./event-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class EventListComponent implements OnInit {
 

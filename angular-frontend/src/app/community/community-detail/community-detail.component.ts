@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommunityService } from '../services/community.service';
@@ -13,7 +13,9 @@ import { User } from '../../user/model/user.model';
 @Component({
   selector: 'app-community-detail',
   templateUrl: './community-detail.component.html',
-  styleUrls: ['./community-detail.component.css']
+  styleUrls: ['./community-detail.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class CommunityDetailComponent implements OnInit {
 

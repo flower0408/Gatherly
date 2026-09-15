@@ -14,38 +14,46 @@
         <li class="nav-item">
           <a class="nav-link" [routerLink]="['/communities']" routerLinkActive="active">Communities</a>
         </li>
-        <li class="nav-item" *ngIf="auth.isLoggedIn()">
-          <a class="nav-link" [routerLink]="['/registrations']" routerLinkActive="active">My registrations</a>
-        </li>
-        <li class="nav-item" *ngIf="auth.isLoggedIn()">
-          <a class="nav-link" [routerLink]="['/events/new']" routerLinkActive="active">Create event</a>
-        </li>
-        <li class="nav-item" *ngIf="auth.isAdmin()">
-          <a class="nav-link" [routerLink]="['/reports']" routerLinkActive="active">Reports</a>
-        </li>
-        <li class="nav-item" *ngIf="auth.isAdmin()">
-          <a class="nav-link" [routerLink]="['/bans']" routerLinkActive="active">Banned</a>
-        </li>
+        @if (auth.isLoggedIn()) {
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/registrations']" routerLinkActive="active">My registrations</a>
+          </li>
+        }
+        @if (auth.isLoggedIn()) {
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/events/new']" routerLinkActive="active">Create event</a>
+          </li>
+        }
+        @if (auth.isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/reports']" routerLinkActive="active">Reports</a>
+          </li>
+        }
+        @if (auth.isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/bans']" routerLinkActive="active">Banned</a>
+          </li>
+        }
       </ul>
 
       <ul class="navbar-nav">
-        <ng-container *ngIf="!auth.isLoggedIn()">
+        @if (!auth.isLoggedIn()) {
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['/users/login']">Sign in</a>
           </li>
           <li class="nav-item">
             <a class="btn btn-light btn-sm ms-lg-2 mt-2 mt-lg-0" [routerLink]="['/users/register']">Sign up</a>
           </li>
-        </ng-container>
+        }
 
-        <ng-container *ngIf="auth.isLoggedIn()">
+        @if (auth.isLoggedIn()) {
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['/users/profile']">{{ auth.getUsername() }}</a>
           </li>
           <li class="nav-item">
             <button class="btn btn-light btn-sm ms-lg-2 mt-2 mt-lg-0" (click)="logout()">Sign out</button>
           </li>
-        </ng-container>
+        }
       </ul>
     </div>
   </div>

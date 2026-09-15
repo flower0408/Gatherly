@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
 
@@ -7,7 +7,9 @@ import { AuthenticationService } from '../services/authentication.service';
 @Component({
   selector: 'app-verify',
   templateUrl: './verify.component.html',
-  styleUrls: ['./verify.component.css']
+  styleUrls: ['./verify.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class VerifyComponent implements OnInit {
 

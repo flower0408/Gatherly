@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BanService } from '../services/ban.service';
@@ -9,7 +9,9 @@ import { Community } from '../../community/model/community.model';
 @Component({
   selector: 'app-ban-list',
   templateUrl: './ban-list.component.html',
-  styleUrls: ['./ban-list.component.css']
+  styleUrls: ['./ban-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
 export class BanListComponent implements OnInit {
 

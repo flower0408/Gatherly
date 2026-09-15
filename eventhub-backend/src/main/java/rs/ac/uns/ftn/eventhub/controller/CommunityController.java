@@ -137,25 +137,6 @@ public class CommunityController {
 
     // Od ove tacke rute traze prijavljenog korisnika
 
-    @GetMapping("/my")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<List<CommunityDTO>> getMyCommunities(@RequestHeader("authorization") String token) {
-        logger.info("Authentication check");
-        User user = findUserByToken(token);
-        if (user == null) {
-            logger.error("User not found with token: " + token);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        logger.info("Finding communities of user with id: " + user.getId());
-        List<CommunityDTO> communityDTOS = new ArrayList<>();
-        for (Community temp : communityService.findCommunitiesForUser(user.getId())) {
-            communityDTOS.add(new CommunityDTO(temp));
-        }
-        logger.info("Created and sent response");
-
-        return new ResponseEntity<>(communityDTOS, HttpStatus.OK);
-    }
-
     // Zajednice u kojima korisnik moze da otvara dogadjaje, dakle one gde je organizator
     @GetMapping("/my/organizing")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -190,7 +171,7 @@ public class CommunityController {
         Community createdCommunity = communityService.createCommunity(newCommunity);
         if (createdCommunity == null) {
             logger.error("Community couldn't be created from DTO");
-            return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
         // Onaj ko je napravio zajednicu postaje njen organizator i clan
         logger.info("Setting user with id: " + user.getId() + " as organizer and member");
@@ -215,7 +196,7 @@ public class CommunityController {
         Community oldCommunity = communityService.findById(Long.parseLong(id));
         if (oldCommunity == null) {
             logger.error("Original community not found with id: " + id);
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if (!communityService.checkOrganizer(oldCommunity.getId(), user.getId()) && !user.isAdmin()) {
             logger.error("User with id: " + user.getId() + " is not allowed to edit community with id: " + id);

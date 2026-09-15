@@ -19,8 +19,4 @@ public interface UserService {
 
     Integer deleteUser(Long id);
 
-    List<User> searchUsersByNames(String firstName, String lastName);
-
-    List<User> findAll();
-
 }

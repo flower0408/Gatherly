@@ -1,139 +1,162 @@
 <div class="container page">
 
-  <p *ngIf="loading" class="text-body-secondary">Loading…</p>
+  @if (loading) {
+    <p class="text-body-secondary">Loading…</p>
+  }
 
-  <div *ngIf="notFound" class="text-center py-5">
-    <h1 class="h4 mb-3">Community not found</h1>
-    <p class="text-body-secondary">It may have been removed.</p>
-    <a class="btn btn-primary" [routerLink]="['/communities']">Back to communities</a>
-  </div>
-
-  <div *ngIf="community">
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-2">
-      <h1 class="h2 mb-0">{{ community.name }}</h1>
-
-      <div class="d-flex gap-2">
-        <button class="btn btn-sm" *ngIf="auth.isLoggedIn() && !community.suspended"
-                [ngClass]="isMember ? 'btn-outline-secondary' : 'btn-primary'"
-                (click)="isMember ? leave() : join()">
-          {{ isMember ? 'Leave community' : 'Join community' }}
-        </button>
-
-        <a class="btn btn-primary btn-sm" *ngIf="canManage && !community.suspended"
-           [routerLink]="['/events/new']" [queryParams]="{ community: community.id }">Create event here</a>
-
-        <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
-           [routerLink]="['/communities', community.id, 'reports']">Reports</a>
-
-        <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
-           [routerLink]="['/communities', community.id, 'bans']">Banned</a>
-
-        <a class="btn btn-outline-primary btn-sm" *ngIf="canManage"
-           [routerLink]="['/communities', community.id, 'edit']">Edit</a>
-
-        <button class="btn btn-outline-danger btn-sm" *ngIf="auth.isAdmin() && !community.suspended"
-                (click)="startSuspending()">Suspend</button>
-
-        <button class="btn btn-outline-danger btn-sm" *ngIf="canManage"
-                (click)="remove()">Delete</button>
-      </div>
+  @if (notFound) {
+    <div class="text-center py-5">
+      <h1 class="h4 mb-3">Community not found</h1>
+      <p class="text-body-secondary">It may have been removed.</p>
+      <a class="btn btn-primary" [routerLink]="['/communities']">Back to communities</a>
     </div>
+  }
 
-    <p class="text-body-secondary">
-      Since {{ community.creationDate | date: 'MMMM y' }} · {{ members.length }} {{ members.length === 1 ? 'member' : 'members' }}
-    </p>
-
-    <div class="alert alert-warning" *ngIf="community.suspended">
-      <strong>This community is suspended.</strong>
-      <span *ngIf="community.suspendedReason"> {{ community.suspendedReason }}</span>
-    </div>
-
-    <div class="card mb-3" *ngIf="suspending">
-      <div class="card-body">
-        <label class="form-label" for="suspendedReason">Why is this community being suspended?</label>
-        <input class="form-control mb-2" type="text" id="suspendedReason" [(ngModel)]="suspendedReason">
-        <div class="form-text mb-2">
-          The reason is shown on the community page, and the community is left without organizers.
-        </div>
-
-        <button class="btn btn-danger btn-sm" (click)="suspend()" [disabled]="!suspendedReason.trim()">
-          Suspend community
-        </button>
-        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancelSuspending()">Cancel</button>
-      </div>
-    </div>
-
-    <div class="alert alert-success" *ngIf="message">{{ message }}</div>
-    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
-    <p class="mb-4">{{ community.description }}</p>
-
-    <div class="row g-4">
-      <div class="col-lg-8">
-        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
-          <h2 class="h4 mb-0">Events</h2>
-
-          <div class="btn-group btn-group-sm">
-            <button class="btn" [ngClass]="order === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
-                    (click)="sortBy('asc')">Soonest first</button>
-            <button class="btn" [ngClass]="order === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
-                    (click)="sortBy('desc')">Latest first</button>
-          </div>
-        </div>
-
-        <p *ngIf="events.length === 0" class="text-body-secondary">
-          This community has no events yet.
-        </p>
-
-        <div class="row row-cols-1 row-cols-sm-2 g-4">
-          <div class="col" *ngFor="let event of events">
-            <app-event-card [event]="event"></app-event-card>
-          </div>
+  @if (community) {
+    <div>
+      <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-2">
+        <h1 class="h2 mb-0">{{ community.name }}</h1>
+        <div class="d-flex gap-2">
+          @if (auth.isLoggedIn() && !community.suspended) {
+            <button class="btn btn-sm"
+              [ngClass]="isMember ? 'btn-outline-secondary' : 'btn-primary'"
+              (click)="isMember ? leave() : join()">
+              {{ isMember ? 'Leave community' : 'Join community' }}
+            </button>
+          }
+          @if (canManage && !community.suspended) {
+            <a class="btn btn-primary btn-sm"
+            [routerLink]="['/events/new']" [queryParams]="{ community: community.id }">Create event here</a>
+          }
+          @if (canManage) {
+            <a class="btn btn-outline-primary btn-sm"
+            [routerLink]="['/communities', community.id, 'reports']">Reports</a>
+          }
+          @if (canManage) {
+            <a class="btn btn-outline-primary btn-sm"
+            [routerLink]="['/communities', community.id, 'bans']">Banned</a>
+          }
+          @if (canManage) {
+            <a class="btn btn-outline-primary btn-sm"
+            [routerLink]="['/communities', community.id, 'edit']">Edit</a>
+          }
+          @if (auth.isAdmin() && !community.suspended) {
+            <button class="btn btn-outline-danger btn-sm"
+            (click)="startSuspending()">Suspend</button>
+          }
+          @if (canManage) {
+            <button class="btn btn-outline-danger btn-sm"
+            (click)="remove()">Delete</button>
+          }
         </div>
       </div>
-
-      <div class="col-lg-4">
-        <div class="card">
+      <p class="text-body-secondary">
+        Since {{ community.creationDate | date: 'MMMM y' }} · {{ members.length }} {{ members.length === 1 ? 'member' : 'members' }}
+      </p>
+      @if (community.suspended) {
+        <div class="alert alert-warning">
+          <strong>This community is suspended.</strong>
+          @if (community.suspendedReason) {
+            <span> {{ community.suspendedReason }}</span>
+          }
+        </div>
+      }
+      @if (suspending) {
+        <div class="card mb-3">
           <div class="card-body">
-            <h2 class="h6 text-uppercase text-body-secondary mb-3">Members</h2>
-
-            <p *ngIf="members.length === 0" class="text-body-secondary small mb-0">
-              No members yet.
+            <label class="form-label" for="suspendedReason">Why is this community being suspended?</label>
+            <input class="form-control mb-2" type="text" id="suspendedReason" [(ngModel)]="suspendedReason">
+            <div class="form-text mb-2">
+              The reason is shown on the community page, and the community is left without organizers.
+            </div>
+            <button class="btn btn-danger btn-sm" (click)="suspend()" [disabled]="!suspendedReason.trim()">
+              Suspend community
+            </button>
+            <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancelSuspending()">Cancel</button>
+          </div>
+        </div>
+      }
+      @if (message) {
+        <div class="alert alert-success">{{ message }}</div>
+      }
+      @if (error) {
+        <div class="alert alert-danger">{{ error }}</div>
+      }
+      <p class="mb-4">{{ community.description }}</p>
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+            <h2 class="h4 mb-0">Events</h2>
+            <div class="btn-group btn-group-sm">
+              <button class="btn" [ngClass]="order === 'asc' ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="sortBy('asc')">Soonest first</button>
+              <button class="btn" [ngClass]="order === 'desc' ? 'btn-primary' : 'btn-outline-primary'"
+              (click)="sortBy('desc')">Latest first</button>
+            </div>
+          </div>
+          @if (events.length === 0) {
+            <p class="text-body-secondary">
+              This community has no events yet.
             </p>
-
-            <div class="d-flex align-items-center gap-2 mb-3" *ngFor="let member of members">
-              <img class="avatar rounded-circle" *ngIf="member.profileImage"
-                   [src]="member.profileImage.path" [alt]="member.username">
-              <span class="avatar rounded-circle bg-primary text-white text-center"
-                    *ngIf="!member.profileImage">{{ member.username.charAt(0) | uppercase }}</span>
-
-              <div class="flex-grow-1">
-                <a class="small fw-semibold d-block text-decoration-none"
-                   [routerLink]="['/users', member.id]">{{ member.displayName || member.username }}</a>
-                <div class="small text-body-secondary" *ngIf="isOrganizer(member)">Organizer</div>
+          }
+          <div class="row row-cols-1 row-cols-sm-2 g-4">
+            @for (event of events; track event) {
+              <div class="col">
+                <app-event-card [event]="event"></app-event-card>
               </div>
-
-              <button class="btn btn-outline-primary btn-sm"
-                      *ngIf="canManage && !isOrganizer(member) && !community.suspended"
-                      (click)="makeOrganizer(member)">Make organizer</button>
-
-              <button class="btn btn-outline-danger btn-sm"
-                      *ngIf="auth.isAdmin() && isOrganizer(member) && !isMe(member)"
-                      (click)="removeOrganizer(member)">Remove</button>
-
-              <button class="btn btn-outline-danger btn-sm"
-                      *ngIf="canManage && !isOrganizer(member) && !isMe(member)
-                             && member.role !== 'ADMIN' && !community.suspended"
-                      (click)="banMember(member)">Ban</button>
-                              
-              <button class="btn btn-outline-secondary btn-sm"
-                      *ngIf="isOrganizer(member) && isMe(member)"
-                      (click)="removeOrganizer(member)">Step down</button>
+            }
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="h6 text-uppercase text-body-secondary mb-3">Members</h2>
+              @if (members.length === 0) {
+                <p class="text-body-secondary small mb-0">
+                  No members yet.
+                </p>
+              }
+              @for (member of members; track member) {
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  @if (member.profileImage) {
+                    <img class="avatar rounded-circle"
+                      [src]="member.profileImage.path" [alt]="member.username">
+                  }
+                  @if (!member.profileImage) {
+                    <span class="avatar rounded-circle bg-primary text-white text-center"
+                    >{{ member.username.charAt(0) | uppercase }}</span>
+                  }
+                  <div class="flex-grow-1">
+                    <a class="small fw-semibold d-block text-decoration-none"
+                    [routerLink]="['/users', member.id]">{{ member.displayName || member.username }}</a>
+                    @if (isOrganizer(member)) {
+                      <div class="small text-body-secondary">Organizer</div>
+                    }
+                  </div>
+                  @if (canManage && !isOrganizer(member) && !community.suspended) {
+                    <button class="btn btn-outline-primary btn-sm"
+                    (click)="makeOrganizer(member)">Make organizer</button>
+                  }
+                  @if (auth.isAdmin() && isOrganizer(member) && !isMe(member)) {
+                    <button class="btn btn-outline-danger btn-sm"
+                    (click)="removeOrganizer(member)">Remove</button>
+                  }
+                  @if (canManage && !isOrganizer(member) && !isMe(member)
+                    && member.role !== 'ADMIN' && !community.suspended) {
+                    <button class="btn btn-outline-danger btn-sm"
+                    (click)="banMember(member)">Ban</button>
+                  }
+                  @if (isOrganizer(member) && isMe(member)) {
+                    <button class="btn btn-outline-secondary btn-sm"
+                    (click)="removeOrganizer(member)">Step down</button>
+                  }
+                </div>
+              }
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 
 </div>

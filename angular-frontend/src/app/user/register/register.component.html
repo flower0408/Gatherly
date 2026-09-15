@@ -1,67 +1,70 @@
 <div class="container page">
   <div class="form-narrow">
 
-    <div *ngIf="registeredEmail" class="text-center">
-      <h1 class="h3 mb-3">Check your inbox</h1>
-      <p class="text-body-secondary">
-        We sent a confirmation link to <strong>{{ registeredEmail }}</strong>.
-        Open it to activate your account, then sign in.
-      </p>
-      <a class="btn btn-primary" [routerLink]="['/users/login']">Go to sign in</a>
-    </div>
+    @if (registeredEmail) {
+      <div class="text-center">
+        <h1 class="h3 mb-3">Check your inbox</h1>
+        <p class="text-body-secondary">
+          We sent a confirmation link to <strong>{{ registeredEmail }}</strong>.
+          Open it to activate your account, then sign in.
+        </p>
+        <a class="btn btn-primary" [routerLink]="['/users/login']">Go to sign in</a>
+      </div>
+    }
 
-    <div *ngIf="!registeredEmail">
-      <h1 class="h3 mb-1">Create your account</h1>
-      <p class="text-body-secondary mb-4">Join communities and sign up for events.</p>
-
-      <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
-      <form [formGroup]="form" (ngSubmit)="submit()">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label" for="firstName">First name</label>
-            <input class="form-control" type="text" id="firstName" formControlName="firstName">
+    @if (!registeredEmail) {
+      <div>
+        <h1 class="h3 mb-1">Create your account</h1>
+        <p class="text-body-secondary mb-4">Join communities and sign up for events.</p>
+        @if (error) {
+          <div class="alert alert-danger">{{ error }}</div>
+        }
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="firstName">First name</label>
+              <input class="form-control" type="text" id="firstName" formControlName="firstName">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label" for="lastName">Last name</label>
+              <input class="form-control" type="text" id="lastName" formControlName="lastName">
+            </div>
           </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label" for="lastName">Last name</label>
-            <input class="form-control" type="text" id="lastName" formControlName="lastName">
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" type="text" id="username" formControlName="username">
           </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="username">Username</label>
-          <input class="form-control" type="text" id="username" formControlName="username">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="email">Email</label>
-          <input class="form-control" type="email" id="email" formControlName="email">
-          <div class="form-text text-danger"
-               *ngIf="form.controls['email'].touched && form.controls['email'].errors?.['email']">
-            Please enter a valid email address.
+          <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" type="email" id="email" formControlName="email">
+            @if (form.controls['email'].touched && form.controls['email'].errors?.['email']) {
+              <div class="form-text text-danger"
+                >
+                Please enter a valid email address.
+              </div>
+            }
           </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="password">Password</label>
-          <input class="form-control" type="password" id="password" formControlName="password">
-          <div class="form-text">
-            At least 12 characters. A phrase you can remember is stronger than a short password
-            with symbols, so spaces are welcome.
+          <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" type="password" id="password" formControlName="password">
+            <div class="form-text">
+              At least 12 characters. A phrase you can remember is stronger than a short password
+              with symbols, so spaces are welcome.
+            </div>
+            @if (form.controls['password'].touched && form.controls['password'].errors?.['minlength']) {
+              <div class="form-text text-danger"
+                >
+                The password must have at least 12 characters.
+              </div>
+            }
           </div>
-          <div class="form-text text-danger"
-               *ngIf="form.controls['password'].touched && form.controls['password'].errors?.['minlength']">
-            The password must have at least 12 characters.
-          </div>
-        </div>
-
-        <button class="btn btn-primary w-100" type="submit" [disabled]="!form.valid">Create account</button>
-      </form>
-
-      <p class="text-center mt-3 mb-0">
-        Already have an account? <a [routerLink]="['/users/login']">Sign in</a>
-      </p>
-    </div>
+          <button class="btn btn-primary w-100" type="submit" [disabled]="!form.valid">Create account</button>
+        </form>
+        <p class="text-center mt-3 mb-0">
+          Already have an account? <a [routerLink]="['/users/login']">Sign in</a>
+        </p>
+      </div>
+    }
 
   </div>
 </div>

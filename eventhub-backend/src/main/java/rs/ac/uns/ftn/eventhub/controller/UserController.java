@@ -35,8 +35,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RestController
@@ -115,7 +113,7 @@ public class UserController {
         User createdUser = userService.createUser(newUser);
         if (createdUser == null) {
             logger.error("User couldn't be created from DTO");
-            return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
         logger.info("Sending verification mail to new user");
         mailService.sendVerificationMail(createdUser);
@@ -273,7 +271,7 @@ public class UserController {
         User oldUser = userService.findById(editedUser.getId());
         if (oldUser == null) {
             logger.error("Original user not found with id: " + editedUser.getId());
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         // Svoj profil menja samo njegov vlasnik
         if (!oldUser.getId().equals(user.getId())) {
@@ -361,49 +359,6 @@ public class UserController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
-
-    @PostMapping("/search")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<List<UserDTO>> searchUsers(@RequestBody UserSearch userSearch, @RequestHeader("authorization") String token) {
-        logger.info("Authentication check");
-        String cleanToken = token.substring(7);
-        String username = tokenUtils.getUsernameFromToken(cleanToken);
-        User user = userService.findByUsername(username);
-        if (user == null) {
-            logger.error("User not found with token: " + cleanToken);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        logger.info("Finding users that match names");
-        List<User> users = userService.searchUsersByNames(userSearch.getFirstName(), userSearch.getLastName());
-        List<UserDTO> userDTOS = new ArrayList<>();
-        logger.info("Creating response");
-        for (User temp : users) {
-            userDTOS.add(toDTO(temp));
-        }
-        logger.info("Created and sent response");
-
-        return new ResponseEntity<>(userDTOS, HttpStatus.OK);
-    }
-
-    @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserDTO>> loadAll(@RequestHeader("authorization") String token) {
-        logger.info("Authentication check");
-        String cleanToken = token.substring(7);
-        String username = tokenUtils.getUsernameFromToken(cleanToken);
-        User user = userService.findByUsername(username);
-        if (user == null) {
-            logger.error("User not found with token: " + cleanToken);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        List<UserDTO> userDTOS = new ArrayList<>();
-        for (User temp : userService.findAll()) {
-            userDTOS.add(toDTO(temp));
-        }
-        logger.info("Created and sent response");
-
-        return new ResponseEntity<>(userDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/whoami")

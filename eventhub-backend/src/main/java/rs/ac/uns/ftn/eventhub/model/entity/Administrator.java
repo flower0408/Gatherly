@@ -1,7 +1,7 @@
 package rs.ac.uns.ftn.eventhub.model.entity;
 
 import lombok.*;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.*;
 @RequiredArgsConstructor
 @Getter
