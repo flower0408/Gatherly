@@ -3,11 +3,13 @@ package rs.ac.uns.ftn.eventhub.security;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-// Provera pravila za lozinku, postavljenih prema NIST SP 800-63B i prema radu
-// Shay i saradnici, "Designing Password Policies for Strength and Usability" (2016).
+// Provera pravila za lozinku, postavljenih prema NIST SP 800-63B-4, odeljak 3.1.1,
+// i prema radu Shay i saradnici, "Designing Password Policies for Strength and
+// Usability" (2016). Granicni slucajevi su birani analizom granicnih vrednosti.
 class PasswordPolicyTest {
 
     private PasswordPolicy policy;
@@ -36,7 +38,9 @@ class PasswordPolicyTest {
 
     @Test
     void rejectsPasswordShorterThanTheMinimum() {
-        assertNotNull(policy.check("kratka12345", "mika", "mika@mail.com"));
+        String jedanZnakPrekratka = "abcdefghijklmn";
+        assertEquals(PasswordPolicy.NAJMANJA_DUZINA - 1, jedanZnakPrekratka.length());
+        assertNotNull(policy.check(jedanZnakPrekratka, "mika", "mika@mail.com"));
     }
 
     @Test
@@ -48,27 +52,27 @@ class PasswordPolicyTest {
     // NIST trazi poredjenje sa spiskom poznatih i cesto koriscenih lozinki
     @Test
     void rejectsPasswordFromTheCommonList() {
-        assertNotNull(policy.check("crvenazvezda", "mika", "mika@mail.com"));
+        assertNotNull(policy.check("crvenazvezdabeograd", "mika", "mika@mail.com"));
     }
 
     @Test
     void rejectsPasswordFromTheCommonListRegardlessOfCase() {
-        assertNotNull(policy.check("CrvenaZvezda", "mika", "mika@mail.com"));
+        assertNotNull(policy.check("CrvenaZvezdaBeograd", "mika", "mika@mail.com"));
     }
 
     @Test
     void rejectsPasswordThatContainsTheUsername() {
-        assertNotNull(policy.check("markomarko2026", "markomarko", "marko@mail.com"));
+        assertNotNull(policy.check("markomarko123456", "markomarko", "marko@mail.com"));
     }
 
     @Test
     void rejectsPasswordThatContainsTheEmailName() {
-        assertNotNull(policy.check("jovanajovana12", "korisnik", "jovana@mail.com"));
+        assertNotNull(policy.check("jovanajovana1234", "korisnik", "jovana@mail.com"));
     }
 
     @Test
     void rejectsTheSameCharacterRepeated() {
-        assertNotNull(policy.check("aaaaaaaaaaaaaa", "mika", "mika@mail.com"));
+        assertNotNull(policy.check("aaaaaaaaaaaaaaa", "mika", "mika@mail.com"));
     }
 
     // BCrypt racuna samo prvih 72 bajta, pa se duza lozinka odbija umesto da se preseca
@@ -83,7 +87,8 @@ class PasswordPolicyTest {
 
     @Test
     void acceptsPasswordExactlyAtTheMinimumLength() {
-        String naGranici = "abcdefghijkl";
+        String naGranici = "abcdefghijklmno";
+        assertEquals(PasswordPolicy.NAJMANJA_DUZINA, naGranici.length());
         assertNull(policy.check(naGranici, "mika", "mika@mail.com"));
     }
 }

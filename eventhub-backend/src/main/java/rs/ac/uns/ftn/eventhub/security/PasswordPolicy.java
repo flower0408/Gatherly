@@ -12,21 +12,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
-// Pravila za lozinku, postavljena prema NIST SP 800-63B (revizija 4, avgust 2025) i prema
+// Pravila za lozinku, postavljena prema NIST SP 800-63B-4, odeljak 3.1.1 (jul 2025), i prema
 // istrazivanju Shay i saradnici, "Designing Password Policies for Strength and Usability",
 // ACM TISSEC 18(4), 2016. Oba izvora vode ka istom zakljucku: duzina i provera spiska
 // poznatih lozinki daju vise nego zahtevi za mesanjem velikih slova, cifara i znakova.
+// Zato ovde namerno nema nijednog pravila o sastavu lozinke: standard ih izricito zabranjuje.
 @Component
 public class PasswordPolicy {
 
-    // NIST za lozinku kao jedini cinilac trazi najmanje 15 znakova, a uz drugi cinilac 8.
-    // Ovde je uzeto 12, jer je to duzina koju pomenuto istrazivanje nalazi kao onu koja
-    // je istovremeno upotrebljiva i otporna, a aplikacija nema drugi cinilac.
-    public static final int NAJMANJA_DUZINA = 12;
+    // Prijava se oslanja samo na lozinku, bez drugog cinioca, pa vazi stroza granica
+    // iz standarda: najmanje 15 znakova. Uz drugi cinilac bi bilo dovoljno 8.
+    public static final int NAJMANJA_DUZINA = 15;
 
     // BCrypt racuna samo prvih 72 bajta lozinke, a ostatak tiho zanemaruje. Zato se duza
     // lozinka odbija sa objasnjenjem, umesto da korisnik misli da koristi nesto sto se ne koristi.
-    // NIST trazi da se dozvoli bar 64 znaka, sto ovo i dalje ispunjava.
+    // Standard trazi da se dozvoli bar 64 znaka, sto ovo i dalje ispunjava.
     public static final int NAJVISE_BAJTOVA = 72;
 
     private Set<String> cesteLozinke = new HashSet<>();
