@@ -20,7 +20,10 @@ import rs.ac.uns.ftn.eventhub.security.TokenUtils;
 import rs.ac.uns.ftn.eventhub.service.BannedService;
 import rs.ac.uns.ftn.eventhub.service.CommentService;
 import rs.ac.uns.ftn.eventhub.service.CommunityService;
+import rs.ac.uns.ftn.eventhub.model.entity.EventRegistration;
+import rs.ac.uns.ftn.eventhub.model.enums.RegistrationStatus;
 import rs.ac.uns.ftn.eventhub.service.EventRegistrationService;
+import rs.ac.uns.ftn.eventhub.service.MailService;
 import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.ReactionService;
@@ -29,6 +32,7 @@ import rs.ac.uns.ftn.eventhub.service.implementation.BannedServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommentServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.CommunityServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventRegistrationServiceImpl;
+import rs.ac.uns.ftn.eventhub.service.implementation.MailServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ReactionServiceImpl;
@@ -57,6 +61,9 @@ public class EventController {
     EventRegistrationService registrationService;
 
 
+    MailService mailService;
+
+
     ImageService imageService;
 
 
@@ -78,7 +85,7 @@ public class EventController {
                            UserServiceImpl userService, EventRegistrationServiceImpl registrationService,
                            ImageServiceImpl imageService, CommentServiceImpl commentService,
                            ReactionServiceImpl reactionService, BannedServiceImpl bannedService,
-                           TokenUtils tokenUtils) {
+                           MailServiceImpl mailService, TokenUtils tokenUtils) {
         this.eventService = eventService;
         this.communityService = communityService;
         this.userService = userService;
@@ -87,6 +94,7 @@ public class EventController {
         this.commentService = commentService;
         this.reactionService = reactionService;
         this.bannedService = bannedService;
+        this.mailService = mailService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -318,6 +326,10 @@ public class EventController {
             return new ResponseEntity<>("An event cannot be moved into the past.", HttpStatus.BAD_REQUEST);
         }
 
+        // Stari termin se pamti da bi se posle znalo da li je pomeren
+        LocalDateTime previousStart = oldEvent.getStartsAt();
+        LocalDateTime previousEnd = oldEvent.getEndsAt();
+
         logger.info("Applying changes of event");
         if (editedEvent.getTitle() != null)
             oldEvent.setTitle(editedEvent.getTitle());
@@ -358,6 +370,11 @@ public class EventController {
             oldEvent.setCapacity(editedEvent.getCapacity());
         }
         oldEvent = eventService.updateEvent(oldEvent);
+        // Ko je vec zauzeo mesto racunao je na objavljeno vreme, pa se o pomeranju obavestava.
+        // Isto radi i Eventbrite: promena datuma, vremena ili mesta salje poruku prijavljenima.
+        if (!oldEvent.getStartsAt().equals(previousStart) || !oldEvent.getEndsAt().equals(previousEnd)) {
+            notifyAboutNewTime(oldEvent);
+        }
         // Ako su poslate slike, one zamenjuju postojece
         if (editedEvent.getImages() != null) {
             imageService.deleteImagesForEvent(oldEvent.getId());
@@ -440,6 +457,22 @@ public class EventController {
     }
 
     // Zajednica kojoj dogadjaj pripada se cuva u spojnoj tabeli, pa se dopisuje u DTO posebno
+    // Obavestava sve koji jos imaju zivu prijavu: potvrdjene, one koji cekaju odgovor
+    // i one sa liste cekanja. Organizatoru se ne salje, jer je on taj koji je pomerio termin.
+    private void notifyAboutNewTime(Event event) {
+        for (EventRegistration registration : registrationService.findRegistrationsForEvent(event.getId())) {
+            RegistrationStatus status = registration.getStatus();
+            if (status != RegistrationStatus.ACCEPTED && status != RegistrationStatus.PENDING
+                    && status != RegistrationStatus.WAITLISTED) {
+                continue;
+            }
+            User participant = userService.findById(registration.getCreatedBy().getId());
+            if (participant != null && !participant.getId().equals(event.getCreatedBy().getId())) {
+                mailService.sendEventTimeChangedMail(participant, event);
+            }
+        }
+    }
+
     private EventDTO toDTO(Event event) {
         EventDTO eventDTO = new EventDTO(event);
         Long communityId = eventService.findCommunityIdForEvent(event.getId());

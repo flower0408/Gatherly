@@ -115,6 +115,22 @@ public class MailServiceImpl implements MailService {
         send(message, user);
     }
 
+    @Override
+    public void sendEventTimeChangedMail(User user, Event event) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(sender);
+        message.setTo(user.getEmail());
+        message.setSubject("Gatherly - \"" + event.getTitle() + "\" has been moved");
+        message.setText("Hello " + user.getFirstName() + ",\n\n"
+                + "The organizer changed the time of \"" + event.getTitle() + "\", "
+                + "an event you signed up for.\n\n"
+                + "New time: " + event.getStartsAt().format(MAIL_DATE) + "\n"
+                + "Where: " + event.getLocation() + "\n\n"
+                + "If the new time does not suit you, please cancel so someone else can take the spot.");
+
+        send(message, user);
+    }
+
     // Neuspelo slanje ne sme da obori zahtev koji ga je pokrenuo, zato se greska samo loguje
     private void send(SimpleMailMessage message, User user) {
         if (smtpUsername == null || smtpUsername.isBlank() || sender == null || sender.isBlank()) {

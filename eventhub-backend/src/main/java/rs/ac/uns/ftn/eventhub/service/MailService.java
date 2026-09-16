@@ -15,4 +15,7 @@ public interface MailService {
 
     void sendPromotedFromWaitlistMail(User user, Event event);
 
+    // Kada organizator pomeri termin, ucesnici o tome moraju biti obavesteni
+    void sendEventTimeChangedMail(User user, Event event);
+
 }
