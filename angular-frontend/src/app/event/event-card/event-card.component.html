@@ -23,6 +23,11 @@
 
     <h3 class="h6 card-title text-body">{{ event.title }}</h3>
 
+    <!-- Cela kartica je vec veza ka dogadjaju, pa ime domacina stoji kao obican tekst -->
+    @if (event.hostName) {
+      <p class="card-text text-body-secondary small mb-1">Hosted by {{ event.hostName }}</p>
+    }
+
     <p class="card-text text-body-secondary small mb-2">{{ event.location }}</p>
 
     <div class="d-flex align-items-center gap-2">

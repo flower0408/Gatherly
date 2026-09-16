@@ -12,6 +12,7 @@ export class Event {
   creationDate: string = '';
   createdByUserId: number | null = null;
   belongsToCommunityId: number | null = null;
+  hostName: string | null = null;
   takenSpots: number = 0;
   images: Image[] = [];
 }

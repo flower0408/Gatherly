@@ -47,6 +47,10 @@ public class EventDTO {
 
     private Long belongsToCommunityId;
 
+    // Ime domacina se dopisuje u kontroleru: zajednica ako dogadjaj pripada nekoj,
+    // inace onaj ko ga je otvorio. Tako se domacin vidi i kod samostalnih dogadjaja.
+    private String hostName;
+
     // Broj zauzetih mesta, racuna se iz prijava pa se dopisuje u kontroleru
     private Integer takenSpots;
 

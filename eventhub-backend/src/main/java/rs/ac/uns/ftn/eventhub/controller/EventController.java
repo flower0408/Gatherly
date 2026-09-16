@@ -442,7 +442,9 @@ public class EventController {
     // Zajednica kojoj dogadjaj pripada se cuva u spojnoj tabeli, pa se dopisuje u DTO posebno
     private EventDTO toDTO(Event event) {
         EventDTO eventDTO = new EventDTO(event);
-        eventDTO.setBelongsToCommunityId(eventService.findCommunityIdForEvent(event.getId()));
+        Long communityId = eventService.findCommunityIdForEvent(event.getId());
+        eventDTO.setBelongsToCommunityId(communityId);
+        eventDTO.setHostName(findHostName(communityId, eventDTO.getCreatedByUserId()));
         eventDTO.setTakenSpots(registrationService.countTakenSpots(event.getId()));
         List<ImageDTO> imageDTOS = new ArrayList<>();
         for (Image image : imageService.findImagesForEvent(event.getId())) {
@@ -450,6 +452,23 @@ public class EventController {
         }
         eventDTO.setImages(imageDTOS);
         return eventDTO;
+    }
+
+    // Domacin je zajednica kada dogadjaj pripada nekoj, a inace osoba koja ga je otvorila.
+    // Veza ka tvorcu je lenja, pa se korisnik dovlaci kroz servis umesto sa samog dogadjaja.
+    private String findHostName(Long communityId, Long creatorId) {
+        if (communityId != null) {
+            Community community = communityService.findById(communityId);
+            return community == null ? null : community.getName();
+        }
+        User creator = creatorId == null ? null : userService.findById(creatorId);
+        if (creator == null) {
+            return null;
+        }
+        if (creator.getDisplayName() != null && !creator.getDisplayName().isBlank()) {
+            return creator.getDisplayName();
+        }
+        return creator.getUsername();
     }
 
     private List<EventDTO> toDTOs(List<Event> events) {

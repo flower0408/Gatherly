@@ -43,10 +43,18 @@
             </div>
           }
         </div>
-        @if (community) {
+        <!-- Domacin je zajednica kada dogadjaj pripada nekoj, inace osoba koja ga je otvorila.
+             Gostu se ime ispisuje bez veze, jer profil moze da otvori samo prijavljeni. -->
+        @if (event.hostName) {
           <p class="text-body-secondary mb-4">
             Hosted by
-            <a [routerLink]="['/communities', community.id]">{{ community.name }}</a>
+            @if (event.belongsToCommunityId) {
+              <a [routerLink]="['/communities', event.belongsToCommunityId]">{{ event.hostName }}</a>
+            } @else if (myId !== null) {
+              <a [routerLink]="['/users', event.createdByUserId]">{{ event.hostName }}</a>
+            } @else {
+              {{ event.hostName }}
+            }
           </p>
         }
         <h2 class="h6 text-uppercase text-body-secondary">About</h2>
