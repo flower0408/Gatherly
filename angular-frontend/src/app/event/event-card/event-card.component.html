@@ -2,9 +2,14 @@
   @if (coverImage) {
     <img class="card-img-top" [src]="coverImage" [alt]="event.title">
   }
+  <!-- Bez slike bi kartica pocinjala praznim poljem, pa mesto naslovne slike
+       popunjava traka sa datumom, ista kao na stranici dogadjaja -->
   @if (!coverImage) {
     <div class="event-placeholder card-img-top">
-      <span class="small">No image</span>
+      <div class="p-3 text-white">
+        <div class="h3 fw-bold mb-0">{{ event.startsAt | date: 'd MMM' }}</div>
+        <div class="small mb-0">{{ event.startsAt | date: 'y · HH:mm' }}</div>
+      </div>
     </div>
   }
 

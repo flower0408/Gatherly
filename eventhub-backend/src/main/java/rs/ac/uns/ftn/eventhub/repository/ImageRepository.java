@@ -22,6 +22,12 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
             value = "select * from image where belongs_to_user_id = :userId and is_deleted = false limit 1")
     Optional<Image> findProfileImageForUser(@Param("userId") Long userId);
 
+    // Vraca samo id dogadjaja, jer je veza ka dogadjaju lenja, a kontroler nema
+    // otvorenu sesiju pa bi citanje samog dogadjaja preko nje puklo
+    @Query(nativeQuery = true,
+            value = "select belongs_to_event_id from image where id = :imageId")
+    Optional<Long> findEventIdForImage(@Param("imageId") Long imageId);
+
     @Transactional
     Integer deleteImageById(Long id);
 

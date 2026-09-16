@@ -15,6 +15,9 @@ public interface ImageService {
 
     Image findProfileImageForUser(Long userId);
 
+    // Id dogadjaja kojem slika pripada, ili null ako je u pitanju profilna slika
+    Long findEventIdForImage(Long imageId);
+
     // Snima fajl na disk i vraca putanju pod kojom je dostupan preko HTTP-a
     String storeFile(MultipartFile file);
 

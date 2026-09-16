@@ -9,11 +9,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import rs.ac.uns.ftn.eventhub.model.dto.ImageDTO;
+import rs.ac.uns.ftn.eventhub.model.entity.Event;
 import rs.ac.uns.ftn.eventhub.model.entity.Image;
 import rs.ac.uns.ftn.eventhub.model.entity.User;
 import rs.ac.uns.ftn.eventhub.security.TokenUtils;
+import rs.ac.uns.ftn.eventhub.service.EventService;
 import rs.ac.uns.ftn.eventhub.service.ImageService;
 import rs.ac.uns.ftn.eventhub.service.UserService;
+import rs.ac.uns.ftn.eventhub.service.implementation.EventServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.ImageServiceImpl;
 import rs.ac.uns.ftn.eventhub.service.implementation.UserServiceImpl;
 
@@ -29,14 +32,19 @@ public class ImageController {
     UserService userService;
 
 
+    EventService eventService;
+
+
     TokenUtils tokenUtils;
 
     private static final Logger logger = LogManager.getLogger(ImageController.class);
 
     @Autowired
-    public ImageController(ImageServiceImpl imageService, UserServiceImpl userService, TokenUtils tokenUtils) {
+    public ImageController(ImageServiceImpl imageService, UserServiceImpl userService,
+                           EventServiceImpl eventService, TokenUtils tokenUtils) {
         this.imageService = imageService;
         this.userService = userService;
+        this.eventService = eventService;
         this.tokenUtils = tokenUtils;
     }
 
@@ -110,11 +118,16 @@ public class ImageController {
             logger.error("Image not found with id: " + id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        // Sliku brise onaj cija je: svoju profilnu, ili sliku dogadjaja koji vodi
+        // Sliku brise onaj cija je: svoju profilnu, ili sliku dogadjaja koji vodi.
+        // Dogadjaj se dovlaci kroz servis, jer je veza sa slike lenja i van sesije se ne moze procitati.
         boolean isMine = image.getBelongsToUser() != null
                 && image.getBelongsToUser().getId().equals(user.getId());
-        boolean managesEvent = image.getBelongsToEvent() != null
-                && image.getBelongsToEvent().getCreatedBy().getId().equals(user.getId());
+        boolean managesEvent = false;
+        Long eventId = imageService.findEventIdForImage(image.getId());
+        if (eventId != null) {
+            Event event = eventService.findById(eventId);
+            managesEvent = event != null && event.getCreatedBy().getId().equals(user.getId());
+        }
         if (!isMine && !managesEvent && !user.isAdmin()) {
             logger.error("User with id: " + user.getId() + " is not allowed to delete image with id: " + id);
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

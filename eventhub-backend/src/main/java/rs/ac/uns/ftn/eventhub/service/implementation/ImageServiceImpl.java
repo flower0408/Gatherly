@@ -65,6 +65,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    public Long findEventIdForImage(Long imageId) {
+        return imageRepository.findEventIdForImage(imageId).orElse(null);
+    }
+
+    @Override
     public String storeFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             logger.error("Uploaded file is empty");

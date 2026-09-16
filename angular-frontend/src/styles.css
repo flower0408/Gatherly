@@ -32,13 +32,14 @@ body {
   letter-spacing: 0.03em;
 }
 
+/* Stoji umesto naslovne slike na kartici dogadjaja, u tonu teme.
+   Isti preliv koristi i nadomestak na stranici dogadjaja, da prikaz bude ujednacen. */
 .event-placeholder {
   height: 180px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bs-secondary-bg);
-  color: var(--bs-secondary-color);
+  align-items: flex-end;
+  background: linear-gradient(135deg, var(--bs-primary), var(--bs-purple, #6f42c1));
+  color: #fff;
 }
 
 .avatar {
