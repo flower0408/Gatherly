@@ -51,7 +51,7 @@ public class Event {
     private LocalDateTime creationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_user_id", referencedColumnName = "id")
+    @JoinColumn(name = "created_by_user_id", referencedColumnName = "id", nullable = false)
     private User createdBy;
 
     @Column(nullable = false)

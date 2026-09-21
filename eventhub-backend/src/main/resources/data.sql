@@ -98,8 +98,9 @@ values ('ATTENDED', '2026-08-10', '2026-07-28', false, 3, 7);
 insert into event_registration (status, at, created_at, is_deleted, created_by_user_id, for_event_id)
 values ('NO_SHOW', '2026-08-10', '2026-07-29', false, 1, 7);
 
+-- Sistemsku blokadu uvek izrice administrator, pa se i on belezi
 insert into banned (is_deleted, timestamp, banned_by_user_id, towards_user_id, for_community_id)
-values (false, '2026-05-13', null, 5, null);
+values (false, '2026-05-13', 1, 5, null);
 
 -- Dodatni podaci, da aplikacija ima sadrzaj za prikaz: jos korisnika, zajednica,
 -- dogadjaja po raznim kategorijama i datumima, prijava u svim stanjima i razgovora.

@@ -53,16 +53,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(UserDTO userDTO) {
 
-        Optional<User> user = userRepository.findFirstByUsername(userDTO.getUsername());
-
-        if(user.isPresent()){
+        // Broji se i medju obrisanim nalozima: njihov red ostaje u bazi, pa jedinstveno
+        // ogranicenje i dalje vazi. Bez ovoga bi upis pukao tek na bazi, bez jasne poruke.
+        if (userRepository.countByUsernameIncludingDeleted(userDTO.getUsername()) > 0) {
             logger.error("User with username: " + userDTO.getUsername() + " already exists in repository");
             return null;
         }
 
-        Optional<User> userWithEmail = userRepository.findFirstByEmail(userDTO.getEmail());
-
-        if(userWithEmail.isPresent()){
+        if (userRepository.countByEmailIncludingDeleted(userDTO.getEmail()) > 0) {
             logger.error("User with email: " + userDTO.getEmail() + " already exists in repository");
             return null;
         }
