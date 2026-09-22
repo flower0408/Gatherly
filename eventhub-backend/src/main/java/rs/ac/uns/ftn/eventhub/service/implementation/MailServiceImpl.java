@@ -28,8 +28,10 @@ public class MailServiceImpl implements MailService {
     @Value("${spring.mail.username}")
     private String smtpUsername;
 
-    @Value("${app.base-url}")
-    private String baseUrl;
+    // Adresa Angular aplikacije. Link u mejlu vodi ovamo, a ne direktno na backend,
+    // da bi korisnik potvrdu video u izgledu aplikacije umesto golog odgovora servera.
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     @Autowired
     public MailServiceImpl(JavaMailSender mailSender) {
@@ -44,7 +46,7 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public void sendVerificationMail(User user) {
-        String link = baseUrl + "/api/users/verify?token=" + user.getVerificationToken();
+        String link = frontendUrl + "/users/verify?token=" + user.getVerificationToken();
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(sender);
