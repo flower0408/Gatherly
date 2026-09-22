@@ -55,8 +55,11 @@ export class RegisterComponent {
     });
   }
 
-  // Server salje mapu poruka po polju, pa se prikazuju one a ne opsta recenica
+  // Server salje ili obican tekst (npr. iz PasswordPolicy) ili mapu poruka po polju
   private textOf(response: HttpErrorResponse): string {
+    if (typeof response.error === 'string' && response.error.length > 0) {
+      return response.error;
+    }
     if (response.error && typeof response.error === 'object') {
       const messages = Object.values(response.error).filter((m) => typeof m === 'string');
       if (messages.length > 0) {
