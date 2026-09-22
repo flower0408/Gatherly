@@ -127,11 +127,23 @@ export class AddEventComponent implements OnInit {
         this.router.navigate(['/events', created.id]);
       },
       error: (response: HttpErrorResponse) => {
-        this.error = typeof response.error === 'string'
-          ? response.error
-          : 'The event could not be created, please check the form.';
+        this.error = this.textOf(response);
         this.saving = false;
       }
     });
+  }
+
+  // Server salje ili obican tekst ili mapu poruka po polju (npr. kad je naslov prazan)
+  private textOf(response: HttpErrorResponse): string {
+    if (typeof response.error === 'string' && response.error.length > 0) {
+      return response.error;
+    }
+    if (response.error && typeof response.error === 'object') {
+      const messages = Object.values(response.error).filter((m) => typeof m === 'string');
+      if (messages.length > 0) {
+        return messages.join(' ');
+      }
+    }
+    return 'The event could not be created, please check the form.';
   }
 }
