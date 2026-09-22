@@ -47,9 +47,23 @@ export class AddCommunityComponent {
         // Backend vraca 406 kada zajednica sa istim imenom vec postoji
         this.error = response.status === 406
           ? 'A community with that name already exists.'
-          : 'The community could not be created, please check the form.';
+          : this.textOf(response);
         this.saving = false;
       }
     });
+  }
+
+  // Server salje ili obican tekst ili mapu poruka po polju (npr. kad je ime prazno)
+  private textOf(response: HttpErrorResponse): string {
+    if (typeof response.error === 'string' && response.error.length > 0) {
+      return response.error;
+    }
+    if (response.error && typeof response.error === 'object') {
+      const messages = Object.values(response.error).filter((m) => typeof m === 'string');
+      if (messages.length > 0) {
+        return messages.join(' ');
+      }
+    }
+    return 'The community could not be created, please check the form.';
   }
 }
