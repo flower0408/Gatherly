@@ -22,8 +22,9 @@
 
   @if (myId !== null && canWrite) {
     <div class="mb-3">
-      <textarea class="form-control mb-2" rows="3" [(ngModel)]="draft"
+      <textarea class="form-control mb-1" rows="3" [(ngModel)]="draft" [maxlength]="maxLength"
       placeholder="Ask something about this event…"></textarea>
+      <div class="form-text text-body-secondary mb-2">{{ draft.length }}/{{ maxLength }}</div>
       <button class="btn btn-primary" (click)="submit()" [disabled]="!draft.trim()">Post comment</button>
     </div>
   }

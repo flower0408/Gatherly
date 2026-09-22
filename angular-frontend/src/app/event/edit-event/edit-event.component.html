@@ -31,11 +31,11 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label class="form-label" for="startsAt">Starts at</label>
-            <input class="form-control" type="datetime-local" id="startsAt" formControlName="startsAt">
+            <input class="form-control" type="datetime-local" id="startsAt" formControlName="startsAt" [min]="minDateTime">
           </div>
           <div class="col-md-6 mb-3">
             <label class="form-label" for="endsAt">Ends at</label>
-            <input class="form-control" type="datetime-local" id="endsAt" formControlName="endsAt">
+            <input class="form-control" type="datetime-local" id="endsAt" formControlName="endsAt" [min]="minDateTime">
           </div>
         </div>
         <div class="row">

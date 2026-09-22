@@ -32,7 +32,8 @@
 
   @if (editing) {
     <div class="mb-2">
-      <textarea class="form-control form-control-sm mb-2" rows="2" [(ngModel)]="draft"></textarea>
+      <textarea class="form-control form-control-sm mb-1" rows="2" [(ngModel)]="draft" [maxlength]="maxLength"></textarea>
+      <div class="form-text text-body-secondary mb-2">{{ draft.length }}/{{ maxLength }}</div>
       <button class="btn btn-primary btn-sm" (click)="submitEdit()" [disabled]="!draft.trim()">Save</button>
       <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
     </div>
@@ -40,8 +41,9 @@
 
   @if (replying) {
     <div class="mb-2">
-      <textarea class="form-control form-control-sm mb-2" rows="2" [(ngModel)]="draft"
+      <textarea class="form-control form-control-sm mb-1" rows="2" [(ngModel)]="draft" [maxlength]="maxLength"
       placeholder="Write a reply…"></textarea>
+      <div class="form-text text-body-secondary mb-2">{{ draft.length }}/{{ maxLength }}</div>
       <button class="btn btn-primary btn-sm" (click)="submitReply()" [disabled]="!draft.trim()">Reply</button>
       <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancel()">Cancel</button>
     </div>

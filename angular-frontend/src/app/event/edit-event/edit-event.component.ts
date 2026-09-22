@@ -29,6 +29,14 @@ export class EditEventComponent implements OnInit {
   // Termin dogadjaja koji je poceo se ne prepravlja unazad
   alreadyStarted = false;
   loading = true;
+  // Isto pravilo kao na backend-u: dogadjaj ne sme da bude pomeren u proslost
+  minDateTime = EditEventComponent.toLocalDateTimeString(new Date());
+
+  private static toLocalDateTimeString(date: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
+      + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+  }
 
   constructor(
     private fb: FormBuilder,

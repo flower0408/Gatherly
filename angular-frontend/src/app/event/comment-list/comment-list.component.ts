@@ -25,6 +25,8 @@ export class CommentListComponent implements OnInit {
   sortField = 'date';
   draft = '';
   error: string | null = null;
+  // Isto ogranicenje kao na backend-u, da korisnik unapred vidi koliko prostora ima
+  readonly maxLength = 200;
 
   constructor(private commentService: CommentService) {}
 
