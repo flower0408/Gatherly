@@ -23,7 +23,7 @@ Below are the steps to get the project up and running on your local environment.
 1. Java 21 (Eclipse Temurin or another JDK 21 distribution)
 2. Maven 3.9 or newer
 3. MySQL 8
-4. Node.js 20.19 or newer (the project was developed on 24.18)
+4. Node.js 22.22.3 or newer, or 24.15 or newer (the project was developed on 24.18)
 5. IntelliJ IDEA
 6. Visual Studio Code
 7. An SMTP account for outgoing mail (the project uses Brevo)
@@ -56,10 +56,13 @@ cp eventhub-backend/application-local.properties.example eventhub-backend/applic
 ```
 The file `application-local.properties` is not kept in the repository. If it is left empty the
 application still runs, but no mail is sent and every attempt is written to the log instead.
+Without mail settings a newly registered account cannot be activated, so use the
+[test accounts](#test-accounts) below.
 
 ### Step 6: Run the Application
 Start the backend from IntelliJ IDEA, or from the terminal:
 ```bash
+cd eventhub-backend
 mvn spring-boot:run
 ```
 The API is served at `http://localhost:8080`.

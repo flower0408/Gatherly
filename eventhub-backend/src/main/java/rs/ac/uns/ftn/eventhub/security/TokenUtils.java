@@ -80,7 +80,6 @@ public class TokenUtils {
         Map<String, Object> claims = new HashMap<String, Object>();
         claims.put("role", userDetails.getAuthorities().toArray()[0]);
         claims.put("created", new Date(System.currentTimeMillis()));
-        // claims() zamenjuje ceo sadrzaj tokena, pa se subject postavlja posle njega
         return Jwts.builder().claims(claims)
                 .subject(userDetails.getUsername())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
